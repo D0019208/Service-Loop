@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Service Loop</title>
+        <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.esm.js"></script>
+        <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>
+        <style>
+            :root {
+                --ion-safe-area-top: 0px;
+                --ion-safe-area-bottom: 0px;
+            }
+
+            h1
+            { 
+                text-align: center;
+                font-weight: bold;
+                margin-top: 8px;
+            }
+            p,h6
+            {
+                text-align: center;
+                filter: opacity(85%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            img
+            {
+                padding: 10px;
+                width: 300px; 
+            }
+            .fields
+            {
+                padding-left: 10%;
+                padding-right: 10%;
+            }
+            ion-label
+            {
+                padding-left: 35%;
+            }
+            .line
+            {
+                margin-top: -48px;
+            }
+            h6 a
+            {
+                color: #2d2d2d;
+                text-decoration: none;
+            }
+
+            #login_success_message {
+                text-align: initial;
+            } 
+            
+            #fingerprint_footer {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+    <ion-app>
+        <ion-header translucent>
+            <ion-toolbar>
+                <ion-title><h1>Sign In</h1></ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content fullscreen>
+            <p><img src="images/newlogofull2.png"></p>
+            <form>
+                <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+                    <ion-item class="line">
+                    </ion-item>
+                    <ion-item>
+                        <ion-label align="center" position="stacked">Email <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input align="center" placeholder="example@gmail.com" id="users_email" type="email" required></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label align="center" position="stacked">Password <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input align="center" placeholder="********" id="users_password" type="password" required></ion-input>
+                    </ion-item>
+
+                    <div class="ion-padding-top">
+                        <ion-button expand="block" type="submit" class="ion-no-margin" id="login">Sign In</ion-button>
+                        <h6><a href="register.html">Create Account</a></h6>
+                    </div>
+            </form>
+        </ion-content>
+        <ion-footer id="fingerprint_footer">
+            <ion-toolbar>  
+                <ion-buttons justify-content-center>
+                    <ion-button id="fingerprint" color="primary">
+                        <ion-icon slot="icon-only" name="finger-print"></ion-icon>
+                    </ion-button>
+                </ion-buttons> 
+            </ion-toolbar>
+        </ion-footer>
+        <ion-alert-controller></ion-alert-controller>
+    </ion-app>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>   
+    <script src="js/modules/common_functions.js" type="text/javascript"></script>
+    <script src="js/modules/login_module.js" type="text/javascript"></script>
+    <script src="js/login.js" type="text/javascript"></script>
+</body>
+</html>

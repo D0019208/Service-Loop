@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Service Loop</title>
+
+        <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.esm.js"></script>
+        <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>  
+        <style>
+            :root {
+                --ion-safe-area-top: 0px;
+                --ion-safe-area-bottom: 0px;
+            }
+
+            h1
+            {
+                text-align: center;
+                font-weight: bold;
+                margin-top: 8px;
+            }
+            p,h6
+            {
+                text-align: center;
+                filter: opacity(85%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            img
+            {
+                padding: 10px;
+                width: 300px;
+            }
+            .fields
+            {
+                padding-left: 10%;
+                padding-right: 10%;
+            }
+            ion-label
+            {
+                padding-left: 35%;
+            }
+            .skill
+            {
+                padding-left: 0%;
+            }
+            .line
+            {
+                margin-top: -48px;
+            }
+            .item-highlight,.item-inner-highlight
+            {
+                display: none !important;
+            }
+            .terms
+            {
+                color: #2d2d2d;
+            }
+            h6 a
+            {
+                color: #2d2d2d;
+                text-decoration: none;
+            }
+
+        </style>
+    </head>
+    <body>
+    <ion-app>
+        <ion-header translucent>
+            <ion-toolbar>
+                <ion-title>
+                    <h1>Register</h1>
+                </ion-title>
+            </ion-toolbar>
+        </ion-header>
+
+        <ion-content fullscreen>
+            <p><img src="images/newlogofull2.png"></p>
+            <form id="registration_form">
+                <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+                    <ion-item class="line"></ion-item>
+                    <ion-item>
+                        <ion-label align="center" position="stacked">Email <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input align="center" placeholder="example@gmail.com" id="users_email" type="email" ></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label align="center" position="stacked">Phone Number <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input align="center" placeholder="1234567890" id="users_phone_number" type="tel" ></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label align="center" position="stacked">Password <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input align="center" placeholder="********" id="users_password" type="password" ></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label align="center" position="stacked">Confirm Password <ion-text color="danger">*</ion-text>
+                        </ion-label>
+                        <ion-input align="center" placeholder="********" id="users_password_confirm" type="password" ></ion-input>
+                    </ion-item>
+
+                    <p class="terms">
+                        <input type="checkbox" name="checkbox" value="check" id="terms_and_conditions" />
+                        <label for="terms_and_conditions">I have read and agree to the</label> 
+                        <a href="#">Terms and Conditions</a>
+                    </p>
+                    <div>
+                        <ion-button id="registration_button" disabled expand="block" type="submit" class="ion-no-margin">Register</ion-button>
+                        <h6>
+                            <a href="login.html">Login</a>
+                        </h6> 
+                    </div>
+            </form>
+            <ion-modal-controller></ion-modal-controller>
+        </ion-content> 
+    </ion-app>
+    
+    <script src="js/modules/common_functions.js" type="text/javascript"></script>
+    <script src="js/modules/register_module.js" type="text/javascript"></script>
+    <script src="js/register.js" type="text/javascript"></script>
+</body>
+</html>

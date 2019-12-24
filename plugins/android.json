@@ -1,0 +1,27 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-dialogs": {
+      "PACKAGE_NAME": "com.dkit.serviceloop"
+    },
+    "cordova-plugin-splashscreen": {
+      "PACKAGE_NAME": "com.dkit.serviceloop"
+    },
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.dkit.serviceloop"
+    },
+    "cordova-plugin-android-fingerprint-auth": {
+      "PACKAGE_NAME": "com.dkit.serviceloop"
+    },
+    "cordova-plugin-secure-key-store": {
+      "PACKAGE_NAME": "com.dkit.serviceloop"
+    }
+  },
+  "dependent_plugins": {}
+}
