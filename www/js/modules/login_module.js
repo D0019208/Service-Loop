@@ -36,6 +36,12 @@ async function login_user(user_email, user_password) {
 
             await set_secure_storage("jwt_session", content.token);
             await set_secure_storage("users_email", user_email);
+            await set_secure_storage("user_name", content.user_name);
+            await set_secure_storage("user_status", content.user_tutor);
+            
+            if(content.user_tutor) {
+                await set_secure_storage("user_modules", content.user_modules);
+            }
 
             window.location.href = 'index.html';
 

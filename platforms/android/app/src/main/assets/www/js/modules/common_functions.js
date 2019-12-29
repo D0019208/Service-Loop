@@ -59,7 +59,7 @@ async function check_session() {
         let data = {
             token: await get_secure_storage("jwt_session")
         };
-        
+
         const rawResponse = await fetch('http://serviceloopserver.ga/verify_token', {
             method: 'POST',
             headers: {
@@ -83,6 +83,37 @@ async function check_session() {
         window.location.href = "login.html";
         return;
     }
+}
+
+async function access_route(data, route, show_loading = true) {
+    //Get back the loading object so we can then dismiss it when our API call is done.
+    let loading;
+    if(show_loading) {
+        loading = await create_ionic_loading();
+    }
+    
+    try {
+        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        
+        if(show_loading) {
+            loading.dismiss();
+        }
+         
+        return await rawResponse.json();
+    } catch (ex) {
+        if(show_loading) {
+            loading.dismiss();
+        }
+        
+        return {error: true, response: ex};
+    } 
 }
 
 /*
@@ -168,13 +199,39 @@ function remove_secure_storage(key) {
     });
 }
 
+function getClosest(elem, selector) {
+
+	// Element.matches() polyfill
+	if (!Element.prototype.matches) {
+	    Element.prototype.matches =
+	        Element.prototype.matchesSelector ||
+	        Element.prototype.mozMatchesSelector ||
+	        Element.prototype.msMatchesSelector ||
+	        Element.prototype.oMatchesSelector ||
+	        Element.prototype.webkitMatchesSelector ||
+	        function(s) {
+	            var matches = (this.document || this.ownerDocument).querySelectorAll(s),
+	                i = matches.length;
+	            while (--i >= 0 && matches.item(i) !== this) {}
+	            return i > -1;
+	        };
+	}
+
+	// Get the closest matching element
+	for ( ; elem && elem !== document; elem = elem.parentNode ) {
+		if ( elem.matches( selector ) ) return elem;
+	}
+	return null;
+
+};
+
 //Ionic 4 Modal
 customElements.define('modal-content', class ModalContent extends HTMLElement {
     connectedCallback() {
         const modalElement = document.querySelector('ion-modal');
         this.innerHTML = modalElement.componentProps.modal_content;
     }
-});
+}); 
 
 
 function createModal(controller, modal_content) {

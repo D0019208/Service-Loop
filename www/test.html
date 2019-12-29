@@ -67,25 +67,26 @@
 
         <ion-content fullscreen>
             <p><img src="images/newlogofull2.png"></p>
-           
-                <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
-                    <ion-item class="line">
-                    </ion-item>
-                    <ion-item>
-                        <ion-label align="center" position="stacked">Email <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input align="center" placeholder="example@gmail.com" id="users_email" type="email" ></ion-input>
-                    </ion-item>
 
-                    <ion-item>
-                        <ion-label align="center" position="stacked">Password <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input align="center" placeholder="********" id="users_password" type="password" ></ion-input>
-                    </ion-item>
+            <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+                <ion-item class="line">
+                </ion-item>
+                <ion-item>
+                    <ion-label align="center" position="stacked">Email <ion-text color="danger">*</ion-text></ion-label>
+                    <ion-input align="center" placeholder="example@gmail.com" id="users_email" type="text" ></ion-input>
+                </ion-item>
 
-                    <div class="ion-padding-top">
-                        <ion-button expand="block" type="submit" class="ion-no-margin" id="login">Sign In</ion-button>
-                        <h6><a href="register.html">Create Account</a></h6>
-                    </div>
-          
+                <ion-item>
+                    <ion-label align="center" position="stacked">Modules <ion-text color="danger">*</ion-text></ion-label>
+                    <ion-input align="center" placeholder="********" id="users_password" type="text" ></ion-input>
+                </ion-item>
+
+                <div class="ion-padding-top">
+                    <ion-button expand="block" type="submit" class="ion-no-margin" id="login">Sign In</ion-button>
+                    <ion-button expand="block" type="submit" class="ion-no-margin" id="send_notification">Send notification</ion-button>
+                    <h6><a href="register.html">Create Account</a></h6>
+                </div>
+
         </ion-content>
         <ion-footer>
             <ion-toolbar>  
@@ -98,6 +99,28 @@
         </ion-footer>
         <ion-alert-controller></ion-alert-controller>
     </ion-app>
-    <script src="js/test.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js" type="text/javascript"></script>
+    <script>
+        document.getElementById("login").addEventListener('click', function () {
+            let email = document.getElementById('users_email').value;
+            let modules = encodeURIComponent(JSON.stringify([document.getElementById('users_password').value]));
+             
+            var socket = io.connect('http://localhost', {query: 'email=' + email + '&modules=' + modules});
+            socket.on('news', function (data) {
+                console.log(data);
+                console.log(socket.id);
+                socket.emit('my other event', {my: 'data'});
+            });
+            
+            document.getElementById('send_notification').addEventListener('click', () => {
+                socket.emit('send_notification', {notification_title: "JavaScript tutorial needed", notification_description: "Please help, if i fail i get sent back to Syria :(", modules_required: ["PHP", "JavaScript"]});
+            }); 
+            
+            socket.on('new_notification', function (data) {
+                console.log("New Notification")
+                console.log(data);
+            });
+        })
+    </script>
 </body>
 </html>

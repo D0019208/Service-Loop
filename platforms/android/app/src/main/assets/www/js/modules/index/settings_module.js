@@ -54,7 +54,7 @@ Now everytime you need to login, you can click on the fingerprint icon and login
 
 }
 
-async function remove_fingerprint(currentModal) {
+async function remove_fingerprint(currentModal, email) {
     let ionic_loading = await create_ionic_loading();
     //Check to see if the fingerprint functionality is available for the users phone
     let fingerprint_available = await is_fingerprint_available();
@@ -62,8 +62,7 @@ async function remove_fingerprint(currentModal) {
 
     //If the fingerprin functionality is present, we validate the users 
     if (fingerprint_available) {
-        try {
-            let email = await get_secure_storage("users_email");
+        try { 
             let password = document.getElementById("fingerprint_password").value;
 
             //Check to see that user login details are correct
@@ -123,16 +122,15 @@ async function setup_fingerprint(currentModal) {
 
     //If the fingerprin functionality is present, we validate the users 
     if (fingerprint_available) {
-        try {
-            let email = await get_secure_storage("users_email");
+        try { 
             let password = document.getElementById("fingerprint_password").value;
 
             //Check to see that user login details are correct
-            let user_validated = await validate_user(email, password);
+            let user_validated = await validate_user(user.getEmail(), password);
 
             //If user successfully authenticated, we encrypt
             if (user_validated) {
-                encrypt_fingerprint(currentModal, email, password, ionic_loading);
+                encrypt_fingerprint(currentModal, user.getEmail(), password, ionic_loading);
             } else {
                 ionic_loading.dismiss();
                 create_ionic_alert("Fingerprint configuration failed", "Email or password supplied was incorrect!", ["OK"]);
@@ -246,7 +244,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
             currentModal = modal_created;
 
             document.getElementById("fingerprint_disable_submit").addEventListener('click', async () => {
-                remove_fingerprint(currentModal);
+                remove_fingerprint(currentModal, user.getEmail());
             });
 
             document.getElementById("modal_close").addEventListener('click', () => {

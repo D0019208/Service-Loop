@@ -291,6 +291,7 @@ async function sms_verification_setup() {
 
 function create_new_user() {
         var data = {
+            users_full_name: document.getElementById('users_full_name').value,
             users_email: document.getElementById('users_email').value,
             users_phone_number: document.getElementById('users_phone_number').value,
             users_password: document.getElementById('users_password').value,
@@ -332,6 +333,7 @@ async function verify_registration_input() {
     let skills_array = [];
 
     var data = {
+        users_full_name: document.getElementById('users_full_name').value,
         users_email: document.getElementById('users_email').value,
         users_phone_number: document.getElementById('users_phone_number').value,
         users_password: document.getElementById('users_password').value,
