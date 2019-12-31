@@ -179,6 +179,44 @@ document.addEventListener("deviceready", async function () {
 
     const nav = document.getElementById('nav-home');
 
+    //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
+    document.addEventListener("backbutton", async function () {
+        let home_active_component = await nav.getActive();
+
+        if (typeof nav !== 'undefined') {
+            if (typeof nav_notifications !== 'undefined') {
+                let can_go_back_home = await nav.canGoBack();
+                
+                if (can_go_back_home && home_active_component.component == "nav-all-tutorials") {
+                    nav.pop();
+                } else if (can_go_back_home && home_active_component.component == "nav-post-tutorial") {
+                    nav.pop();
+                }
+                
+                
+                
+                let notifications_active_component = await nav_notifications.getActive();
+                console.log(notifications_active_component);
+                
+                let can_go_back_notifications = await nav_notifications.canGoBack();
+                console.log(can_go_back_notifications)
+
+                if (can_go_back_notifications && notifications_active_component.component == "nav-notification") {
+                    nav_notifications.pop();
+                }
+            } else {
+                let can_go_back_home = await nav.canGoBack();
+
+                if (can_go_back_home && home_active_component.component == "nav-all-tutorials") {
+                    nav.pop();
+                } else if (can_go_back_home && home_active_component.component == "nav-post-tutorial") {
+                    nav.pop();
+                }
+            }
+
+        }
+    }, false);
+
     //Create home component 
     customElements.define('nav-home', class NavHome extends HTMLElement {
         connectedCallback() {

@@ -121,7 +121,7 @@ if (user_notifications.getTotalNotifications() == 0) {
 
     if (user_notifications.getAllNotifications().length <= 7) {
         appendItems(user_notifications.getAllNotifications().length, list, user_notifications.getAllNotifications());
-    } else { 
+    } else {
         appendItems(7, list, user_notifications.getAllNotifications());
     }
 
@@ -189,7 +189,8 @@ document.querySelector('body').addEventListener('click', async function (event) 
             }
         });
 
-        nav_notifications.push('nav-notification');
+        nav_notifications.push('nav-notification'); 
+        
     } else if (notification_tags.includes("Tutorial requested") && notification_tags.length !== 0) {
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
 
