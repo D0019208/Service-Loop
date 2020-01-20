@@ -2,10 +2,11 @@
  * A function that can create Ionic Alerts based on inputed information.
  * 
  * @param {String} header - This is the heading of the alert e.g. "Warning!"
- * @param {type} message - This is the body of the alert e.g. "Agreement has been changed!"
- * @param {type} buttons - These are the actions a user can take e.g "Invalidate agreement" (Optional)
- * @param {type} inputs - These are fields the user can enter information into e.g. "Password" (Optional)
- * @param {type} on_alert_dismiss_function - A function to execute when alert is dismissed (Optional)
+ * @param {String} message - This is the body of the alert e.g. "Agreement has been changed!"
+ * @param {Array} buttons - These are the actions a user can take e.g "Invalidate agreement" (Optional)
+ * @param {Array} inputs - These are fields the user can enter information into e.g. "Password" (Optional)
+ * @param {Function} on_alert_dismiss_function - A function to execute when alert is dismissed (Optional)
+ * 
  * @returns {undefined}
  */
 function create_ionic_alert(header, message, buttons, on_alert_dismiss_function = null, inputs) {
@@ -21,6 +22,7 @@ function create_ionic_alert(header, message, buttons, on_alert_dismiss_function 
 
         alert.present();
 
+        //If we pass in an on_alert_dismiss_function then we call it after we dismiss the alert
         if (on_alert_dismiss_function !== null) {
             alert.onDidDismiss().then(() => {
                 document.querySelector('ion-alert-controller').remove();
@@ -37,11 +39,18 @@ function create_ionic_alert(header, message, buttons, on_alert_dismiss_function 
 }
 
 
-//Ionic loading overlay
+/*
+ * A function that can create an Ionic Loading overlay. 
+ * 
+ * @returns {Promise} This function returns the controller for the Ionic loading overlay allowing us to
+ * call dismiss() whenever we no longer require the loading overlay
+ */
 function create_ionic_loading() {
+    //Create the ion-loading-controller element
     let ion_loading_controller = document.createElement('ion-loading-controller');
     document.querySelector('ion-app').appendChild(ion_loading_controller);
 
+    //Return the conroller itself as a Promise
     return new Promise((resolve, reject) => {
         ion_loading_controller.create({
             message: 'Please wait...',
@@ -85,15 +94,26 @@ async function check_session() {
     }
 }
 
-async function access_route(data, route, show_loading = true) {
+/*
+ * A function that we can use to access a route in our NodeJS server. It fetches the data from the specified
+ * route and then returns it.
+ * 
+ * @param {Object} data - This is the data that we wish to pass to the NodeJS e.g. {user_name: "John Wick"}
+ * @param {String} route - This is the route that our application should request data from e.g. "login"
+ * @param {Boolean} show_loading - This boolean determines wether we see a loading message or not (Optional)
+ * 
+ * @returns {Object} Once we are finished fetching the data or encounter an error, we send back an Object containing
+ * a boolean representing wether the fetching was successful and the response text 
+ */
+async function access_route(data, route, show_loading = true) { 
     //Get back the loading object so we can then dismiss it when our API call is done.
     let loading;
-    if(show_loading) {
+    if (show_loading) {
         loading = await create_ionic_loading();
     }
-    
+
     try {
-        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
+        const rawResponse = await fetch("http://localhost:3001/" + route, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -101,19 +121,23 @@ async function access_route(data, route, show_loading = true) {
             },
             body: JSON.stringify(data)
         });
-        
-        if(show_loading) {
+
+        let response = await rawResponse.json();
+
+        if (show_loading) { 
             loading.dismiss();
+            return response;
+        } else {
+            return response;
         }
-         
-        return await rawResponse.json();
+
     } catch (ex) {
-        if(show_loading) {
+        if (show_loading) {
             loading.dismiss();
         }
-        
+
         return {error: true, response: ex};
-    } 
+    }
 }
 
 /*
@@ -121,6 +145,7 @@ async function access_route(data, route, show_loading = true) {
  * 
  * @param {String} user_email
  * @param {String} user_password
+ * 
  * @returns {boolean}
  */
 async function validate_user(user_email, user_password) {
@@ -168,7 +193,15 @@ async function is_fingerprint_available() {
 
 }
 
-//Cordova Secure Storage
+/*
+ * A function that sets puts a piece of data into your phones SecureStorage. It takes a key and a value as its
+ * only arguments
+ * 
+ * @param {String} key - This is the key that will be associated with our data e.g. "name"
+ * @param {String} value - This is the data that we wish to store in SecureStorage e.g. "John Wick"
+ * 
+ * @returns {Promise} Once we are finished storing the data, we pass back either a success message or error message
+ */
 function set_secure_storage(key, value) {
     return new Promise((resolve, reject) => {
         cordova.plugins.SecureKeyStore.set(function (res) {
@@ -179,6 +212,14 @@ function set_secure_storage(key, value) {
     });
 }
 
+/*
+ * A function that gets data from SecureStorage by a key and returns said data
+ * 
+ * @param {String} key - This is the key that is associated with our data e.g. "name" 
+ * 
+ * @returns {Promise} Once we are finished getting the data from SecureStorage, we 
+ * pass back the data or an error via Promise
+ */
 function get_secure_storage(key) {
     return new Promise((resolve, reject) => {
         cordova.plugins.SecureKeyStore.get(function (email) {
@@ -189,6 +230,13 @@ function get_secure_storage(key) {
     });
 }
 
+/*
+ * A function that deletes a piece of data from SecureStorage based on the key passed in
+ * 
+ * @param {String} key - This is the key that will be used to delete our data e.g. "name" 
+ * 
+ * @returns {Promise} Once we are finished deleting the data, we pass back either a success message or error message
+ */
 function remove_secure_storage(key) {
     return new Promise((resolve, reject) => {
         cordova.plugins.SecureKeyStore.remove(function (res) {
@@ -201,39 +249,50 @@ function remove_secure_storage(key) {
 
 function getClosest(elem, selector) {
 
-	// Element.matches() polyfill
-	if (!Element.prototype.matches) {
-	    Element.prototype.matches =
-	        Element.prototype.matchesSelector ||
-	        Element.prototype.mozMatchesSelector ||
-	        Element.prototype.msMatchesSelector ||
-	        Element.prototype.oMatchesSelector ||
-	        Element.prototype.webkitMatchesSelector ||
-	        function(s) {
-	            var matches = (this.document || this.ownerDocument).querySelectorAll(s),
-	                i = matches.length;
-	            while (--i >= 0 && matches.item(i) !== this) {}
-	            return i > -1;
-	        };
-	}
+    // Element.matches() polyfill
+    if (!Element.prototype.matches) {
+        Element.prototype.matches =
+                Element.prototype.matchesSelector ||
+                Element.prototype.mozMatchesSelector ||
+                Element.prototype.msMatchesSelector ||
+                Element.prototype.oMatchesSelector ||
+                Element.prototype.webkitMatchesSelector ||
+                function (s) {
+                    var matches = (this.document || this.ownerDocument).querySelectorAll(s),
+                            i = matches.length;
+                    while (--i >= 0 && matches.item(i) !== this) {
+                    }
+                    return i > -1;
+                };
+    }
 
-	// Get the closest matching element
-	for ( ; elem && elem !== document; elem = elem.parentNode ) {
-		if ( elem.matches( selector ) ) return elem;
-	}
-	return null;
+    // Get the closest matching element
+    for (; elem && elem !== document; elem = elem.parentNode) {
+        if (elem.matches(selector))
+            return elem;
+    }
+    return null;
 
-};
+}
+;
 
 //Ionic 4 Modal
+//Why is this here?
 customElements.define('modal-content', class ModalContent extends HTMLElement {
     connectedCallback() {
         const modalElement = document.querySelector('ion-modal');
         this.innerHTML = modalElement.componentProps.modal_content;
     }
-}); 
+});
 
-
+/*
+ * A function that creates a modal based on the content passed in
+ * 
+ * @param {Element} controller - This is the modal controller element
+ * @param {String} modal_content - This is the HTML that we will use in the modal
+ * 
+ * @returns {Controller} Once we are finished creating the modal, we pass its controller back
+ */
 function createModal(controller, modal_content) {
     return controller.create({
         component: 'modal-content',
@@ -243,10 +302,35 @@ function createModal(controller, modal_content) {
     });
 }
 
+/*
+ * A function that dismisses a particular modal
+ * 
+ * @param {Element} currentModal - This is the current active modal
+ * 
+ * @returns {Null} This function DOES NOT return anything
+ */
 function dismissModal(currentModal) {
     if (currentModal) {
         currentModal.dismiss().then(() => {
             currentModal = null;
         });
+    }
+}
+
+/*
+ * A function that loads a script tag from the url specified
+ * 
+ * @param {String} url - This is the location of the script file we wish to load
+ * @param {String} id - This is the id that we will assign to the <script> element
+ * 
+ * @returns {Null} This function DOES NOT return anything
+ */
+function include(url, id) {
+    if (!document.getElementById(id)) {
+        let script = document.createElement("script");
+        script.type = "text/javascript";
+        script.id = id;
+        script.src = url; 
+        document.querySelector('ion-tabs').appendChild(script);
     }
 }

@@ -60,7 +60,8 @@ async function login_user(user_email, user_password) {
     }
 }
 
-
+//We call this function when the user wishes to login via fingerprint, we decrypt the data then send it
+//to the login function
 async function decrypt_fingerprint() {
     try {
         let token = await get_secure_storage("service_loop_fingerprint_token")

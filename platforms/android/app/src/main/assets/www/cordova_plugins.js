@@ -39,6 +39,14 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "cordova.plugins.SecureKeyStore"
       ]
+    },
+    {
+      "id": "cordova-plugin-velda-devicefeedback.DeviceFeedback",
+      "file": "plugins/cordova-plugin-velda-devicefeedback/DeviceFeedback.js",
+      "pluginId": "cordova-plugin-velda-devicefeedback",
+      "clobbers": [
+        "window.plugins.deviceFeedback"
+      ]
     }
   ];
   module.exports.metadata = {
@@ -46,6 +54,7 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-splashscreen": "3.2.2",
     "cordova-plugin-whitelist": "1.3.3",
     "cordova-plugin-android-fingerprint-auth": "1.5.0",
-    "cordova-plugin-secure-key-store": "1.5.4"
+    "cordova-plugin-secure-key-store": "1.5.4",
+    "cordova-plugin-velda-devicefeedback": "0.0.2"
   };
 });

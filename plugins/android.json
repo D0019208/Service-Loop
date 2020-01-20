@@ -21,6 +21,9 @@
     },
     "cordova-plugin-secure-key-store": {
       "PACKAGE_NAME": "com.dkit.serviceloop"
+    },
+    "cordova-plugin-velda-devicefeedback": {
+      "PACKAGE_NAME": "com.dkit.serviceloop"
     }
   },
   "dependent_plugins": {}
