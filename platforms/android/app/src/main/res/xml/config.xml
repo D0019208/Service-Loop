@@ -17,6 +17,10 @@
     <feature name="SecureKeyStore">
         <param name="android-package" value="com.securekeystore.plugin.SecureKeyStore" />
     </feature>
+    <feature name="DeviceFeedback">
+        <param name="android-package" value="cz.Velda.cordova.plugin.devicefeedback.DeviceFeedback" />
+        <param name="onload" value="true" />
+    </feature>
     <name>Service Loop</name>
     <description>Service Loop - Stay in the loop with Service Loop</description>
     <access origin="*" />

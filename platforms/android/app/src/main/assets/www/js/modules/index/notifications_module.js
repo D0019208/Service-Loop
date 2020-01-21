@@ -1,43 +1,41 @@
 "use strict"
-
-//Make this as a closure
-var length = 0;
+ 
 //Notifications
-function appendItems(number, list, notifications) {
-    console.log('length is', length);
-    const originalLength = length;
-    let read_class;
-    console.log(notifications)
-    for (var i = 0; i < number; i++) {
-        const el = document.createElement('ion-list');
-        console.log(notifications[i + originalLength])
-        if (notifications[i + originalLength].notification_opened) {
-            read_class = "read";
-        } else {
-            read_class = "not_read";
-        }
-
-        el.classList.add('ion-activatable', 'ripple', read_class);
-        el.innerHTML = `
-                
-                <ion-item lines="none" class="notification" notification_id="${notifications[i + originalLength]._id}" post_id="${notifications[i + originalLength].post_id}" notification_tags="${notifications[i + originalLength].notification_tags.join(', ')}" notification_modules="${notifications[i + originalLength].notification_modules.join(', ')}">
-          <ion-avatar slot="start">
-            <img src="${notifications[i + originalLength].notification_avatar}">
-        </ion-avatar>
-        <ion-label>
-            <h2>${notifications[i + originalLength].notification_title}</h2>
-            <span>${notifications[i + originalLength].notification_posted_on}</span>
-            <p>${notifications[i + originalLength].notification_desc_trunc}</p>
-        </ion-label>
-            </ion-item>
-            <ion-ripple-effect></ion-ripple-effect>
-            
-        `;
-        list.appendChild(el);
-
-        length++;
-    }
-}
+//function appendItems(number, list, notifications) {
+//    console.log('length is', length);
+//    const originalLength = length;
+//    let read_class;
+//    console.log(notifications)
+//    for (var i = 0; i < number; i++) {
+//        const el = document.createElement('ion-list');
+//        console.log(notifications[i + originalLength])
+//        if (notifications[i + originalLength].notification_opened) {
+//            read_class = "read";
+//        } else {
+//            read_class = "not_read";
+//        }
+//
+//        el.classList.add('ion-activatable', 'ripple', read_class);
+//        el.innerHTML = `
+//                
+//                <ion-item lines="none" class="notification" notification_id="${notifications[i + originalLength]._id}" post_id="${notifications[i + originalLength].post_id}" notification_tags="${notifications[i + originalLength].notification_tags.join(', ')}" notification_modules="${notifications[i + originalLength].notification_modules.join(', ')}">
+//          <ion-avatar slot="start">
+//            <img src="${notifications[i + originalLength].notification_avatar}">
+//        </ion-avatar>
+//        <ion-label>
+//            <h2>${notifications[i + originalLength].notification_title}</h2>
+//            <span>${notifications[i + originalLength].notification_posted_on}</span>
+//            <p>${notifications[i + originalLength].notification_desc_trunc}</p>
+//        </ion-label>
+//            </ion-item>
+//            <ion-ripple-effect></ion-ripple-effect>
+//            
+//        `;
+//        list.appendChild(el);
+//
+//        length++;
+//    }
+//}
 
 function wait(time) {
     return new Promise(resolve => {
@@ -99,17 +97,17 @@ if (user_notifications.getTotalNotifications() == 0) {
      * the bottom, it appends new elements
      */
     infiniteScroll.addEventListener('ionInfinite', async function () {
-        if (length < user_notifications.getAllNotifications().length - 1) {
+        if (user_notifications.notifications_length < user_notifications.getAllNotifications().length - 1) {
             console.log('Loading data...');
             await wait(500);
             infiniteScroll.complete();
 
-            number_of_notifications_to_add = user_notifications.getAllNotifications().length - length;
+            number_of_notifications_to_add = user_notifications.getAllNotifications().length - user_notifications.notifications_length;
 
-            appendItems(number_of_notifications_to_add, list, user_notifications.getAllNotifications());
+            user_notifications.appendNotifications(number_of_notifications_to_add, list);
             console.log('Done');
 
-            if (length > user_notifications.getAllNotifications().length - 1) {
+            if (user_notifications.notifications_length > user_notifications.getAllNotifications().length - 1) {
                 console.log('No More Data');
                 infiniteScroll.disabled = true;
             }
@@ -120,9 +118,9 @@ if (user_notifications.getTotalNotifications() == 0) {
     });
 
     if (user_notifications.getAllNotifications().length <= 7) {
-        appendItems(user_notifications.getAllNotifications().length, list, user_notifications.getAllNotifications());
+        user_notifications.appendNotifications(user_notifications.getAllNotifications().length, list);
     } else {
-        appendItems(7, list, user_notifications.getAllNotifications());
+        user_notifications.appendNotifications(7, list);
     }
 
 }

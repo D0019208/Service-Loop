@@ -15,6 +15,13 @@ function add_skill() {
     }
 }
 
+/*
+ * A function that will send the user a 4 digit code to verify their phone number.
+ * 
+ * @param {String} route - This is the route we will use to send a text message, e.g. "send_sms_verification" 
+ * 
+ * @returns {Null} This function DOES NOT return anything
+ */
 async function send_verification_sms(route) {
     try {
         var data = {
@@ -49,6 +56,17 @@ async function send_verification_sms(route) {
     }
 }
 
+/*
+ * A function to verify that the users entered SMS code is valid. We pass in the token of the verification session
+ * along with the code the user entered and the users phone number and current active modal
+ * 
+ * @param {String} token - This is the error code, e.g. "ERROR_INVALID_SECRET_KEY"
+ * @param {Integer} code - This is the 4 digit code that the user recieved via SMS, e.g. 1234
+ * @param {String} verification_phone_number - This is the phone number of the user, e.g. "0843682975"
+ * @param {Element} currentModal - This is the current active modal (Optional)
+ * 
+ * @returns {Null} This function DOES NOT return anything
+ */
 async function verify_sms_code(token, code, verification_phone_number, currentModal) {
     try {
         var data = {
@@ -86,6 +104,14 @@ async function verify_sms_code(token, code, verification_phone_number, currentMo
     }
 }
 
+/*
+ * A function to display the correct error message depending on what is returned by the server
+ * 
+ * @param {String} sms_response - This is the error code, e.g. "ERROR_INVALID_SECRET_KEY"
+ * @param {Element} currentModal - This is the current active modal (Optional)
+ * 
+ * @returns {Null} This function DOES NOT return anything
+ */
 function sms_verification_errors(sms_response, currentModal = null) {
     switch (sms_response.message) {
         case "ERROR_INVALID_SECRET_KEY":
@@ -229,10 +255,12 @@ async function sms_verification_setup() {
 
         <div class="ion-padding-top">
           <ion-button expand="block" type="button" class="ion-no-margin" id="verify_submit">Verify me</ion-button>
-    <ion-button expand="block" type="button" class="ion-no-margin" id="resend_sms">Resend code</ion-button>
+    <h6>
+        <a href="#" id="resend_sms">Resend Code</a>
+    </h6> 
         </div>
-            <p style="text-align: center; color: gray;">This is a security precaution to safeguard you from malicious users. We appreciate your patience and cooperation.</p>
-          </ion-content>
+            <p style="text-align: center; color: gray; font-size: 0.85em;">This is a security precaution to safeguard you from malicious users. We appreciate your patience and cooperation.</p>
+          </ion-content> 
         `;
 
     let modal_created = await createModal(controller, modal_text);

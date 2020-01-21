@@ -10,7 +10,8 @@
 document.addEventListener("DOMContentLoaded", function () {
     let register_button = document.getElementById("registration_button");
     let sms_sent = false;
-
+    
+    //We add a quick function here to test wether the user has agreed to the Terms & Conditions
     document.getElementById('terms_and_conditions').addEventListener("click", function (event) {
         let registration_button_state = register_button.hasAttribute("disabled");
 
@@ -24,7 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('registration_form').addEventListener("submit", async function (event) {
         if (document.getElementById('terms_and_conditions').checked) {
             event.preventDefault();
-
+            
+            //We check to see if the users registration data meets all our criteria
             let user_data_correct = await verify_registration_input();
 
             if (user_data_correct) {
@@ -36,8 +38,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     //
                     //Consider adding check to see if session timed out LATER
                     sms_response = await send_verification_sms("send_sms_verification");
-                    console.log(sms_response);
-                    console.log("^^^^^^^")
                     if (sms_response.status !== "ERROR") {
                         sms_verification_setup(sms_response);
                     } else {
