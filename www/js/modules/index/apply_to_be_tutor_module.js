@@ -18,7 +18,7 @@ function apply_to_be_tutor(handler) {
             <ion-toolbar>
               <ion-title>Tutor application form</ion-title>
             <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
+                <ion-back-button id="apply_to_be_tutor_back" defaultHref="/"></ion-back-button>
               </ion-buttons>
               <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
@@ -89,7 +89,7 @@ function apply_to_be_tutor(handler) {
                     user.setModules(document.getElementById("tutor_modules").value);
 
                     create_ionic_alert("Tutor application successfull", "Congratulations! You have become a tutor for DKIT!", ["OK"], function () {
-                        return dismissModal(currentModal);
+                        document.getElementById("apply_to_be_tutor_back").click();
                     });
                 } else {
                     tutor_apply_button.disabled = false;

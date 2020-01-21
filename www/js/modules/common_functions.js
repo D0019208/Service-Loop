@@ -334,3 +334,11 @@ function include(url, id) {
         document.querySelector('ion-tabs').appendChild(script);
     }
 }
+
+function wait(time) {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve();
+        }, time);
+    });
+}

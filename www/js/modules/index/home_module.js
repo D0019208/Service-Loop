@@ -33,8 +33,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     ////Set status of user to tutor
     user.setName("Joe Postolachi")
-    user.setStatus("Student");
-    user.setEmail("D00192082@student.dkit.ie");
+    user.setStatus("Tutor");
+    user.setEmail("D0019082@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -312,6 +312,17 @@ document.addEventListener("DOMContentLoaded", async function () {
             include("js/modules/index/notifications_module.js", "notifications_script");
         } else if (event.detail.tab === "settings") {
             include("js/modules/index/settings_module.js", "settings_script");
-        }
+        } 
     });
+    
+    
+    //MIGHT REMOVE
+    document.querySelector("ion-tab-bar").addEventListener('click', function(event) {
+        if(typeof nav_notifications !== "undefined") {
+            nav_notifications.popToRoot();
+            nav.popToRoot()
+        } else if (typeof nav !== "undefined") {
+            nav.popToRoot()
+        }
+    })
 });

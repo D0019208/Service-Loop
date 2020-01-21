@@ -37,17 +37,13 @@
 //    }
 //}
 
-function wait(time) {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve();
-        }, time);
-    });
-}
-
 const nav_notifications = document.getElementById('nav-notifications');
 
 customElements.define('nav-notifications', class NavNotifications extends HTMLElement {
+    constructor() {
+        super();
+    }
+    
     connectedCallback() {
         this.innerHTML = `
           <ion-header translucent>
@@ -128,14 +124,18 @@ if (user_notifications.getTotalNotifications() == 0) {
 
 
 document.querySelector('body').addEventListener('click', async function (event) {
+    //Get closest element with specified class
     let notification = getClosest(event.target, '.notification');
     let notification_tags = [];
-
+    
+    //If there exists an element with the specified target near the clicked 
     if (notification !== null) {
         notification_tags.push(notification.getAttribute('notification_tags'));
     }
+    
     console.log(notification);
     if (notification_tags.includes("Tutorial request sent") && notification_tags.length !== 0) {
+        //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
 
         if (!this_notification.notification_opened) {
@@ -190,6 +190,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         nav_notifications.push('nav-notification'); 
         
     } else if (notification_tags.includes("Tutorial requested") && notification_tags.length !== 0) {
+        //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
 
         if (!this_notification.notification_opened) {
