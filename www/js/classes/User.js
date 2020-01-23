@@ -64,13 +64,16 @@ class User {
 
             const content = await rawResponse.json();
 
-            if (content !== "Session valid") {
-                await remove_secure_storage("jwt_session");
+            if (content !== "Session valid") { 
+                //alert("Session NOT valid")
+                await remove_secure_storage("jwt_session"); 
                 window.location.href = "login.html";
                 return;
-            } else {
+            } else {  
+                //alert("Session valid.") 
                 return "Proceed";
             }
+            
         } catch (ex) {
             console.log(ex);
             window.location.href = "login.html";
@@ -82,7 +85,7 @@ class User {
         //HTTPS
         //const socket = io.connect("https://my.website.com:3002", { secure: true, reconnection: true, rejectUnauthorized: false });
         let modules = encodeURIComponent(JSON.stringify(this.modules));
-        let socket = io.connect('http://localhost:3001', {query: 'email=' + this.email + '&modules=' + modules});
+        let socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
         this.socket = socket;
 
         console.log(socket);
@@ -138,11 +141,11 @@ class User {
         tutor_application_button.querySelector("h6").innerText = "All tutorial requests";
         tutor_application_button.querySelector("p").innerText = "View all the requested tutorials on the forum";
         tutor_application_button.id = "all_tutorials";
-        
+
         //Load the forum script
         include("js/modules/index/forum_module.js", "forum_script");
 
-        tutor_application_button.addEventListener("click", function () { 
+        tutor_application_button.addEventListener("click", function () {
             all_tutorials(nav);
         })
     }

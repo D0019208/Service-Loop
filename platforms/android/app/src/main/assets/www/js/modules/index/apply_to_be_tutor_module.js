@@ -6,18 +6,23 @@
  * 
  * @returns {Null} This function DOES NOT return anything
  */
-async function apply_to_be_tutor(handler) {
-    let currentModal = null;
-    const controller = document.querySelector('ion-modal-controller');
+function apply_to_be_tutor(handler) {
+    customElements.get('nav-apply_to_be_tutor') || customElements.define('nav-apply_to_be_tutor', class Apply_To_Be_Tutor extends HTMLElement {
+        constructor() {
+            super();
+        }
 
-    let tutor_years = [3, 4];
-    let modal_text = `
+        connectedCallback() {
+            this.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>Tutor application form</ion-title>
-              <ion-buttons slot="end">
-                <ion-button id="modal_close">Close</ion-button>
+            <ion-buttons slot="start">
+                <ion-back-button id="apply_to_be_tutor_back" defaultHref="/"></ion-back-button>
               </ion-buttons>
+              <ion-buttons slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
             </ion-toolbar>
           </ion-header>
           <ion-content>
@@ -59,26 +64,22 @@ async function apply_to_be_tutor(handler) {
           </ion-content>
         `;
 
-    let modal_created = await createModal(controller, modal_text);
+            let tutor_apply_button = document.getElementById("tutor_apply");
 
-    modal_created.present().then(function () {
-        currentModal = modal_created;
-        let tutor_apply_button = document.getElementById("tutor_apply");
+            tutor_apply_button.addEventListener('click', async function () {
+                tutor_apply_button.disabled = true;
 
-        tutor_apply_button.addEventListener('click', async function() {
-            tutor_apply_button.disabled = true;
 
-            
                 let data = {
                     users_email: user.getEmail(),
                     users_skills: document.getElementById("tutor_modules").value
                 };
-                
-                if(data["users_email"] === "" || data["users_skills"].length === 0) {
+
+                if (data["users_email"] === "" || data["users_skills"].length === 0) {
                     tutor_apply_button.disabled = false;
                     create_ionic_alert("Tutor application failed", "Please fill in all required fields to proceed.", ["OK"]);
                     return;
-                } 
+                }
 
                 let tutor_added_response = await access_route(data, "appply_to_be_tutor");
 
@@ -86,20 +87,40 @@ async function apply_to_be_tutor(handler) {
                     //We update the user so he becomes a tutor
                     user.ascendToTutor(user_notifications, document.getElementById("tutor_modules").value, handler)
                     user.setModules(document.getElementById("tutor_modules").value);
-                    
+
                     create_ionic_alert("Tutor application successfull", "Congratulations! You have become a tutor for DKIT!", ["OK"], function () {
-                        return dismissModal(currentModal);
+                        document.getElementById("apply_to_be_tutor_back").click();
                     });
                 } else {
                     tutor_apply_button.disabled = false;
                     create_ionic_alert("Tutor application failed", tutor_added_response.response, ["OK"]);
                 }
-            
 
-        });
 
-        document.getElementById("modal_close").addEventListener('click', () => {
-            dismissModal(currentModal);
-        });
+            });
+        }
+
+        //Callback to call when component is removed
+        disconnectedCallback() {
+            console.log('Custom square element removed from page.');
+        }
+
+        adoptedCallback() {
+            console.log('Custom square element moved to new page.');
+        }
+
+        attributeChangedCallback(name, oldValue, newValue) {
+//        switch (name) {
+//            case 'value':
+//                console.log(`Value changed from ${oldValue} to ${newValue}`);
+//                break;
+//            case 'max':
+//                console.log(`You won't max-out any time soon, with ${newValue}!`);
+//                break;
+//        }
+            console.log("Attribute changed?")
+        }
+
     });
+    nav.push('nav-apply_to_be_tutor');
 }

@@ -255,10 +255,12 @@ async function sms_verification_setup() {
 
         <div class="ion-padding-top">
           <ion-button expand="block" type="button" class="ion-no-margin" id="verify_submit">Verify me</ion-button>
-    <ion-button expand="block" type="button" class="ion-no-margin" id="resend_sms">Resend code</ion-button>
+    <h6>
+        <a href="#" id="resend_sms">Resend Code</a>
+    </h6> 
         </div>
-            <p style="text-align: center; color: gray;">This is a security precaution to safeguard you from malicious users. We appreciate your patience and cooperation.</p>
-          </ion-content>
+            <p style="text-align: center; color: gray; font-size: 0.85em;">This is a security precaution to safeguard you from malicious users. We appreciate your patience and cooperation.</p>
+          </ion-content> 
         `;
 
     let modal_created = await createModal(controller, modal_text);
