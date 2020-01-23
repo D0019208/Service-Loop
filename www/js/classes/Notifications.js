@@ -18,26 +18,10 @@ class Notifications extends User {
             this.total_notifications = 0;
             this.unread_notifications = 0;
         }
-        
-        this.notifications_length = 0;
+
         console.log(this.all_notifications);
     }
-    
-    find_unopened_notifications_number() {
-        if (typeof notifications !== "string") {
-            let unopened_notifications_counter = 0;
-            for (let i = 0; i < this.all_notifications.length; i++) {
-                if (!this.all_notifications[i]["notification_opened"]) {
-                    unopened_notifications_counter++;
-                }
-            } 
-            
-            return unopened_notifications_counter;
-        } else {
-            return 0;
-        }
-    }
-    
+
     addToTotalNotifications() {
         this.total_notifications++;
     }
@@ -48,8 +32,11 @@ class Notifications extends User {
 
     getTotalNotifications() {
         return this.total_notifications;
-    } 
-    
+    }
+
+    setUnreadNotifications(unread_notifications) {
+        this.unread_notifications = unread_notifications;
+    }
     subtractUnreadNotifications() {
         if (this.unread_notifications != 0) {
             this.unread_notifications--;
@@ -165,52 +152,7 @@ class Notifications extends User {
             return "No new notifications!"
         }
     }
-    
-    addUnreadNotificationsToBadge(unread_notifications) {
-        if(!document.getElementById("new_notifications").length) {
-            document.getElementById("new_notifications").innerText = unread_notifications;
-        }
-    }
-    
-    //Add the notifications 
-    appendNotifications(number, list) {
-        let notifications = this.getAllNotifications();
-        
-        console.log('length is', this.notifications_length);
-        const originalLength = this.notifications_length;
-        let read_class;
-        console.log(notifications)
-        for (var i = 0; i < number; i++) {
-            const el = document.createElement('ion-list');
-            
-            if (notifications[i + originalLength].notification_opened) {
-                read_class = "read";
-            } else {
-                read_class = "not_read";
-            }
 
-            el.classList.add('ion-activatable', 'ripple', read_class);
-            el.innerHTML = `
-                
-                <ion-item lines="none" class="notification" notification_id="${notifications[i + originalLength]._id}" post_id="${notifications[i + originalLength].post_id}" notification_tags="${notifications[i + originalLength].notification_tags.join(', ')}" notification_modules="${notifications[i + originalLength].notification_modules.join(', ')}">
-          <ion-avatar slot="start">
-            <img src="${notifications[i + originalLength].notification_avatar}">
-        </ion-avatar>
-        <ion-label>
-            <h2>${notifications[i + originalLength].notification_title}</h2>
-            <span>${notifications[i + originalLength].notification_posted_on}</span>
-            <p>${notifications[i + originalLength].notification_desc_trunc}</p>
-        </ion-label>
-            </ion-item>
-            <ion-ripple-effect></ion-ripple-effect>
-            
-        `;
-            list.appendChild(el);
-            
-            this.notifications_length += 1;
-        }
-    }
-    
     sendNewNotification(notification) {
         this.socket.emit('send_notification', notification);
     }
@@ -219,7 +161,6 @@ class Notifications extends User {
         let socket = this.socket;
 
         socket.on('new_notification', (data) => {
-            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
         });
