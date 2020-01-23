@@ -73,7 +73,7 @@ function create_ionic_loading() {
  * @returns {Object} Once we are finished fetching the data or encounter an error, we send back an Object containing
  * a boolean representing wether the fetching was successful and the response text 
  */
-async function access_route(data, route, show_loading = true) { 
+async function access_route(data, route, show_loading = true) {
     //Get back the loading object so we can then dismiss it when our API call is done.
     let loading;
     if (show_loading) {
@@ -81,7 +81,7 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
+        const rawResponse = await fetch("http://localhost:3001/" + route, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -92,7 +92,7 @@ async function access_route(data, route, show_loading = true) {
 
         let response = await rawResponse.json();
 
-        if (show_loading) { 
+        if (show_loading) {
             loading.dismiss();
             return response;
         } else {
@@ -105,7 +105,7 @@ async function access_route(data, route, show_loading = true) {
         }
 
         return {error: true, response: ex};
-    }
+}
 }
 
 /*
@@ -294,13 +294,18 @@ function dismissModal(currentModal) {
  * @returns {Null} This function DOES NOT return anything
  */
 function include(url, id) {
-    if (!document.getElementById(id)) {
-        let script = document.createElement("script");
-        script.type = "text/javascript";
-        script.id = id;
-        script.src = url; 
-        document.querySelector('ion-tabs').appendChild(script);
-    }
+    return new Promise((resolve, reject) => {
+        if (!document.getElementById(id)) {
+            let script = document.createElement("script");
+            script.type = "text/javascript";
+            script.id = id;
+            script.src = url;
+            script.onload = function () {resolve()};
+            document.querySelector('ion-tabs').appendChild(script);
+        } else {
+            resolve();
+        }
+    });
 }
 
 function wait(time) {
@@ -309,4 +314,25 @@ function wait(time) {
             resolve();
         }, time);
     });
+}
+
+function formatDate(date_string) {
+//  var monthNames = [
+//    "January", "February", "March",
+//    "April", "May", "June", "July",
+//    "August", "September", "October",
+//    "November", "December"
+//  ];
+  let date = new Date(date_string);
+  
+  let day = date.getDate();
+  let monthIndex = date.getMonth() + 1;
+  if(monthIndex < 10) {
+      monthIndex = "0" + monthIndex;
+  }
+  
+  let year = date.getFullYear();
+
+  //return day + ' ' + monthNames[monthIndex] + ' ' + year;
+  return day + '/' + monthIndex + '/' + year;
 }

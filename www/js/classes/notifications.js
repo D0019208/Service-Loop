@@ -198,7 +198,7 @@ class Notifications extends User {
         </ion-avatar>
         <ion-label>
             <h2>${notifications[i + originalLength].notification_title}</h2>
-            <span>${notifications[i + originalLength].notification_posted_on}</span>
+            <span>${formatDate(notifications[i + originalLength].notification_posted_on)}</span>
             <p>${notifications[i + originalLength].notification_desc_trunc}</p>
         </ion-label>
             </ion-item>

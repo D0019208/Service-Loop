@@ -18,23 +18,23 @@ Element.prototype.appendAfter = function (element) {
  */
 //deviceready
 //DOMContentLoaded
-document.addEventListener("deviceready", async function () {
+document.addEventListener("DOMContentLoaded", async function () {
     user = new User();
     let home_component;
     let notifications_response;
 
     //Check to make sure that the users session has not expired
-    await user.check_session();
+    //await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    user.setName(await get_secure_storage("user_name"));
-    user.setEmail(await get_secure_storage("users_email"));
-    user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    //user.setName(await get_secure_storage("user_name"));
+    //user.setEmail(await get_secure_storage("users_email"));
+    //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     ////Set status of user to tutor
-    //user.setName("Joe Postolachi")
-    //user.setStatus("Tutor");
-    //user.setEmail("D0019082@student.dkit.ie");
+    user.setName("Joe Postolachi")
+    user.setStatus("Tutor");
+    user.setEmail("D00190047@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -94,8 +94,8 @@ document.addEventListener("deviceready", async function () {
     customElements.define('nav-home', class Home extends HTMLElement {
         async connectedCallback() {
             if (user.getStatus() === "Tutor") {
-                user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-                //user.setModules(["PHP", "JavaScript", "Java"]);
+                //user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+                user.setModules(["PHP", "JavaScript", "Java"]);
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -238,7 +238,7 @@ document.addEventListener("deviceready", async function () {
             this.innerHTML = home_component;
             
             //Hide splashscreen
-            navigator.splashscreen.hide();
+            //navigator.splashscreen.hide();
             
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
@@ -250,14 +250,14 @@ document.addEventListener("deviceready", async function () {
 
             //If the user is a tutor, we display the forum else we have a button to apply to become a tutor
             if (user.getStatus() === "Tutor") {
-                include("js/modules/index/forum_module.js", "forum_script");
+                await include("js/modules/index/forum_module.js", "forum_script");
                 let handler = () => {
                     //Remember to move this to new file
                     all_tutorials(nav);
                 };
                 document.getElementById('all_tutorials').addEventListener('click', handler);
             } else {
-                include("js/modules/index/apply_to_be_tutor_module.js", "apply_to_be_tutor_script"); 
+                await include("js/modules/index/apply_to_be_tutor_module.js", "apply_to_be_tutor_script"); 
                 //To later remove the event listener, we create a reference to the function and we pass the handler to that function so that we can later remove the event listener
                 let handler = function () {
                     apply_to_be_tutor(handler);
@@ -281,7 +281,7 @@ document.addEventListener("deviceready", async function () {
 
             //Create post tutorial page
             document.getElementById('post_tutorial').addEventListener('click', async function () {
-                include("js/modules/index/request_tutorial_module.js", "request_tutorial_script");
+                await include("js/modules/index/request_tutorial_module.js", "request_tutorial_script"); 
                 load_request_tutorial();
             });
         }
@@ -310,11 +310,11 @@ document.addEventListener("deviceready", async function () {
     });
 
     //Lazy loading - once user clicks on tab, only then do we launch JavaScript
-    document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', function (event) {
+    document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', async function (event) {
         if (event.detail.tab === "notifications") {
-            include("js/modules/index/notifications_module.js", "notifications_script");
+            await include("js/modules/index/notifications_module.js", "notifications_script");
         } else if (event.detail.tab === "settings") {
-            include("js/modules/index/settings_module.js", "settings_script");
+            await include("js/modules/index/settings_module.js", "settings_script");
         } 
     });
     

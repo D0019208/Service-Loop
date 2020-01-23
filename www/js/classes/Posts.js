@@ -12,7 +12,7 @@ class Posts extends User {
         }
 
         this.posts_length = 0;
-        console.log(this.all_notifications);
+        console.log(this.all_posts);
     } 
 
     appendPosts(number, list) {
@@ -31,7 +31,8 @@ class Posts extends User {
 //                read_class = "not_read";
 //            }
 
-            el.classList.add('ion-activatable', 'ripple', "not_read");
+            el.classList.add('ion-activatable', 'ripple', "not_read"); 
+  
             el.innerHTML = `
                 
                 <ion-item lines="none" class="post" post_id="${posts[i + originalLength]._id}" post_modules="${posts[i + originalLength].post_modules.join(', ')}">
@@ -40,7 +41,7 @@ class Posts extends User {
         </ion-avatar>
         <ion-label>
             <h2>${posts[i + originalLength].post_title}</h2>
-            <span>${posts[i + originalLength].post_posted_on}</span>
+            <span>${formatDate(posts[i + originalLength].post_posted_on)}</span>
             <p>${posts[i + originalLength].post_desc_trunc}</p>
         </ion-label>
             </ion-item>
