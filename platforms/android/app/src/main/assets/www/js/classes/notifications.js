@@ -210,7 +210,7 @@ class Notifications extends User {
             this.notifications_length += 1;
         }
     }
-
+    
     sendNewNotification(notification) {
         this.socket.emit('send_notification', notification);
     }
@@ -219,7 +219,7 @@ class Notifications extends User {
         let socket = this.socket;
 
         socket.on('new_notification', (data) => {
-            window.plugins.deviceFeedback.haptic()
+            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
         });

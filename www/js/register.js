@@ -7,7 +7,10 @@
  ******************************************************************************************************************
  ******************************************************************************************************************
  */
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("deviceready", function () {
+    //Hide splashscreen
+    navigator.splashscreen.hide();
+    
     let register_button = document.getElementById("registration_button");
     let sms_sent = false;
     

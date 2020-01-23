@@ -18,23 +18,23 @@ Element.prototype.appendAfter = function (element) {
  */
 //deviceready
 //DOMContentLoaded
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("deviceready", async function () {
     user = new User();
     let home_component;
     let notifications_response;
 
     //Check to make sure that the users session has not expired
-    //await user.check_session();
+    await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    //user.setName(await get_secure_storage("user_name"));
-    //user.setEmail(await get_secure_storage("users_email"));
-    //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    user.setName(await get_secure_storage("user_name"));
+    user.setEmail(await get_secure_storage("users_email"));
+    user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     ////Set status of user to tutor
-    user.setName("Joe Postolachi")
-    user.setStatus("Tutor");
-    user.setEmail("D0019082@student.dkit.ie");
+    //user.setName("Joe Postolachi")
+    //user.setStatus("Tutor");
+    //user.setEmail("D0019082@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -94,8 +94,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     customElements.define('nav-home', class Home extends HTMLElement {
         async connectedCallback() {
             if (user.getStatus() === "Tutor") {
-                //user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-                user.setModules(["PHP", "JavaScript", "Java"]);
+                user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+                //user.setModules(["PHP", "JavaScript", "Java"]);
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -236,7 +236,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             this.innerHTML = home_component;
-
+            
+            //Hide splashscreen
+            navigator.splashscreen.hide();
+            
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
             if (user.getStatus() === "Tutor") {

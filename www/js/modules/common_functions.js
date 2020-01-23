@@ -62,38 +62,6 @@ function create_ionic_loading() {
     });
 }
 
-//Check JWT session
-async function check_session() {
-    try {
-        let data = {
-            token: await get_secure_storage("jwt_session")
-        };
-
-        const rawResponse = await fetch('http://serviceloopserver.ga/verify_token', {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        const content = await rawResponse.json();
-
-        if (content !== "Session valid") {
-            await remove_secure_storage("jwt_session");
-            window.location.href = "login.html";
-            return;
-        } else {
-            return "Proceed";
-        }
-    } catch (ex) {
-        console.log(ex);
-        window.location.href = "login.html";
-        return;
-    }
-}
-
 /*
  * A function that we can use to access a route in our NodeJS server. It fetches the data from the specified
  * route and then returns it.
@@ -113,7 +81,7 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        const rawResponse = await fetch("http://localhost:3001/" + route, {
+        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
