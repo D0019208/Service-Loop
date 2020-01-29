@@ -285,6 +285,8 @@ async function sms_verification_setup() {
          then we pass the 4 digit code and users phone number to the below function verify SMS
          */
         document.getElementById("verify_submit").addEventListener('click', async () => {
+            device_feedback();
+            
             //Wait for the function to finish checking on the server whether the code is correct
             let sms_verification_response = await verify_sms_code(token, document.getElementById('4_digit_verifier').value, document.getElementById('users_phone_number').value);
             console.log(sms_verification_response);
@@ -300,6 +302,8 @@ async function sms_verification_setup() {
 
         //If the user loses their code, we can resend it
         document.getElementById("resend_sms").addEventListener('click', async () => {
+            device_feedback();
+            
             //We pass in a different route to resend code
             sms_response = await send_verification_sms("send_sms_verification");
             console.log(sms_response)
@@ -312,6 +316,7 @@ async function sms_verification_setup() {
         });
 
         document.getElementById("modal_close").addEventListener('click', () => {
+            device_feedback();
             dismissModal(currentModal);
         });
     });

@@ -1,5 +1,4 @@
 let posts_response;
-let posts;
 var posts_loaded = false;
 
 /*
@@ -12,10 +11,11 @@ var posts_loaded = false;
 async function all_tutorials(nav) {
     //Check to see if we have already quereyd the database for posts, if not, we query
     if (!posts_loaded) {
+        console.log("dsfds")
         posts_response = await access_route({email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
-        posts = new Posts(posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+        posts.addPosts(posts_response.response);
     }
-    
+
     //We define our component, this will display all the requested Tutorials
     customElements.get('nav-all-tutorials') || customElements.define('nav-all-tutorials', class NavViewAllTutorials extends HTMLElement {
         connectedCallback() {
@@ -49,7 +49,7 @@ async function all_tutorials(nav) {
                                                   </ion-list>
                                               </ion-content>
                                               `;
-            
+
             //Add element after another element
             let referenceNode = document.getElementById("posts_header");
             let post_list_element = document.createElement("ion-list");
@@ -62,14 +62,14 @@ async function all_tutorials(nav) {
 
             //We set the posts length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value
             posts.posts_length = 0;
-            
+
             //List element we are appending our tutorial requests to
             const list = document.getElementById('forum_list');
             const infiniteScroll = document.getElementById('forum-infinite-scroll');
-            
+
             //The number of posts we will add, this is calculated later
             let number_of_posts_to_add;
-            
+
             //If there are no tutorial requests we display a message
             if (posts.getTotalPosts() === 0) {
                 document.getElementById("posts_header").innerText = "THERE ARE NO TUTORIAL REQUESTS!";
@@ -79,6 +79,10 @@ async function all_tutorials(nav) {
                  * the bottom, it appends new elements
                  */
                 infiniteScroll.addEventListener('ionInfinite', async function () {
+                    console.log(posts.posts_length)
+                    console.log(posts.getAllPosts().length);
+
+
                     if (posts.posts_length < posts.getAllPosts().length - 1) {
                         console.log('Loading data...');
                         await wait(500);
@@ -98,14 +102,13 @@ async function all_tutorials(nav) {
                         infiniteScroll.disabled = true;
                     }
                 });
-                
+
                 //If we have less than 7 tutorial requests we display all of them otherwise we display only 7
                 if (posts.getAllPosts().length <= 7) {
                     posts.appendPosts(posts.getAllPosts().length, list);
                 } else {
                     posts.appendPosts(7, list);
                 }
-
             }
 
 
@@ -114,7 +117,7 @@ async function all_tutorials(nav) {
 
 
             if (!posts_loaded) {
-                posts_loaded = true; 
+                posts_loaded = true;
                 document.querySelector('body').addEventListener('click', async function (event) {
                     //Get closest element with specified class
                     let post = getClosest(event.target, '.post');
@@ -137,10 +140,8 @@ async function all_tutorials(nav) {
                             modules += '<ion-chip class="module" color="primary"><ion-icon name="star"></ion-icon><ion-label>' + this_post.post_modules[i] + '</ion-label></ion-chip>';
                         }
 
-                        customElements.get('nav-post') || customElements.define('nav-post', class NavViewTutorialDesc extends HTMLElement {
-                            connectedCallback() {
-                                let post_element = `
-                            <ion-header translucent>
+                        let nav_post = document.createElement('nav-post');
+                        nav_post.innerHTML = `<ion-header translucent>
                             <ion-toolbar>
                                     <ion-buttons slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
@@ -179,57 +180,46 @@ async function all_tutorials(nav) {
                         </ion-content>
                                               `;
 
-                                this.innerHTML = post_element;
 
-                                document.getElementById("accept_request_btn").addEventListener("click", async () => {
-                                    let post_acceptated_response = await access_route({tutor_email: user.getEmail(), post_id: post.getAttribute("post_id")}, "post_accepted", function () {
-                                        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"]);
-                                    });
 
-                                    if (!post_acceptated_response.error) {
-                                        user_notifications.addToNotifications(post_acceptated_response.response);
-                                        
-                                        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"], function () {
-                                            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-                                            posts.total_posts = posts.total_posts - 1;
-                                            
-                                            if (document.getElementById("forum_list").childNodes.length === 0) {
-                                                document.getElementById("forum_list").remove();
-                                            }
-                                            
-                                            post.remove();
-                                            nav.popToRoot();
-                                        });
-                                    } else {
-                                        create_ionic_alert("Tutorial request error", post_acceptated_response.response, ["OK"], function () {
-                                            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-                                            posts.total_posts = posts.total_posts - 1;
-                                            
-                                            if (document.getElementById("forum_list").childNodes.length === 0) {
-                                                document.getElementById("forum_list").remove();
-                                            }
-                                            
-                                            post.remove();
-                                            nav.popToRoot();
-                                        });
-                                    }
-                                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+                        nav.push(nav_post);
+
+                        let accept_tutorial_request_button;
+
+                        let event_handler = function () {
+                            device_feedback();
+                            load_nav_post_functionality(this_post, post);
+                        };
+
+                        let ionNavDidChangeEvent = async function () {
+                            if (document.getElementById('accept_request_btn') !== null) {
+                                accept_tutorial_request_button = document.getElementById('accept_request_btn');
+
+                                accept_tutorial_request_button.addEventListener('click', event_handler, false);
                             }
 
-                            disconnectedCallback() {
-                                console.log('Custom square element removed from page.');
-                            }
+                            let notifications_active_component = await nav.getActive();
 
-                            adoptedCallback() {
-                                console.log('Custom square element moved to new page.');
+                            if (notifications_active_component.component === "nav-all-tutorials") {
+                                accept_tutorial_request_button.removeEventListener("click", event_handler, false);
+                                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
                             }
+                        };
 
-                            attributeChangedCallback() {
-                                console.log("Attribute changed?")
-                            }
-                        });
-
-                        nav.push('nav-post');
+                        nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
                     }
                 });
             }
@@ -249,4 +239,41 @@ async function all_tutorials(nav) {
     });
 
     nav.push('nav-all-tutorials');
+}
+
+async function load_nav_post_functionality(this_post, post) { 
+    let post_acceptated_response = await access_route({tutor_email: user.getEmail(), post_id: post.getAttribute("post_id")}, "post_accepted", function () {
+        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"]);
+    });
+
+    if (!post_acceptated_response.error) {
+        user_notifications.addToNotifications(post_acceptated_response.response.tutor_notification);
+        user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification);
+
+        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"], function () {
+            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
+            posts.total_posts = posts.total_posts - 1;
+
+            if (document.getElementById("forum_list").childNodes.length === 0) {
+                document.getElementById("forum_list").remove();
+            }
+
+            post.remove();
+            nav.popToRoot();
+
+            posts.removePostById(post.getAttribute("post_id"));
+        });
+    } else {
+        create_ionic_alert("Tutorial request error", post_acceptated_response.response, ["OK"], function () {
+            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
+            posts.total_posts = posts.total_posts - 1;
+
+            if (document.getElementById("forum_list").childNodes.length === 0) {
+                document.getElementById("forum_list").remove();
+            }
+
+            post.remove();
+            nav.popToRoot();
+        });
+    }
 }

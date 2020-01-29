@@ -3,7 +3,12 @@ var notifications_object
 var unopened_notifications_counter = 0;
 var user;
 var user_notifications;
+var tutorials;
 var nav;
+var posts;
+var notification_posts;
+var current_tab;
+var previous_tab;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -22,6 +27,10 @@ document.addEventListener("DOMContentLoaded", async function () {
     user = new User();
     let home_component;
     let notifications_response;
+    let tab_controller = document.getElementById('tabs');
+
+    current_tab = 'home';
+    previous_tab = 'home';
 
     //Check to make sure that the users session has not expired
     //await user.check_session();
@@ -32,9 +41,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     ////Set status of user to tutor
-    user.setName("Joe Postolachi")
-    user.setStatus("Tutor");
-    user.setEmail("D00190047@student.dkit.ie");
+    user.setName("Nichita Postolachi");
+    user.setStatus("Student");
+    user.setEmail("nikito888@gmail.com");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -43,8 +52,14 @@ document.addEventListener("DOMContentLoaded", async function () {
     //Define our Navigation controller for the home tab
     nav = document.getElementById('nav-home');
 
+
+
+
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
+        let selected_tab = await tab_controller.getSelected();
+        console.log(selected_tab)
+
         let home_active_component = await nav.getActive();
 
         //Checking if the main home nav router is defined
@@ -55,38 +70,46 @@ document.addEventListener("DOMContentLoaded", async function () {
                 let can_go_back_home = await nav.canGoBack();
 
                 //If there is an active component and the active compoent matches our criteria, we go back
-                if (can_go_back_home && home_active_component.component == "nav-all-tutorials") {
-                    nav.pop();
-                } else if (can_go_back_home && home_active_component.component == "nav-post-tutorial") {
+                if (can_go_back_home) {
                     nav.pop();
                 }
 
-                let notifications_active_component = await nav_notifications.getActive();
-                console.log(notifications_active_component);
-
+                //let notifications_active_component = await nav_notifications.getActive();
                 let can_go_back_notifications = await nav_notifications.canGoBack();
                 console.log(can_go_back_notifications)
 
-                if (can_go_back_notifications && notifications_active_component.component == "nav-notification") {
+                //Check if the routers have any content, if not, we go back to the previous content, if empty, go to previous tab
+                if (can_go_back_notifications) {
                     nav_notifications.pop();
+                } else {
+                    if (current_tab !== previous_tab) {
+                        tab_controller.select(previous_tab);
+                    }
                 }
 
                 //If there is no active component in either the notifications router or home router, we exit the app
-                if (!can_go_back_notifications && !can_go_back_home) {
+                if (!can_go_back_notifications && !can_go_back_home && selected_tab === "home") {
                     navigator.app.exitApp();
                 }
             } else {
+                //If the nav_notifications router is not defined we check if the main router can go back
                 let can_go_back_home = await nav.canGoBack();
 
-                if (can_go_back_home && home_active_component.component == "nav-all-tutorials") {
-                    nav.pop();
-                } else if (can_go_back_home && home_active_component.component == "nav-post-tutorial") {
+                //Check if the routers have any content, if not, we go back to the previous content, if empty, go to previous tab
+                if (can_go_back_home) {
                     nav.pop();
                 } else {
+                    if (current_tab !== previous_tab) {
+                        tab_controller.select(previous_tab);
+                    }
+                }
+
+                console.log(home_active_component)
+
+                if (!can_go_back_home && selected_tab === "home") {
                     navigator.app.exitApp();
                 }
             }
-
         }
     }, false);
 
@@ -141,16 +164,16 @@ document.addEventListener("DOMContentLoaded", async function () {
             
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple'>
-                                    <h6>My Posts</h6>
-                                    <p>Some text about my post</p>
+                                    <h6>My tutorials</h6>
+                                    <p>View all tutorials that are tutored by you</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_post' src="images/i_posts.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
                                 </ion-list>
                                 <hr><hr>
-                                <ion-list class='home_buttons ion-activatable ripple'>
-                                    <h6>Ongoing Exchanges</h6>
-                                    <p>Some text about ongoing exchanges</p>
+                                <ion-list class='home_buttons ion-activatable ripple' id='my_requested_tutorials'>
+                                    <h6>My requested tutorials</h6>
+                                    <p>View all the tutorials requested by you</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -202,33 +225,20 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple' id="home_tutor_application">
                                     <h6>Apply to be a tutor</h6>
-                                    <p>Have you got what it takes to be a tutor? Apply today!</p>
+                                    <p>Apply to be a tutor here</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_search' src="images/i_search.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
                                 </ion-list>
             
                                 <hr><hr>
-                                <ion-list class='home_buttons ion-activatable ripple'>
-                                    <h6>My Posts</h6>
-                                    <p>Some text about my post</p>
-                                    <img class='b_circle' src="images/circle.png" alt=""/>
-                                    <img class='i_post' src="images/i_posts.png" alt=""/>
-                                    <ion-ripple-effect></ion-ripple-effect>
-                                </ion-list>
-                                <hr><hr>
-                                <ion-list class='home_buttons ion-activatable ripple'>
-                                    <h6>Ongoing Exchanges</h6>
-                                    <p>Some text about ongoing exchanges</p>
+                                <ion-list class='home_buttons ion-activatable ripple' id="my_requested_tutorials">
+                                    <h6>My requested tutorials</h6>
+                                    <p>View all the tutorials requested by you</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
-                                </ion-list>
-                                <!--<ion-item onclick="navigateForward()">
-                                    Navigate Forward
-                                </ion-item>-->
-
-
+                                </ion-list>  
                             </div>
                         </ion-content>`;
                 //We get all the users notificatios based only on his email as the user is not a tutor
@@ -236,10 +246,10 @@ document.addEventListener("DOMContentLoaded", async function () {
             }
 
             this.innerHTML = home_component;
-            
+
             //Hide splashscreen
             //navigator.splashscreen.hide();
-            
+
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
             if (user.getStatus() === "Tutor") {
@@ -252,20 +262,32 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (user.getStatus() === "Tutor") {
                 await include("js/modules/index/forum_module.js", "forum_script");
                 let handler = () => {
+                    device_feedback();
                     //Remember to move this to new file
                     all_tutorials(nav);
                 };
                 document.getElementById('all_tutorials').addEventListener('click', handler);
             } else {
-                await include("js/modules/index/apply_to_be_tutor_module.js", "apply_to_be_tutor_script"); 
+                await include("js/modules/index/apply_to_be_tutor_module.js", "apply_to_be_tutor_script");
                 //To later remove the event listener, we create a reference to the function and we pass the handler to that function so that we can later remove the event listener
                 let handler = function () {
+                    device_feedback();
                     apply_to_be_tutor(handler);
                 };
                 document.getElementById("home_tutor_application").addEventListener('click', handler, false);
             }
 
             user.createWebSocketConnection();
+            if (user.getStatus() === "Tutor") {
+                posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                posts.waitForNewTutorials(); 
+            } else {
+                posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+            }
+
+            posts.waitForTutorialAccepted();
 
             //Create a Notifications class to store all the details and functions relating to the notifications
             //Extends User class
@@ -274,15 +296,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             } else {
                 user_notifications = new Notifications(notifications_response.response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
             }
- 
+
             //Now that we have notifications, we need to add a badge to show all unread notifications
             user_notifications.addUnreadNotificationsToDOM();
             user_notifications.waitForNewNotifications();
 
             //Create post tutorial page
             document.getElementById('post_tutorial').addEventListener('click', async function () {
-                await include("js/modules/index/request_tutorial_module.js", "request_tutorial_script"); 
+                device_feedback();
+                await include("js/modules/index/request_tutorial_module.js", "request_tutorial_script");
                 load_request_tutorial();
+            });
+
+            //Create My Requested Tutorials page
+            document.getElementById('my_requested_tutorials').addEventListener('click', async function () {
+                device_feedback();
+                await include("js/modules/index/my_tutorials_module.js", "my_requested_tutorials_script");
+                load_my_requested_tutorials();
             });
         }
 
@@ -309,23 +339,28 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     });
 
+    document.querySelector("ion-tabs").addEventListener('click', function (event) {
+        if (event.target.innerText == "Home" || event.target.innerText == "Notifications" || event.target.innerText == "Settings") {
+            nav.popToRoot();
+
+            if (typeof nav_notifications !== 'undefined') {
+                nav_notifications.popToRoot();
+            }
+        }
+    });
+
     //Lazy loading - once user clicks on tab, only then do we launch JavaScript
     document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', async function (event) {
+        previous_tab = current_tab;
+        current_tab = await tab_controller.getSelected();
+
+        console.log("previous tab " + previous_tab);
+        console.log('current tab ' + current_tab)
+
         if (event.detail.tab === "notifications") {
             await include("js/modules/index/notifications_module.js", "notifications_script");
         } else if (event.detail.tab === "settings") {
             await include("js/modules/index/settings_module.js", "settings_script");
-        } 
-    });
-    
-    
-    //MIGHT REMOVE
-    document.querySelector("ion-tab-bar").addEventListener('click', function(event) {
-        if(typeof nav_notifications !== "undefined") {
-            nav_notifications.popToRoot();
-            nav.popToRoot()
-        } else if (typeof nav !== "undefined") {
-            nav.popToRoot()
         }
-    })
+    });
 });

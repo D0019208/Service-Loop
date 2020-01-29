@@ -10,12 +10,14 @@
 document.addEventListener("deviceready", function () {
     //Hide splashscreen
     navigator.splashscreen.hide();
-    
+});
+
+document.addEventListener("DOMContentLoaded", function () { 
     let register_button = document.getElementById("registration_button");
     let sms_sent = false;
-    
-    //We add a quick function here to test wether the user has agreed to the Terms & Conditions
-    document.getElementById('terms_and_conditions').addEventListener("click", function (event) {
+
+//We add a quick function here to test wether the user has agreed to the Terms & Conditions
+    document.getElementById('terms_and_conditions').addEventListener("click", function () {
         let registration_button_state = register_button.hasAttribute("disabled");
 
         if (registration_button_state) {
@@ -23,12 +25,14 @@ document.addEventListener("deviceready", function () {
         } else {
             register_button.disabled = true;
         }
+        
+        device_feedback();
     });
 
     document.getElementById('registration_form').addEventListener("submit", async function (event) {
         if (document.getElementById('terms_and_conditions').checked) {
             event.preventDefault();
-            
+
             //We check to see if the users registration data meets all our criteria
             let user_data_correct = await verify_registration_input();
 

@@ -81,7 +81,8 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        const rawResponse = await fetch("http://localhost:3001/" + route, {
+          const rawResponse = await fetch("http://localhost:3001/" + route, {
+          //const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -94,10 +95,9 @@ async function access_route(data, route, show_loading = true) {
 
         if (show_loading) {
             loading.dismiss();
-            return response;
-        } else {
-            return response;
         }
+        
+        return response;
 
     } catch (ex) {
         if (show_loading) {
@@ -300,7 +300,9 @@ function include(url, id) {
             script.type = "text/javascript";
             script.id = id;
             script.src = url;
-            script.onload = function () {resolve()};
+            script.onload = function () {
+                resolve()
+            };
             document.querySelector('ion-tabs').appendChild(script);
         } else {
             resolve();
@@ -323,16 +325,76 @@ function formatDate(date_string) {
 //    "August", "September", "October",
 //    "November", "December"
 //  ];
-  let date = new Date(date_string);
-  
-  let day = date.getDate();
-  let monthIndex = date.getMonth() + 1;
-  if(monthIndex < 10) {
-      monthIndex = "0" + monthIndex;
-  }
-  
-  let year = date.getFullYear();
+    let date = new Date(date_string);
 
-  //return day + ' ' + monthNames[monthIndex] + ' ' + year;
-  return day + '/' + monthIndex + '/' + year;
+    let day = date.getDate();
+    let monthIndex = date.getMonth() + 1;
+    if (monthIndex < 10) {
+        monthIndex = "0" + monthIndex;
+    }
+
+    let year = date.getFullYear();
+
+    //return day + ' ' + monthNames[monthIndex] + ' ' + year;
+    return day + '/' + monthIndex + '/' + year;
+}
+
+function insert_to_array_by_index(array, index, value) {
+    array.splice(index, 0, value);
+}
+
+function device_feedback() {
+//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+//        if (feedback.haptic && feedback.acoustic) {
+//            window.plugins.deviceFeedback.haptic();
+//            window.plugins.deviceFeedback.acoustic();
+//        }  
+//        else if (feedback.haptic) {
+//            window.plugins.deviceFeedback.haptic();
+//        }
+//        else if (feedback.acoustic) {
+//            window.plugins.deviceFeedback.acoustic();
+//        }
+//    });
+}
+
+/*
+ * A function that creates a toast that disapears after a certain time
+ * 
+ * @param {String} toast_message - This is the message to be displayed on the toast
+ * @param {int} toast_duration - This is the duration of the toast after which it closes
+ * @param {Object} toast_buttons - These are the buttons that will appear on the toast
+ * @param {Object} toast_dismiss_function - This is an optional function that is executed upon the
+ * toast being dismissed
+ * 
+ * @returns {Promise} This function returns a resolved promise that displays the toast notification
+ */
+async function create_toast(toast_message, toast_color, toast_duration, toast_buttons, toast_dismiss_function = null) {
+    const toast = document.createElement('ion-toast');
+     
+    toast.message = toast_message;
+    toast.color = toast_color;
+    toast.duration = toast_duration;
+    toast.position = 'bottom';
+    toast.buttons = toast_buttons;
+    
+    if(toast_dismiss_function !== null) {
+        toast.addEventListener('ionToastWillDismiss', toast_dismiss_function);
+    }
+     
+    document.body.appendChild(toast);
+    
+    return toast.present();
+}
+
+function groupBy(array, prop) {
+    let grouped_objects_array = [];
+    
+    for (let i = 0; i < array.length; i++) {
+        if(array[i].post_status === prop) {
+            grouped_objects_array.push(array[i]);
+        }
+    }  
+
+  return grouped_objects_array;
 }

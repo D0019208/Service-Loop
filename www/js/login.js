@@ -19,7 +19,11 @@ document.addEventListener("deviceready", function () {
     navigator.splashscreen.hide();
     
     let fingerprint_active = false;
-
+    
+    document.getElementById('login').addEventListener('click', () => {
+        device_feedback();
+    });
+    
     document.querySelector('form').addEventListener('submit', (event) => {
         event.preventDefault();
         document.getElementById('login').disabled = true;
@@ -29,6 +33,8 @@ document.addEventListener("deviceready", function () {
 
     //Login using fingerprint
     document.getElementById("fingerprint").addEventListener('click', async () => {
+        device_feedback();
+        
         if (!fingerprint_active) {
             fingerprint_active = true;
             let fingerprint_available = await is_fingerprint_available();

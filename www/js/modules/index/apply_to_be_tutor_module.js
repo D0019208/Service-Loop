@@ -67,6 +67,7 @@ function apply_to_be_tutor(handler) {
             let tutor_apply_button = document.getElementById("tutor_apply");
 
             tutor_apply_button.addEventListener('click', async function () {
+                device_feedback();
                 tutor_apply_button.disabled = true;
 
 
@@ -86,11 +87,7 @@ function apply_to_be_tutor(handler) {
                 if (!tutor_added_response.error) {
                     //We update the user so he becomes a tutor
                     user.ascendToTutor(user_notifications, document.getElementById("tutor_modules").value, handler)
-                    user.setModules(document.getElementById("tutor_modules").value);
-
-                    create_ionic_alert("Tutor application successfull", "Congratulations! You have become a tutor for DKIT!", ["OK"], function () {
-                        document.getElementById("apply_to_be_tutor_back").click();
-                    });
+                    user.setModules(document.getElementById("tutor_modules").value); 
                 } else {
                     tutor_apply_button.disabled = false;
                     create_ionic_alert("Tutor application failed", tutor_added_response.response, ["OK"]);

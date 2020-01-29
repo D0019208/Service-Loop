@@ -64,16 +64,16 @@ class User {
 
             const content = await rawResponse.json();
 
-            if (content !== "Session valid") { 
+            if (content !== "Session valid") {
                 //alert("Session NOT valid")
-                await remove_secure_storage("jwt_session"); 
+                await remove_secure_storage("jwt_session");
                 window.location.href = "login.html";
                 return;
-            } else {  
+            } else {
                 //alert("Session valid.") 
                 return "Proceed";
             }
-            
+
         } catch (ex) {
             console.log(ex);
             window.location.href = "login.html";
@@ -90,11 +90,7 @@ class User {
         this.socket = socket;
 
         console.log(socket);
-    }
-
-    test() {
-        this.socket.emit('update_socket', {user_email: this.getEmail(), user_modules: ["test"]});
-    }
+    } 
 
     async ascendToTutor(user_notifications, user_modules, handler) {
         //We update the users modules, status and socket as he is now a tutor
@@ -103,7 +99,7 @@ class User {
         this.socket.emit('update_socket', {user_email: this.getEmail(), user_modules: user_modules});
 
         //Get the new notifications that the user would see as a tutor
-        let notifications_response = await access_route({users_email: this.getEmail(), user_tutor: {is_tutor: true, user_modules: user_modules}}, "get_all_notifications", false);
+        let notifications_response = await access_route({users_email: this.getEmail(), user_tutor: {is_tutor: true, user_modules: user_modules}}, "get_all_notifications");
 
 
         if (typeof notifications_response === "string") {
@@ -112,9 +108,13 @@ class User {
             user_notifications.all_notifications = notifications_response.response;
         }
 
+        user_notifications.total_notifications = user_notifications.getAllNotifications().length;
+
         let unopened_notification = user_notifications.find_unopened_notifications_number();
 
         user_notifications.setUnreadNotifications(unopened_notification);
+
+        user_notifications.addUnreadNotificationsToDOM();
         user_notifications.addUnreadNotificationsToBadge(unopened_notification);
 
         //Delete the current notifications so that we can add the new ones IF we have initialized the notifications module
@@ -143,11 +143,34 @@ class User {
         tutor_application_button.querySelector("p").innerText = "View all the requested tutorials on the forum";
         tutor_application_button.id = "all_tutorials";
 
+        let my_tutorials = document.createElement('ion-list');
+        my_tutorials.classList.add("home_buttons", "ion-activatable", "ripple", "md", "list-md", "hydrated");
+        my_tutorials.innerHTML = `
+                                    <h6>My tutorials</h6>
+                                    <p>View all tutorials that are tutored by you</p>
+                                    <img class='b_circle' src="images/circle.png" alt=""/>
+                                    <img class='i_post' src="images/i_posts.png" alt=""/>
+                                    <ion-ripple-effect></ion-ripple-effect>`;
+
+        let hr = document.createElement('hr');
+
+        document.getElementById('my_requested_tutorials').parentNode.insertBefore(my_tutorials, document.getElementById('my_requested_tutorials').previousSibling);
+
+        my_tutorials.parentNode.insertBefore(hr, my_tutorials.nextSibling);
+
+        hr = document.createElement('hr');
+        my_tutorials.parentNode.insertBefore(hr, my_tutorials.nextSibling);
+
+
         //Load the forum script
         include("js/modules/index/forum_module.js", "forum_script");
 
         tutor_application_button.addEventListener("click", function () {
             all_tutorials(nav);
-        })
+        });
+
+        create_ionic_alert("Tutor application successfull", "Congratulations! You have become a tutor for DKIT!", ["OK"], function () {
+            document.getElementById("apply_to_be_tutor_back").click();
+        });
     }
 }

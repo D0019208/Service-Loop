@@ -24,32 +24,74 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
 
                 ionic_loading.dismiss();
 
-                create_ionic_alert("Fingerprint configuration successful", "Congratulations! You have successfully setup fingerprint authentication.\n\
-Now everytime you need to login, you can click on the fingerprint icon and login without entering email and password.", ["OK"], function () {
-                    return dismissModal(currentModal);
-                });
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Fingerprint configuration successful", "dark", 2000, toast_buttons);
+                dismissModal(currentModal);
             } else {
                 ionic_loading.dismiss();
-                create_ionic_alert("Fingerprint configuration failed", set_token_result, ["OK"], function () {
-                    return dismissModal(currentModal);
-                });
+
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
+                dismissModal(currentModal);
             }
         }
 
         function errorCallback(error) {
             if (error !== FingerprintAuth.ERRORS.FINGERPRINT_CANCELLED) {
                 ionic_loading.dismiss();
-                create_ionic_alert("Fingerprint configuration failed", error, ["OK"], function () {
-                    return dismissModal(currentModal);
-                });
+
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
+                dismissModal(currentModal);
             }
         }
 
     } catch (ex) {
         ionic_loading.dismiss();
-        create_ionic_alert("Fingerprint configuration failed", ex, ["OK"], function () {
-            return dismissModal(currentModal);
-        });
+
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
+        dismissModal(currentModal);
     }
 
 }
@@ -62,14 +104,14 @@ async function remove_fingerprint(currentModal, email) {
 
     //If the fingerprin functionality is present, we validate the users 
     if (fingerprint_available) {
-        try { 
+        try {
             let password = document.getElementById("fingerprint_password").value;
 
             //Check to see that user login details are correct
             let user_validated = await validate_user(email, password);
 
             //If user successfully authenticated, we encrypt
-            if (user_validated) {
+            if (user_validated.password_matches) {
                 FingerprintAuth.delete({
                     clientId: "Service Loop User",
                     username: email
@@ -83,23 +125,49 @@ async function remove_fingerprint(currentModal, email) {
                     localStorage.removeItem("fingerprint_setup");
 
                     ionic_loading.dismiss();
-                    create_ionic_alert("Fingerprint removed", "Fingerprint successfully deactivated, turn it on again in Settings.", ["OK"], function () {
-                        return dismissModal(currentModal);
-                    });
+
+                    let toast_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Fingerprint successfully deactivated", "dark", 2000, toast_buttons);
+                    dismissModal(currentModal);
                 }
 
                 function errorCallback(error) {
                     ionic_loading.dismiss();
+
                     create_ionic_alert("Fingerprint removal failed", error, ["OK"], function () {
                         return dismissModal(currentModal);
                     });
+                    dismissModal(currentModal);
                 }
             } else {
                 ionic_loading.dismiss();
-                create_ionic_alert("Fingerprint removal failed", "Email or password supplied was incorrect!", ["OK"]);
+
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Password supplied is incorrect", "dark", 2000, toast_buttons);
             }
         } catch (ex) {
             ionic_loading.dismiss();
+
             create_ionic_alert("Fingerprint removal failed", ex, ["OK"], function () {
                 return dismissModal(currentModal);
             });
@@ -107,10 +175,20 @@ async function remove_fingerprint(currentModal, email) {
 
     } else {
         ionic_loading.dismiss();
-        create_ionic_alert("Fingerprint removal failed", "Unfortunetly your device does not support fingerprint authentication, please \n\
-            use your email and password instead.", ["OK"], function () {
-            return dismissModal(currentModal);
-        });
+
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast("Your device does not support fingerprint authentication", "dark", 2000, toast_buttons);
+        dismissModal(currentModal);
     }
 }
 
@@ -122,32 +200,65 @@ async function setup_fingerprint(currentModal) {
 
     //If the fingerprin functionality is present, we validate the users 
     if (fingerprint_available) {
-        try { 
+        try {
             let password = document.getElementById("fingerprint_password").value;
 
             //Check to see that user login details are correct
             let user_validated = await validate_user(user.getEmail(), password);
 
             //If user successfully authenticated, we encrypt
-            if (user_validated) {
+            if (user_validated.password_matches) {
                 encrypt_fingerprint(currentModal, user.getEmail(), password, ionic_loading);
             } else {
                 ionic_loading.dismiss();
-                create_ionic_alert("Fingerprint configuration failed", "Email or password supplied was incorrect!", ["OK"]);
+
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Password supplied is incorrect", "dark", 2000, toast_buttons);
             }
         } catch (ex) {
             ionic_loading.dismiss();
-            create_ionic_alert("Fingerprint configuration failed", ex, ["OK"], function () {
-                return dismissModal(currentModal);
-            });
+
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast(ex, "dark", 2000, toast_buttons);
+            dismissModal(currentModal);
         }
 
     } else {
         ionic_loading.dismiss();
-        create_ionic_alert("Fingerprint configuration failed", "Unfortunetly your device does not support fingerprint authentication, please \n\
-            use your email and password instead.", ["OK"], function () {
-            return dismissModal(currentModal);
-        });
+
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast("Your device does not support fingerprint authentication", "dark", 2000, toast_buttons);
+        dismissModal(currentModal);
     }
 }
 
@@ -157,10 +268,21 @@ async function logout(logout_button) {
 
         window.location.href = "login.html";
     } catch (ex) {
-        create_ionic_alert("Logout failed", ex, ["OK"], function () {
-            logout_button.disabled = false;
-            window.location.href = "login.html";
-        });
+
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast("Your device does not support fingerprint authentication", "dark", 2000, toast_buttons);
+        logout_button.disabled = false;
+        window.location.href = "login.html";
     }
 }
 
@@ -183,6 +305,7 @@ if (localStorage.getItem("fingerprint_setup") !== null) {
 let logout_button = document.getElementById("logout");
 
 logout_button.addEventListener('click', () => {
+    device_feedback();
     let logout_button_state = logout_button.hasAttribute("disabled");
 
     if (logout_button_state)
@@ -200,6 +323,7 @@ let currentModal = null;
 const controller = document.querySelector('ion-modal-controller');
 
 document.getElementById('fingerprint_toggle').addEventListener('click', async () => {
+    device_feedback();
     let modal_text;
 
     //This if statement prevents toggle from changing
@@ -244,10 +368,12 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
             currentModal = modal_created;
 
             document.getElementById("fingerprint_disable_submit").addEventListener('click', async () => {
+                device_feedback();
                 remove_fingerprint(currentModal, user.getEmail());
             });
 
             document.getElementById("modal_close").addEventListener('click', () => {
+                device_feedback();
                 dismissModal(currentModal);
             });
         });
@@ -294,10 +420,12 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
             currentModal = modal_created;
 
             document.getElementById("fingerprint_toggle_submit").addEventListener('click', async () => {
+                device_feedback();
                 setup_fingerprint(currentModal);
             });
 
             document.getElementById("modal_close").addEventListener('click', () => {
+                device_feedback();
                 dismissModal(currentModal);
             });
         });

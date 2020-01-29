@@ -39,7 +39,9 @@ class Notifications extends User {
     }
     
     addToTotalNotifications() {
+        console.log("Total nots = " + this.total_notifications)
         this.total_notifications++;
+        console.log("Total nots after add = " + this.total_notifications)
     }
 
     setTotalNotifications(total_notifications) {
@@ -93,8 +95,11 @@ class Notifications extends User {
     }
 
     getNotificationDetailsById(id) {
+        console.log(id)
+        console.log(this.all_notifications)
         for (let i = 0; i < this.all_notifications.length; i++) {
             if (this.all_notifications[i]._id == id) {
+                console.log(this.all_notifications[i])
                 return this.all_notifications[i];
             }
         }
@@ -111,19 +116,21 @@ class Notifications extends User {
     }
 
     addToNotifications(notification) {
-        console.log(this.all_notifications)
+        console.log("A notification")
+        console.log(notification);
+         
         if (this.all_notifications == "There are no notifications to display!") {
             this.all_notifications = [notification];
         } else {
-            this.all_notifications.push(notification);
+            insert_to_array_by_index(this.all_notifications, 0, notification) 
         }
-
-        this.addToTotalNotifications();
-        console.log(this.all_notifications)
-
+        
+        //Increase count of total notifications
+        this.addToTotalNotifications(); 
+        
         if (document.getElementById('list') != null) {
-            document.getElementById("notifications_header").innerText = "NOTIFICATIONS";
-
+            document.getElementById("notifications_header").innerText = "NOTIFICATIONS"; 
+            
             this.addUnreadNotifications();
             const el = document.createElement('ion-list');
             el.classList.add('ion-activatable', 'ripple', 'not_read');
@@ -135,14 +142,14 @@ class Notifications extends User {
         </ion-avatar>
         <ion-label>
             <h2>${notification.notification_title}</h2>
-            <span>${notification.notification_posted_on}</span>
+            <span>${formatDate(notification.notification_posted_on)}</span>
             <p>${notification.notification_desc_trunc}</p>
         </ion-label>
             </ion-item>
             <ion-ripple-effect></ion-ripple-effect>
             
         `;
-            document.getElementById('list').appendChild(el);
+            document.getElementById('list').prepend(el);
         } else {
             this.addUnreadNotifications();
         }
@@ -198,7 +205,7 @@ class Notifications extends User {
         </ion-avatar>
         <ion-label>
             <h2>${notifications[i + originalLength].notification_title}</h2>
-            <span>${notifications[i + originalLength].notification_posted_on}</span>
+            <span>${formatDate(notifications[i + originalLength].notification_posted_on)}</span>
             <p>${notifications[i + originalLength].notification_desc_trunc}</p>
         </ion-label>
             </ion-item>
@@ -209,10 +216,14 @@ class Notifications extends User {
             
             this.notifications_length += 1;
         }
-    }
+    }  
     
     sendNewNotification(notification) {
         this.socket.emit('send_notification', notification);
+    }
+    
+    sendTutorialAcceptedNotification(notification) {
+        this.socket.emit('tutorial_request_accepted', notification);
     }
 
     waitForNewNotifications() {
@@ -222,7 +233,14 @@ class Notifications extends User {
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
-        });
+        }); 
+        
+        socket.on('add_tutorial_request_accepted_notification', (data) => {
+            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response); 
+            
+            console.log(data);
+        })
 
         socket.on('news', function (data) {
             console.log(data);

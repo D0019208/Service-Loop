@@ -27,12 +27,10 @@
                 --overflow: auto;
             }
             .white_backgound
-            {
-                height: 450px;
+            { 
                 margin-top: -15px;
                 margin-left: -40px;
                 margin-right: -40px;
-                margin-bottom: -50px;
                 background-color: white;
                 box-shadow: 0px -20px 20px rgba(0, 0, 0, 0.2);
                 border-radius: 100px;
@@ -210,6 +208,121 @@
             {
                 margin-top: -15px;
             }
+            
+            
+            
+            h1
+            {
+                margin-left: 8%;
+                text-align: center;
+                font-weight: bold;
+                margin-top: 8px;
+            }
+            .offer p
+            {
+                color: gray;
+            }
+            .offer span
+            {
+                position: absolute;
+                right: 10px;
+                top: 16px;
+                font-size: 12px;
+            }
+            .test
+            {
+                margin-top: 0px;
+                margin-bottom: 10px;
+                
+            }
+            ion-list-header
+            {
+                margin-bottom: -10px;
+            }
+            .module2
+            {
+                margin-left: 0px;
+            }
+            ion-card-content
+            {
+                color: black;
+            }
+            
+            
+            
+            
+            
+            :root {
+                --ion-safe-area-top: 0px;
+                --ion-safe-area-bottom: 0px;
+            }
+
+            h1
+            {
+                margin-left: 8%;
+                text-align: center;
+                font-weight: bold;
+                margin-top: 8px;
+            }
+            .offer p
+            {
+                color: gray;
+            }
+            .offer span
+            {
+                position: absolute;
+                right: 10px;
+                top: 16px;
+                font-size: 12px;
+            }
+            .state
+            {
+                height: 100%;
+                width: 5px;
+                background-color: lightsalmon;
+                position: absolute;
+                left: 0px;
+                top: 0px;
+            }
+            IonBadge
+            {
+                margin-top: -8px;
+            }
+            .hide
+            {
+                display: none
+            }
+            
+            
+            
+            
+            
+            .note
+            {
+                text-align: center;
+                filter: opacity(70%);
+            }
+            .date
+            {
+                position: absolute;
+                right: 10px;
+                top: 0px;
+                font-size: 12px;
+                filter: opacity(80%);
+            }
+            .pdf_button
+            {
+                position: absolute;
+                left: 15px;
+                margin-top: 15px;
+            }
+            .blockchain_button
+            {
+                position: absolute;
+                right: 15px;
+                margin-top: 15px;
+                opacity: 0.93;
+            }
         </style>
     </head>
     <body>
@@ -249,11 +362,11 @@
         </div> 
         <ion-menu-controller></ion-menu-controller>
 
-        <ion-tabs>
+        <ion-tabs id="tabs">
 
             <!-- HOME PAGE -->
 
-            <ion-tab tab="home">
+            <ion-tab tab="home" selected>
                 <ion-nav root="nav-home" id="nav-home">
                     
                 </ion-nav>
@@ -419,11 +532,7 @@
                 </ion-tab-button>
             </ion-tab-bar>
         </ion-tabs>
-    </ion-app> 
-    
-    <!-- Components -->
-    <script src="js/components/HomeComponent.js" type="text/javascript"></script>
-    <script src="js/components/RequestTutorial.js" type="text/javascript"></script>
+    </ion-app>  
     
     <!-- Pre Reqs --> 
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
@@ -436,6 +545,7 @@
     <script src="js/classes/User.js" type="text/javascript"></script>
     <script src="js/classes/notifications.js" type="text/javascript"></script>
     <script src="js/classes/Posts.js" type="text/javascript"></script>
+    <script src="js/classes/Tutorials.js" type="text/javascript"></script>
     <script src="js/modules/index/home_module.js" type="text/javascript"></script> 
     <script>
         function openMenu() {
