@@ -4,11 +4,13 @@ var unopened_notifications_counter = 0;
 var user;
 var user_notifications;
 var tutorials;
+var tutor_tutorials;
 var nav;
 var posts;
 var notification_posts;
 var current_tab;
 var previous_tab;
+var signaturePad;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -41,9 +43,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     ////Set status of user to tutor
-    user.setName("Nichita Postolachi");
-    user.setStatus("Student");
-    user.setEmail("nikito888@gmail.com");
+    user.setName("Joe Postolachi");
+    user.setStatus("Tutor");
+    user.setEmail("D00192082@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -163,7 +165,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 </ion-list>
             
                                 <hr><hr>
-                                <ion-list class='home_buttons ion-activatable ripple'>
+                                <ion-list class='home_buttons ion-activatable ripple' id='my_tutorials'>
                                     <h6>My tutorials</h6>
                                     <p>View all tutorials that are tutored by you</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
@@ -281,10 +283,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (user.getStatus() === "Tutor") {
                 posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
                 tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                
                 posts.waitForNewTutorials(); 
             } else {
                 posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
                 tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
             }
 
             posts.waitForTutorialAccepted();
@@ -314,6 +319,13 @@ document.addEventListener("DOMContentLoaded", async function () {
                 await include("js/modules/index/my_tutorials_module.js", "my_requested_tutorials_script");
                 load_my_requested_tutorials();
             });
+            
+            //Create My Tutorials page
+            document.getElementById('my_tutorials').addEventListener('click', async function () {
+                device_feedback();
+                await include("js/modules/index/tutor_tutorials_module.js", "my_tutorials_script");
+                all_tutor_tutorials(nav);
+            });
         }
 
         //Callback to call when component is removed
@@ -340,7 +352,11 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
 
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
+        console.log("??")
+        console.log(event)
+        
         if (event.target.innerText == "Home" || event.target.innerText == "Notifications" || event.target.innerText == "Settings") {
+            console.log("test")
             nav.popToRoot();
 
             if (typeof nav_notifications !== 'undefined') {

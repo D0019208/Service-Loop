@@ -1,5 +1,6 @@
 let my_requested_posts_response;
 let my_requested_posts_loaded = false;
+let my_requested_posts_event_listener_added = false;
 
 let my_requested_posts_open;
 let my_requested_posts_pending;
@@ -243,6 +244,14 @@ function load_my_requested_tutorials() {
             //List element we are appending our tutorials to
             //const open_tutorial_list = document.getElementById('open_tutorials_header');
             const openInfiniteScroll = document.getElementById('open-tutorials-infinite-scroll');
+
+
+            console.log("Tutorials")
+            console.log(tutorials);
+            console.log(tutorials.get_open_tutorials());
+
+
+
             //If we have less than 7 tutorials we display all of them otherwise we display only 7
             if (tutorials.get_open_tutorials().length <= 3) {
                 tutorials.open_tutorials_length = tutorials.appendPosts(tutorials.get_open_tutorials().length, openInfiniteScroll, tutorials.open_tutorials, tutorials.open_tutorials_length);
@@ -302,7 +311,7 @@ function load_my_requested_tutorials() {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_pending_loaded) {
+                        if (!my_requested_posts_pending_loaded || document.getElementById('pending').childElementCount <= 2) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutorials.get_pending_tutorials().length <= 3) {
                                 tutorials.pending_tutorials_length = tutorials.appendPosts(tutorials.get_pending_tutorials().length, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
@@ -333,10 +342,6 @@ function load_my_requested_tutorials() {
 
                             my_requested_posts_pending_loaded = true;
                         }
-
-
-
-
                     } else if (ev.detail.value === "ongoing_segment") {
                         segment_elements.ongoing.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
@@ -344,7 +349,7 @@ function load_my_requested_tutorials() {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_ongoing_loaded) {
+                        if (!my_requested_posts_ongoing_loaded || document.getElementById('ongoing').childElementCount <= 2) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutorials.get_ongoing_tutorials().length <= 3) {
                                 tutorials.ongoing_tutorials_length = tutorials.appendPosts(tutorials.get_ongoing_tutorials().length, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
@@ -382,7 +387,7 @@ function load_my_requested_tutorials() {
                         segment_elements.open.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_done_loaded) {
+                        if (!my_requested_posts_done_loaded || document.getElementById('ongoing').childElementCount <= 2) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutorials.get_done_tutorials().length <= 3) {
                                 tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.get_done_tutorials().length, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
@@ -417,33 +422,37 @@ function load_my_requested_tutorials() {
                 });
             }
 
-            document.querySelector('body').addEventListener('click', async function (event) {
-                //Get closest element with specified class
-                let tutorial = getClosest(event.target, '.test');
-                let tutorial_tags = [];
+            if (!my_requested_posts_event_listener_added) {
+                document.querySelector('body').addEventListener('click', async function (event) {
+                    //Get closest element with specified class
+                    let tutorial = getClosest(event.target, '.test');
+                    let tutorial_tags = [];
 
-                console.log(tutorial);
+                    console.log(tutorial);
 
-                //If there exists an element with the specified target near the clicked 
-                if (tutorial) {
-                    //Find a post from posts object that matches the ID of the clicked element.
-                    let tutorial_tag = tutorial.getAttribute('post_modules');
-                    let tutorial_status = tutorial.getAttribute('post_status');
-                    let this_tutorial = tutorials.getTutorialDetailsById(tutorial.getAttribute('post_id'), tutorial_status);
+                    //If there exists an element with the specified target near the clicked 
+                    if (tutorial) {
+                        //Find a post from posts object that matches the ID of the clicked element.
+                        let tutorial_tag = tutorial.getAttribute('post_modules');
+                        let tutorial_status = tutorial.getAttribute('post_status');
+                        let this_tutorial = tutorials.getTutorialDetailsById(tutorial.getAttribute('post_id'), tutorial_status);
 
-                    if (tutorial_status == "In Negotiation") {
-                        tutorial_status = "Pending";
-                    }
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
 
-                    let tutorial_element = document.createElement('tutorial');
-                    let tutorial_element_html;
+                        let tutorial_element = document.createElement('tutorial');
+                        let tutorial_element_html;
 
-                    if (tutorial_status == "Open") {
-                        tutorial_element_html = `<ion-header translucent>
+                        if (tutorial_status == "Open") {
+                            tutorial_element_html = `<ion-header translucent>
                         <ion-toolbar>
-                                <ion-buttons slot="start">
-                            <ion-back-button defaultHref="/"></ion-back-button>
-                          </ion-buttons>
+                            <ion-buttons slot="start">
+                                <ion-back-button defaultHref="/"></ion-back-button>
+                            </ion-buttons>
+                            <ion-buttons slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
                             <ion-title><h1>Tutorial</h1></ion-title>
                         </ion-toolbar>
                     </ion-header>
@@ -498,13 +507,16 @@ function load_my_requested_tutorials() {
                                 </ion-item>    
                                 <ion-item-divider class="divider2"></ion-item-divider> 
                             </ion-content>`;
-                    } else if (tutorial_status == "In negotiation") {
-                        if (this_tutorial.post_agreement_offered) {
-                            tutorial_element_html = `<ion-header translucent>
+                        } else if (tutorial_status == "Pending") {
+                            if (this_tutorial.post_agreement_offered) {
+                                tutorial_element_html = `<ion-header translucent>
                                                             <ion-toolbar>
-                                                                    <ion-buttons slot="start">
-                                                                <ion-back-button defaultHref="/"></ion-back-button>
-                                                              </ion-buttons>
+                                                                <ion-buttons slot="start">
+                                                                    <ion-back-button defaultHref="/"></ion-back-button>
+                                                                </ion-buttons>
+                                                                <ion-buttons slot="end">
+                                                                    <ion-menu-button></ion-menu-button>
+                                                                </ion-buttons>
                                                                 <ion-title><h1>Tutorial</h1></ion-title>
                                                             </ion-toolbar>
                                                         </ion-header>
@@ -566,12 +578,15 @@ function load_my_requested_tutorials() {
                                                                 </div>            
                                                             <ion-item-divider class="divider2"></ion-item-divider> 
                                                         </ion-content>`;
-                        } else if (this_tutorial.post_agreement_signed) {
-                            tutorial_element_html = `<ion-header translucent>
+                            } else if (this_tutorial.post_agreement_signed) {
+                                tutorial_element_html = `<ion-header translucent>
                                                         <ion-toolbar>
-                                                                <ion-buttons slot="start">
-                                                            <ion-back-button defaultHref="/"></ion-back-button>
-                                                          </ion-buttons>
+                                                            <ion-buttons slot="start">
+                                                                <ion-back-button defaultHref="/"></ion-back-button>
+                                                            </ion-buttons>
+                                                            <ion-buttons slot="end">
+                                                                <ion-menu-button></ion-menu-button>
+                                                            </ion-buttons>
                                                             <ion-title><h1>Tutorial</h1></ion-title>
                                                         </ion-toolbar>
                                                     </ion-header>
@@ -633,13 +648,16 @@ function load_my_requested_tutorials() {
                                                             </div>            
                                                         <ion-item-divider class="divider2"></ion-item-divider> 
                                                     </ion-content>`;
-                        } else {
-                            tutorial_element_html = `
+                            } else {
+                                tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                        <ion-buttons slot="start">
-                                    <ion-back-button defaultHref="/"></ion-back-button>
-                                  </ion-buttons>
+                                    <ion-buttons slot="start">
+                                        <ion-back-button defaultHref="/"></ion-back-button>
+                                    </ion-buttons>
+                                    <ion-buttons slot="end">
+                                        <ion-menu-button></ion-menu-button>
+                                    </ion-buttons>
                                     <ion-title><h1>Tutorial</h1></ion-title>
                                 </ion-toolbar>
                             </ion-header>
@@ -695,116 +713,122 @@ function load_my_requested_tutorials() {
                                 <ion-item-divider class="divider2"></ion-item-divider> 
                             </ion-content>
                         `;
+                            }
+                        } else if (tutorial_status == "Ongoing") {
+                            tutorial_element_html = `
+                            <ion-header translucent>
+                                <ion-toolbar>
+                                    <ion-buttons slot="start">
+                                        <ion-back-button defaultHref="/"></ion-back-button>
+                                    </ion-buttons>
+                                    <ion-buttons slot="end">
+                                        <ion-menu-button></ion-menu-button>
+                                    </ion-buttons>
+                                    <ion-title><h1>Tutorial</h1></ion-title>
+                                </ion-toolbar>
+                            </ion-header>
+
+                            <ion-content fullscreen>
+                                <ion-item style="margin-top:10px;" lines="none">
+                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
+                                        <img src="${this_tutorial.std_avatar}">
+                                    </ion-avatar>
+                                    <ion-label>
+                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
+                                        <p>${this_tutorial.std_email}</p>
+                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
+                                </ion-item>
+
+
+                                <ion-item-divider class="divider"></ion-item-divider>
+                                <ion-item lines="none">
+                                    <ion-label>
+                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
+                                    </ion-label>
+                                </ion-item>
+                                <ion-item style="margin-top:-15px;" lines="none">
+                                    <h6>
+                                        ${this_tutorial.post_desc}
+                                    </h6>
+                                </ion-item>
+                                        <ion-chip class="module" color="primary">
+                                    <ion-icon name="star"></ion-icon>
+                                    <ion-label>${tutorial_tag}</ion-label>
+                                </ion-chip>
+                                <!--<ion-chip class="module2" color="danger">
+                                  <ion-icon name="close"></ion-icon>
+                                  <ion-label>Closed</ion-label>
+                                </ion-chip>-->
+                                <ion-chip color="success">
+                                    <ion-icon name="swap"></ion-icon>
+                                    <ion-label>${tutorial_status}</ion-label>
+                                </ion-chip>
+                                 <ion-item-divider class="divider2"></ion-item-divider>   
+                                <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                <img class="pdf_button" src="images/pdf.png" width="100px" alt=""/>
+                                <img class="blockchain_button" src="images/blockchain.png" width="100px" alt=""/>
+                            </ion-content>
+                        `;
+                        } else {
+                            tutorial_element_html = `
+                            <ion-header translucent>
+                                <ion-toolbar>
+                                    <ion-buttons slot="start">
+                                        <ion-back-button defaultHref="/"></ion-back-button>
+                                    </ion-buttons>
+                                    <ion-buttons slot="end">
+                                        <ion-menu-button></ion-menu-button>
+                                    </ion-buttons>
+                                    <ion-title><h1>Tutorial</h1></ion-title>
+                                </ion-toolbar>
+                            </ion-header>
+
+                            <ion-content fullscreen>
+                                <ion-item style="margin-top:10px;" lines="none">
+                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
+                                        <img src="${this_tutorial.std_avatar}">
+                                    </ion-avatar>
+                                    <ion-label>
+                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
+                                        <p>${this_tutorial.std_email}</p>
+                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
+                                </ion-item>
+
+
+                                <ion-item-divider class="divider"></ion-item-divider>
+                                <ion-item lines="none">
+                                    <ion-label>
+                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
+                                    </ion-label>
+                                </ion-item>
+                                <ion-item style="margin-top:-15px;" lines="none">
+                                    <h6>
+                                        ${this_tutorial.post_desc}
+                                    </h6>
+                                </ion-item>
+                                        <ion-chip class="module" color="primary">
+                                    <ion-icon name="star"></ion-icon>
+                                    <ion-label>${tutorial_tag}</ion-label>
+                                </ion-chip>
+                                <!--<ion-chip class="module2" color="danger">
+                                  <ion-icon name="close"></ion-icon>
+                                  <ion-label>Closed</ion-label>
+                                </ion-chip>-->
+                                <ion-chip color="success">
+                                    <ion-icon name="swap"></ion-icon>
+                                    <ion-label>${tutorial_status}</ion-label>
+                                </ion-chip>
+                                 <ion-item-divider class="divider2"></ion-item-divider>   
+                                <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                <img class="pdf_button" src="images/pdf.png" width="100px" alt=""/>
+                                <img class="blockchain_button" src="images/blockchain.png" width="100px" alt=""/>
+                            </ion-content>
+                        `;
                         }
-                    } else if (tutorial_status == "Ongoing") {
-                        tutorial_element_html = `
-                            <ion-header translucent>
-                                <ion-toolbar>
-                                        <ion-buttons slot="start">
-                                    <ion-back-button defaultHref="/"></ion-back-button>
-                                  </ion-buttons>
-                                    <ion-title><h1>Tutorial</h1></ion-title>
-                                </ion-toolbar>
-                            </ion-header>
 
-                            <ion-content fullscreen>
-                                <ion-item style="margin-top:10px;" lines="none">
-                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                        <img src="${this_tutorial.std_avatar}">
-                                    </ion-avatar>
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                        <p>${this_tutorial.std_email}</p>
-                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                                </ion-item>
+                        tutorial_element.innerHTML = tutorial_element_html;
 
-
-                                <ion-item-divider class="divider"></ion-item-divider>
-                                <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                                <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
-                                        ${this_tutorial.post_desc}
-                                    </h6>
-                                </ion-item>
-                                        <ion-chip class="module" color="primary">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-label>${tutorial_tag}</ion-label>
-                                </ion-chip>
-                                <!--<ion-chip class="module2" color="danger">
-                                  <ion-icon name="close"></ion-icon>
-                                  <ion-label>Closed</ion-label>
-                                </ion-chip>-->
-                                <ion-chip color="success">
-                                    <ion-icon name="swap"></ion-icon>
-                                    <ion-label>${tutorial_status}</ion-label>
-                                </ion-chip>
-                                 <ion-item-divider class="divider2"></ion-item-divider>   
-                                <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                <img class="pdf_button" src="images/pdf.png" width="100px" alt=""/>
-                                <img class="blockchain_button" src="images/blockchain.png" width="100px" alt=""/>
-                            </ion-content>
-                        `;
-                    } else {
-                        tutorial_element_html = `
-                            <ion-header translucent>
-                                <ion-toolbar>
-                                        <ion-buttons slot="start">
-                                    <ion-back-button defaultHref="/"></ion-back-button>
-                                  </ion-buttons>
-                                    <ion-title><h1>Tutorial</h1></ion-title>
-                                </ion-toolbar>
-                            </ion-header>
-
-                            <ion-content fullscreen>
-                                <ion-item style="margin-top:10px;" lines="none">
-                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                        <img src="${this_tutorial.std_avatar}">
-                                    </ion-avatar>
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                        <p>${this_tutorial.std_email}</p>
-                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                                </ion-item>
-
-
-                                <ion-item-divider class="divider"></ion-item-divider>
-                                <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                                <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
-                                        ${this_tutorial.post_desc}
-                                    </h6>
-                                </ion-item>
-                                        <ion-chip class="module" color="primary">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-label>${tutorial_tag}</ion-label>
-                                </ion-chip>
-                                <!--<ion-chip class="module2" color="danger">
-                                  <ion-icon name="close"></ion-icon>
-                                  <ion-label>Closed</ion-label>
-                                </ion-chip>-->
-                                <ion-chip color="success">
-                                    <ion-icon name="swap"></ion-icon>
-                                    <ion-label>${tutorial_status}</ion-label>
-                                </ion-chip>
-                                 <ion-item-divider class="divider2"></ion-item-divider>   
-                                <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                <img class="pdf_button" src="images/pdf.png" width="100px" alt=""/>
-                                <img class="blockchain_button" src="images/blockchain.png" width="100px" alt=""/>
-                            </ion-content>
-                        `;
-                    }
-
-                    tutorial_element.innerHTML = tutorial_element_html;
-
-                    nav.push(tutorial_element);
+                        nav.push(tutorial_element);
 
 //                    let ionNavDidChangeEvent = async function () {
 //                        if (document.getElementById('accept_request_btn') !== null) {
@@ -821,8 +845,11 @@ function load_my_requested_tutorials() {
 //                    };
 //
 //                    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-                }
-            });
+                    }
+                });
+                
+                my_requested_posts_event_listener_added = true;
+            }
         }
 
         disconnectedCallback() {

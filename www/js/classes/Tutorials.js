@@ -19,7 +19,12 @@ class Tutorials extends User {
             this.total_done_tutorials = this.done_tutorials.length;
         } else {
             this.total_tutorials = 0;
-
+            
+            this.open_tutorials = [];
+            this.pending_tutorials = [];
+            this.ongoing_tutorials = [];
+            this.done_tutorials = [];
+            
             this.total_open_tutorials = 0;
             this.total_pending_tutorials = 0;
             this.total_ongoing_tutorials = 0;
@@ -86,9 +91,8 @@ class Tutorials extends User {
     }
 
     appendPosts(number, list, tutorials_array, tutorials_length) {
-        let open_tutorials = tutorials_array;
-
-        console.log('length is', this.open_tutorials_length);
+        let tutorials = tutorials_array;
+ 
         const originalLength = tutorials_length;
 
         for (var i = 0; i < number; i++) {
@@ -104,23 +108,23 @@ class Tutorials extends User {
             el.classList.add('ion-activatable', 'ripple', "not_read");
 
             el.innerHTML = `
-                <ion-card class="test post" post_id="${open_tutorials[i + originalLength]._id}" post_modules="${open_tutorials[i + originalLength].post_modules.join(', ')}" post_status="${open_tutorials[i + originalLength].post_status}">
+                <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
                                 <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
                             </ion-avatar>
                             <ion-label>
-                                <h2>${open_tutorials[i + originalLength].post_title}</h2>
-                                <p>${formatDate(open_tutorials[i + originalLength].post_posted_on)}</p>
+                                <h2>${tutorials[i + originalLength].post_title}</h2>
+                                <p>${formatDate(tutorials[i + originalLength].post_posted_on)}</p>
                             </ion-label>
                         </ion-item>
                         <ion-card-content>
-                            ${open_tutorials[i + originalLength].post_desc_trunc}
+                            ${tutorials[i + originalLength].post_desc_trunc}
                         </ion-card-content>
                         <ion-item>
                             <ion-chip class="module2" outline color="primary">
                                 <ion-icon name="star"></ion-icon>
-                                <ion-label>${open_tutorials[i + originalLength].post_modules.join(', ')}</ion-label>
+                                <ion-label>${tutorials[i + originalLength].post_modules.join(', ')}</ion-label>
                             </ion-chip>
                             <ion-button fill="outline" slot="end">View</ion-button>
                         </ion-item>
