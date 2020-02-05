@@ -175,7 +175,7 @@ class Posts extends User {
     waitForNewTutorials() {
         let socket = this.socket;
 
-        socket.on('new_tutorial_request', (data) => {
+        socket.on('new_tutorial_request', (data) => { 
             this.addToPosts(data.response);
             //Add notification
             console.log(data);
@@ -195,8 +195,8 @@ class Posts extends User {
     waitForTutorialAccepted() {
         let socket = this.socket;
         
-        socket.on('tutorial_request_accepted', (data) => {
-            user_notifications.addToNotifications(data.response);
+        socket.on('tutorial_request_accepted', (data) => { 
+            user_notifications.addToNotifications(data.the_notification.response);
             //Add notification
             console.log(data);
         });
@@ -236,5 +236,13 @@ class Posts extends User {
         
         let notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
         return notification_posts.response;
+    }
+    
+    replace_notification_posts(new_post) {
+        for (let i = 0; i < this.notification_posts.length; i++) {
+            if(this.notification_posts[i]._id === new_post._id) {
+                this.notification_posts[i] = new_post;
+            }
+        }
     }
 }

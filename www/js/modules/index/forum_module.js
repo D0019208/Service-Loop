@@ -200,7 +200,23 @@ async function all_tutorials(nav) {
 
                         let event_handler = function () {
                             device_feedback();
-                            load_nav_post_functionality(this_post, post);
+
+                            create_ionic_alert("Accept tutorial", "Are you sure you want to accept this tutorial? You cannot unasign yourself (yet) after you have accepted a tutorial.", [
+                                {
+                                    text: 'Accept',
+                                    handler: () => {
+                                        console.log('Accepted');
+                                        accept_post(nav, this_post, post, true);
+                                    }
+                                },
+                                {
+                                    text: 'Cancel',
+                                    role: 'cancel',
+                                    handler: () => {
+                                        console.log('Cancel')
+                                    }
+                                }
+                            ]); 
                         };
 
                         let ionNavDidChangeEvent = async function () {
@@ -238,152 +254,4 @@ async function all_tutorials(nav) {
     });
 
     nav.push('nav-all-tutorials');
-}
-
-async function load_nav_post_functionality(this_post, post) {
-    let post_acceptated_response = await access_route({tutor_email: user.getEmail(), tutor_name: user.getName(), post_id: post.getAttribute("post_id")}, "post_accepted", function () {
-        let toast_buttons = [
-            {
-                side: 'end',
-                text: 'Close',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel clicked');
-                }
-            }
-        ];
-
-        create_toast("You have successfully accepted a tutorial.", "dark", 2000, toast_buttons);
-    });
-
-    if (!post_acceptated_response.error) {
-        user_notifications.addToNotifications(post_acceptated_response.response.tutor_notification);
-        user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification);
-
-
-
-        let name = post_acceptated_response.response.student_notification.response.notification_desc.split(' ').slice(0, 2).join(' ');
-
-        let success_screen_element = document.createElement('success_screen');
-        success_screen_element.innerHTML =
-                `<ion-header translucent>
-            <ion-toolbar>
-                <ion-title><h1>Request Accepted</h1></ion-title>
-                <ion-buttons slot="end">
-                    <ion-menu-button></ion-menu-button>
-                </ion-buttons>
-            </ion-toolbar>
-        </ion-header>
-
-        <ion-content fullscreen>
-            <h1 class="success_name">Tutorial request accepted!</h1>
-            <p class="success_img"><img  src="images/success_blue1.png" alt=""/></p>
-            <ion-list lines="full" class="ion-no-margin ion-no-padding fields1">
-            <p class="success_text">Congratulations, You have volunteered to be a tutor for ${name}.</p>
-            <p class="success_text2">Please get in contact with the student and fill out the agreement form.</p>
-            
-            </ion-list>
-            <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
-            <div class="ion-padding-top">
-                <ion-button expand="block" type="submit" class="ion-no-margin" id="ok_btn">Okay</ion-button>
-                <p class="success_text3">Please note, the student has to agree to the agreement before a tutorial can take place.</p>
-            </div>
-            </ion-list>
-        </ion-content>`;
-
-        let ok_btn;
-
-        let ok_btn_handler = function () {
-            device_feedback();
-            success_screen(this_post);
-        }
-
-        nav.push(success_screen_element);
-
-
-
-
-        let ionNavDidChangeEvent = async function () {
-            if (document.getElementById('ok_btn') !== null) {
-                ok_btn = document.getElementById("ok_btn");
-                ok_btn.addEventListener('click', ok_btn_handler, false);
-            }
-
-            let active_component = await nav.getActive();
-
-            //Remove the event listener when we no longer need it
-            if (active_component.component.tagName !== "SUCCESS_SCREEN") {
-                ok_btn.removeEventListener("click", ok_btn_handler, false);
-                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-            }
-        };
-
-        nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-
-
-
-
-
-
-
-
-
-
-
-
-//        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"], function () {
-//            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-//            posts.total_posts = posts.total_posts - 1;
-//
-//            if (document.getElementById("forum_list").childNodes.length === 0) {
-//                document.getElementById("forum_list").remove();
-//            }
-//
-//            post.remove();
-//            nav.popToRoot();
-//
-//            posts.removePostById(post.getAttribute("post_id"));
-//        });
-    } else {
-        create_ionic_alert("Tutorial request error", post_acceptated_response.response, ["OK"], function () {
-            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-            posts.total_posts = posts.total_posts - 1;
-
-            if (document.getElementById("forum_list").childNodes.length === 0) {
-                document.getElementById("forum_list").remove();
-            }
-
-            post.remove();
-            nav.popToRoot();
-        });
-    }
-}
-
-function success_screen(this_post) {
-    //Maybe needed idk
-    //posts.removeNotificationPostByPostId(this_post._id);
-
-
-    //All notification posts
-    let notification_posts = posts.notification_posts;
-
-    //Change the status of this post
-    for (let i = 0; i < notification_posts.length; i++) {
-        if (notification_posts[i]._id === this_post._id) {
-            notification_posts[i].post_status = "In negotiation";
-        }
-    }
-
-    //Set the new array
-    posts.notification_posts = notification_posts;
-
-
-    if (posts.all_posts !== 0 && posts.total_posts !== 0) {
-        posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-        posts.total_posts = posts.total_posts - 1;
-
-        posts.removePostById(this_post._id);
-    }
-
-    nav.popToRoot();
-}
+} 

@@ -222,25 +222,27 @@ class Notifications extends User {
         this.socket.emit('send_notification', notification);
     }
     
-    sendTutorialAcceptedNotification(notification) {
-        this.socket.emit('tutorial_request_accepted', notification);
+    sendTutorialAcceptedNotification(notification, post) {
+        this.socket.emit('tutorial_request_accepted', {the_notification: notification, the_post: post});
     }
 
     waitForNewNotifications() {
         let socket = this.socket;
 
-        socket.on('new_notification', (data) => {
+        socket.on('new_notification', (data) => { 
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
         }); 
         
-        socket.on('add_tutorial_request_accepted_notification', (data) => {
+        socket.on('add_tutorial_request_accepted_notification', (data) => { 
+            posts.replace_notification_posts(data.post); 
+            
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response); 
             
             console.log(data);
-        })
+        });
 
         socket.on('news', function (data) {
             console.log(data);

@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     ////Set status of user to tutor
-    user.setName("Joe Postolachi");
+    user.setName("John Doe");
     user.setStatus("Tutor");
     user.setEmail("D00192082@student.dkit.ie");
 
@@ -284,8 +284,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
                 tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
                 tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
-                
-                posts.waitForNewTutorials(); 
+
+                posts.waitForNewTutorials();
             } else {
                 posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
                 tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
@@ -319,13 +319,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                 await include("js/modules/index/my_tutorials_module.js", "my_requested_tutorials_script");
                 load_my_requested_tutorials();
             });
-            
-            //Create My Tutorials page
-            document.getElementById('my_tutorials').addEventListener('click', async function () {
-                device_feedback();
-                await include("js/modules/index/tutor_tutorials_module.js", "my_tutorials_script");
-                all_tutor_tutorials(nav);
-            });
+
+            //Create My Tutorials page (If user is Tutor)
+            if (user.getStatus() == "Tutor") {
+                document.getElementById('my_tutorials').addEventListener('click', async function () {
+                    device_feedback();
+                    await include("js/modules/index/tutor_tutorials_module.js", "my_tutorials_script");
+                    all_tutor_tutorials(nav);
+                });
+            }
+
         }
 
         //Callback to call when component is removed
@@ -354,7 +357,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
         console.log("??")
         console.log(event)
-        
+
         if (event.target.innerText == "Home" || event.target.innerText == "Notifications" || event.target.innerText == "Settings") {
             console.log("test")
             nav.popToRoot();

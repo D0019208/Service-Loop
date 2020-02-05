@@ -116,7 +116,8 @@ function load_request_tutorial() {
                     ];
 
                     create_toast("You have successfully requested a tutorial.", "dark", 2000, toast_buttons);
-                    document.querySelector("ion-back-button").click();
+                    nav.pop();
+                    //document.querySelector("ion-back-button").click();
                 } else {
                     //If an error occured, display an error and make the button clickable again
                     request_tutorial_button.disabled = false;
