@@ -320,6 +320,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                 load_my_requested_tutorials();
             });
 
+            document.getElementById('profile').addEventListener('click', async function () {
+                device_feedback();
+                await include("js/modules/index/profile_module.js", "profile_script");
+                load_profile_page();
+            });
+
             //Create My Tutorials page (If user is Tutor)
             if (user.getStatus() == "Tutor") {
                 document.getElementById('my_tutorials').addEventListener('click', async function () {

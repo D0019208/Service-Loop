@@ -387,6 +387,115 @@
                 padding-left: 20%;
                 padding-right: 20%;
             }
+
+
+            
+            /*Profile*/
+            .divider
+            {
+                margin-top: -20px;
+            }
+            .divider2
+            {
+                margin-top: -15px;
+            }
+            .note
+            {
+                text-align: center;
+                filter: opacity(70%);
+            }
+            .date
+            {
+                position: absolute;
+                right: 10px;
+                top: 0px;
+                font-size: 12px;
+                filter: opacity(80%);
+            }
+            ion-avatar
+            {
+                margin: auto;
+            }
+            .edit_skills
+            {
+                position: absolute;
+                top:15px;
+                right: 10px;
+                height: 25px;
+            }
+            ion-fab
+            {
+                position: absolute;
+                top: 135px;
+                right: 50%;
+                margin-right: -55px;
+                z-index: 1;
+            }
+            ion-fab-button
+            {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .skills_text
+            {
+                text-align: center;
+                filter: opacity(85%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .fields
+            {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            ion-label
+            {
+                padding-left: 0px;
+            }
+            .skill
+            {
+                padding-left: 0%;
+            }
+            #add_skill
+            {
+                position: absolute;
+                width: 100px;
+                right: 10px;
+                top: 60px;
+                
+            }
+            #p
+            {
+                padding-right: 100px;
+                margin-top: 20px;
+            }
+            .hide_this_input
+            {
+                display: none;
+            }
+            #save_button
+            {
+                margin-top: 20px;
+            }
+            
+            /*accordion*/
+            .collapsible {
+              padding: 18px;
+              width: 100%;
+            }
+            .collapsible:after {
+              content: '\002B';
+            }
+
+            .active:after {
+              content: "\2212";
+            }
+
+            .content {
+              max-height: 0;
+              overflow: hidden;
+              transition: max-height 0.2s ease-out;
+            }
             
             
             
@@ -446,7 +555,7 @@
                         <ion-icon name="home" slot="start"></ion-icon>
                         <ion-label>Home</ion-label>
                     </ion-item>
-                    <ion-item>
+                    <ion-item id="profile">
                         <ion-icon name="person" slot="start"></ion-icon>
                         <ion-label>Profile</ion-label>
                     </ion-item>
