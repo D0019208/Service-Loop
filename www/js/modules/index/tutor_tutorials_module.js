@@ -1,8 +1,7 @@
 let tutor_tutorials_response;
 let tutor_tutorials_loaded = false;
 let tutor_tutorials_event_listener_added = false;
-
-let tutor_tutorials_open;
+ 
 let tutor_tutorials_pending;
 let tutor_tutorials_ongoing;
 let tutor_tutorials_done;
@@ -203,8 +202,7 @@ function all_tutor_tutorials() {
 //            doneReferenceNode.parentNode.insertBefore(append_done_tutorials_infinite_scroll, doneReferenceNode.nextSibling);
 
 
-            //We set the tutorials length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value
-            tutor_tutorials.open_tutor_tutorials_length = 0;
+            //We set the tutorials length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value 
             tutor_tutorials.pending_tutor_tutorials_length = 0;
             tutor_tutorials.ongoing_tutor_tutorials_length = 0;
             tutor_tutorials.closed_tutor_tutorials_length = 0;
@@ -227,18 +225,21 @@ function all_tutor_tutorials() {
             let number_of_done_tutor_tutorials_to_add;
 
             pendingInfiniteScroll.addEventListener('ionInfinite', async function () {
-                if (tutor_tutorials.open_tutorials_length < tutor_tutorials.get_pending_tutor_tutorials().length) {
+                if (tutor_tutorials.pending_tutor_tutorials_length < tutor_tutorials.get_pending_tutor_tutorials().length) {
                     console.log('Loading data...');
                     await wait(500);
-                    pendingInfiniteScroll.complete();
-
-                    number_of_pending_tutor_tutorials_to_add = tutor_tutorials.get_pending_tutor_tutorials().length - tutor_tutorials.open_tutorials_length;
-
-                    tutor_tutorials.open_tutorials_length = tutor_tutorials.appendPosts(number_of_pending_tutor_tutorials_to_add, pendingInfiniteScroll, tutor_tutorials.open_tutorials, tutor_tutorials.open_tutorials_length);
+                    pendingInfiniteScroll.complete(); 
+                    
+                    number_of_pending_tutor_tutorials_to_add = tutor_tutorials.get_pending_tutor_tutorials().length - tutor_tutorials.pending_tutor_tutorials_length;
+                    if(number_of_pending_tutor_tutorials_to_add > 3) {
+                        number_of_pending_tutor_tutorials_to_add = 3;
+                    }
+                    
+                    tutor_tutorials.pending_tutor_tutorials_length = tutor_tutorials.appendPosts(number_of_pending_tutor_tutorials_to_add, pendingInfiniteScroll, tutor_tutorials.pending_tutor_tutorials, tutor_tutorials.pending_tutor_tutorials_length);
 
                     console.log('Done');
 
-                    if (tutor_tutorials.open_tutorials_length >= tutor_tutorials.get_pending_tutor_tutorials().length) {
+                    if (tutor_tutorials.pending_tutor_tutorials_length >= tutor_tutorials.get_pending_tutor_tutorials().length) {
                         console.log('No More Open Data 2');
                         pendingInfiniteScroll.disabled = true;
                     }

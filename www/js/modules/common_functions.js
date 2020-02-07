@@ -670,7 +670,7 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
         user_notifications.addToNotifications(post_acceptated_response.response.tutor_notification);
         user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification, post_acceptated_response.response.post);
 
-
+        tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
 
         let name = post_acceptated_response.response.student_notification.response.notification_desc.split(' ').slice(0, 2).join(' ');
 
@@ -728,18 +728,14 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
                     posts.removePostById(this_post._id);
                 }
 
+
+
                 nav_controller.popToRoot();
             } else {
                 nav_controller.popToRoot();
             }
-            
-            console.log("Response post");
-            console.log(post_acceptated_response.response)
-            console.log("Notification pists pre updated");
-            console.log(posts.notification_posts);
-            posts.replace_notification_posts(post_acceptated_response.response.post); 
-            console.log("Post update");
-            console.log(posts.notification_posts);
+
+            posts.replace_notification_posts(post_acceptated_response.response.post);
         }
 
         nav_controller.push(success_screen_element);
@@ -793,22 +789,25 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
             posts.all_posts = posts.all_posts.filter(e => e !== this_post);
             posts.total_posts = posts.total_posts - 1;
 
-            if (document.getElementById("forum_list").childNodes.length === 0) {
-                document.getElementById("forum_list").remove();
+            if (document.getElementById("forum_list") !== null) {
+                if (document.getElementById("forum_list").childNodes.length === 0) {
+                    document.getElementById("forum_list").remove();
+                }
             }
+
 
             post.remove();
             nav_controller.popToRoot();
         });
     }
-} 
+}
 
 function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     let tutor_tutorial_element = document.createElement('tutorial');
     let date = new Date();
     let year = date.getFullYear();
     let current_date = year + "-" + parseInt(date.getMonth() + 1) + "-" + date.getDate();
-    
+
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
@@ -862,7 +861,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     let generate_agreement_handler = async function () {
         device_feedback();
 
-        generate_agreement(tutorial);
+        generate_agreement(nav_controller, tutorial);
     }
 
     let ionNavDidChangeEvent = async function () {
@@ -875,7 +874,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
 
         let notifications_active_component = await nav_controller.getActive();
 
-        if (notifications_active_component.component.tagName === "TUTORIAL") {
+        if (notifications_active_component.component.tagName !== "TUTORIAL") {
             generate_agreement_button.removeEventListener("click", generate_agreement_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
@@ -884,20 +883,27 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-async function generate_agreement(tutorial) { 
+async function generate_agreement(nav_controller, tutorial) {
     if (isCanvasBlank(document.getElementById('signature-pad')) || document.getElementById('tutorial_room').value == "") {
         create_ionic_alert("Agreement creation failed", "Please fill in all fields before proceeding.", ["OK"]);
     } else {
-        let agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), email: user.getEmail(), name: user.getName(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+        let agreement_generated_response;
+
+        if (typeof tutorial._id == 'undefined') {
+            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), email: user.getEmail(), name: user.getName(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+        } else {
+            agreement_generated_response = await access_route({tutorial_id: tutorial._id, email: user.getEmail(), name: user.getName(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+        }
+
         console.log(agreement_generated_response);
         if (!agreement_generated_response.error) {
             user_notifications.addToNotifications(agreement_generated_response.tutor_notification.response);
-            //user_notifications.sendTutorialAcceptedNotification(agreement_generated_response.student_notification.response);
+            user_notifications.sendTutorialAcceptedNotification({response: agreement_generated_response.student_notification.response}, agreement_generated_response.updated_tutorial);
 
             //tutor_tutorials.remove_tutorial_from_DOM("Pending", agreement_generated_response);
             tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
             //tutor_tutorials.add_tutorial_to_DOM("Ongoing", agreement_generated_response.updated_tutorial)
-            
+
 
             let toast_buttons = [
                 {
@@ -912,7 +918,7 @@ async function generate_agreement(tutorial) {
 
             create_toast("Agreement offer sent.", "dark", 2000, toast_buttons);
 
-            nav.pop();
+            nav_controller.pop();
         } else {
             alert("Error")
         }
@@ -1041,4 +1047,116 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
     nav_controller.push(tutor_tutorial_element);
-}  
+}
+
+async function load_new_tutorial_request_component(nav_controller, this_notification) {
+//    let notification_posts;
+//
+//    if (posts.get_notification_posts().length == 0) {
+//        //Function to get all ids from the notifications list and find the posts associated with them
+//        notification_posts = await posts.getAllNotificationPosts();
+//        console.log(notification_posts);
+//        posts.set_notification_posts(notification_posts);
+//    } else {
+//        notification_posts = posts.get_notification_posts();
+//    }
+
+    //Get the current post notification
+    let this_post = posts.getNotificationPostDetailsById(this_notification.post_id);
+
+    if (typeof this_post == 'undefined') {
+        this_post = posts.getNotificationById(this_notification.post_id);
+    }
+
+    let modules = "";
+
+    for (let i = 0; i < this_post.post_modules.length; i++) {
+        modules += '<ion-chip class="module" color="primary"><ion-icon name="star"></ion-icon><ion-label>' + this_post.post_modules[i] + '</ion-label></ion-chip>';
+    }
+
+    let nav_post = document.createElement("nav-post");
+    nav_post.innerHTML = `
+                            <ion-header translucent>
+                            <ion-toolbar>
+                                    <ion-buttons slot="start">
+                                        <ion-back-button defaultHref="/"></ion-back-button>
+                                    </ion-buttons>
+                                <ion-title><h1>Request Description</h1></ion-title>
+                            </ion-toolbar>
+                        </ion-header>
+                
+                        <ion-content fullscreen>
+                        <ion-item style="margin-top:10px;" lines="none">
+                          <ion-avatar style="width: 100px;height: 100px;" slot="start">
+                            <img src="${this_post.std_avatar}">
+                          </ion-avatar>
+                          <ion-label>
+                            <h2><strong>${this_post.std_name}</strong></h2>
+                            <p>${this_post.std_email}</p>
+                          </ion-label>
+                        </ion-item>
+                            
+                            <ion-item-divider class="divider"></ion-item-divider>
+                        <ion-item lines="none">
+                            <ion-label>
+                                <h2><strong>${this_post.post_title}</strong></h2>
+                            </ion-label>
+                        </ion-item>
+                        <ion-item style="margin-top:-15px;" lines="none">
+                            <ion-label>
+                                <h2>${this_post.post_desc}</h2>
+                            </ion-label>
+                        </ion-item>
+                            
+                        ${modules}
+                            
+                            <ion-item-divider class="divider2"></ion-item-divider>
+                            <ion-button expand="block" type="submit" class="ion-margin accept_request_btn" id="accept_request_btn">Accept Request</ion-button>
+                        </ion-content>
+                                              `;
+
+    let accept_request_btn;
+
+    let handler = function () {
+        device_feedback();
+
+        create_ionic_alert("Accept tutorial", "Are you sure you want to accept this tutorial? You cannot unasign yourself (yet) after you have accepted a tutorial.", [
+            {
+                text: 'Accept',
+                handler: () => {
+                    console.log('Accepted');
+                    accept_post(nav_controller, this_post, null, false);
+                }
+            },
+            {
+                text: 'Cancel',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel')
+                }
+            }
+        ]);
+    }
+
+    nav_controller.push(nav_post);
+
+
+
+
+    let ionNavDidChangeEvent = async function () {
+        if (document.getElementById('accept_request_btn') !== null) {
+            accept_request_btn = document.getElementById("accept_request_btn");
+            accept_request_btn.addEventListener('click', handler, false);
+        }
+
+        let notifications_active_component = await nav_controller.getActive();
+
+        //Remove the event listener when we no longer need it
+        if (notifications_active_component.component.tagName === "NAV-NOTIFICATION-TUTORIAL-REQUESTED") {
+            accept_request_btn.removeEventListener("click", handler, false);
+            nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+        }
+    };
+
+    nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+}

@@ -223,6 +223,7 @@ class Notifications extends User {
     }
     
     sendTutorialAcceptedNotification(notification, post) {
+        alert("test")
         this.socket.emit('tutorial_request_accepted', {the_notification: notification, the_post: post});
     }
 

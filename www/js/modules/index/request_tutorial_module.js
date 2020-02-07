@@ -81,10 +81,8 @@ function load_request_tutorial() {
                     users_email: user.getEmail()
                 };
 
-                console.log(data.request_modules)
-
                 //Checking if any of the data is empty MIGHT NOT WORK
-                if (typeof data.request_modules == "undefined" || data.request_modules == null || data.request_modules.length == null || data.request_title.length == 0 || data.request_description.length == 0 || data.users_email.length == 0) {
+                if (typeof data.request_modules[0] == "undefined" || data.request_modules == null || data.request_modules.length == null || data.request_title.length == 0 || data.request_description.length == 0 || data.users_email.length == 0) {
                     create_ionic_alert("Tutorial request failed", "Please fill in all required fields to proceed.", ["OK"]);
                     request_tutorial_button.disabled = false;
                     return;

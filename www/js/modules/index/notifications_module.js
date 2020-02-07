@@ -306,7 +306,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
             let new_tutorial_request_event_handler = function () {
                 device_feedback();
-                load_new_tutorial_request_component(this_notification);
+                load_new_tutorial_request_component(nav_notifications, this_notification);
             };
 
 
@@ -644,122 +644,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
         nav_notifications.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
     }
-});
-
-
-
-
-
-
-
-
-async function load_new_tutorial_request_component(this_notification) {
-//    let notification_posts;
-//
-//    if (posts.get_notification_posts().length == 0) {
-//        //Function to get all ids from the notifications list and find the posts associated with them
-//        notification_posts = await posts.getAllNotificationPosts();
-//        console.log(notification_posts);
-//        posts.set_notification_posts(notification_posts);
-//    } else {
-//        notification_posts = posts.get_notification_posts();
-//    }
-
-    //Get the current post notification
-    let this_post = posts.getNotificationPostDetailsById(this_notification.post_id);
-
-    let modules = "";
-
-    for (let i = 0; i < this_post.post_modules.length; i++) {
-        modules += '<ion-chip class="module" color="primary"><ion-icon name="star"></ion-icon><ion-label>' + this_post.post_modules[i] + '</ion-label></ion-chip>';
-    }
-
-    let nav_post = document.createElement("nav-post");
-    nav_post.innerHTML = `
-                            <ion-header translucent>
-                            <ion-toolbar>
-                                    <ion-buttons slot="start">
-                                        <ion-back-button defaultHref="/"></ion-back-button>
-                                    </ion-buttons>
-                                <ion-title><h1>Request Description</h1></ion-title>
-                            </ion-toolbar>
-                        </ion-header>
-                
-                        <ion-content fullscreen>
-                        <ion-item style="margin-top:10px;" lines="none">
-                          <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                            <img src="${this_post.std_avatar}">
-                          </ion-avatar>
-                          <ion-label>
-                            <h2><strong>${this_post.std_name}</strong></h2>
-                            <p>${this_post.std_email}</p>
-                          </ion-label>
-                        </ion-item>
-                            
-                            <ion-item-divider class="divider"></ion-item-divider>
-                        <ion-item lines="none">
-                            <ion-label>
-                                <h2><strong>${this_post.post_title}</strong></h2>
-                            </ion-label>
-                        </ion-item>
-                        <ion-item style="margin-top:-15px;" lines="none">
-                            <ion-label>
-                                <h2>${this_post.post_desc}</h2>
-                            </ion-label>
-                        </ion-item>
-                            
-                        ${modules}
-                            
-                            <ion-item-divider class="divider2"></ion-item-divider>
-                            <ion-button expand="block" type="submit" class="ion-margin accept_request_btn" id="accept_request_btn">Accept Request</ion-button>
-                        </ion-content>
-                                              `;
-
-    let accept_request_btn;
-
-    let handler = function () {
-        device_feedback();
-
-        create_ionic_alert("Accept tutorial", "Are you sure you want to accept this tutorial? You cannot unasign yourself (yet) after you have accepted a tutorial.", [
-            {
-                text: 'Accept',
-                handler: () => {
-                    console.log('Accepted');
-                    accept_post(nav_notifications, this_post, null, false);
-                }
-            },
-            {
-                text: 'Cancel',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel')
-                }
-            }
-        ]);
-    }
-
-    nav_notifications.push(nav_post);
-
-
-
-
-    let ionNavDidChangeEvent = async function () {
-        if (document.getElementById('accept_request_btn') !== null) {
-            accept_request_btn = document.getElementById("accept_request_btn");
-            accept_request_btn.addEventListener('click', handler, false);
-        }
-
-        let notifications_active_component = await nav_notifications.getActive();
-
-        //Remove the event listener when we no longer need it
-        if (notifications_active_component.component.tagName === "NAV-NOTIFICATION-TUTORIAL-REQUESTED") {
-            accept_request_btn.removeEventListener("click", handler, false);
-            nav_notifications.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-        }
-    };
-
-    nav_notifications.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-}
+}); 
 
 function load_tutorial_accepted_component(this_post, notification_tags) {
     console.log("Accepted post")
@@ -1140,43 +1025,4 @@ function load_pending_tutorial_component(this_post, tutorial_tag, tutorial_statu
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_notifications.push(tutorial_accepted_component);
-}
-
-async function generate_agreement(tutorial) {
-    console.log(tutorial)
-
-    if (isCanvasBlank(document.getElementById('signature-pad')) || document.getElementById('tutorial_room').value == "") {
-        create_ionic_alert("Agreement creation failed", "Please fill in all fields before proceeding.", ["OK"]);
-    } else {
-        let agreement_generated_response = await access_route({tutorial_id: tutorial._id, email: user.getEmail(), name: user.getName(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
-        console.log(agreement_generated_response);
-        if (!agreement_generated_response.error) {
-            user_notifications.addToNotifications(agreement_generated_response.tutor_notification.response);
-            //user_notifications.sendTutorialAcceptedNotification(agreement_generated_response.student_notification.response);
-
-            //tutor_tutorials.remove_tutorial_from_DOM("Pending", agreement_generated_response);
-            tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
-            //tutor_tutorials.add_tutorial_to_DOM("Ongoing", agreement_generated_response.updated_tutorial)
-
-
-            let toast_buttons = [
-                {
-                    side: 'end',
-                    text: 'Close',
-                    role: 'cancel',
-                    handler: () => {
-                        console.log('Cancel clicked');
-                    }
-                }
-            ];
-
-            create_toast("Agreement offer sent.", "dark", 2000, toast_buttons);
-            console.log(posts.notification_posts)
-            nav_notifications.popToRoot();
-        } else {
-            alert("Error")
-        }
-
-        console.log(agreement_generated_response);
-    }
-}
+} 
