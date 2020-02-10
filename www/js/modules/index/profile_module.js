@@ -21,7 +21,7 @@ function load_profile_page() {
 
         <ion-content fullscreen>
         <ion-item style="margin-top:15px;" lines="none">
-          <ion-avatar style="width: 100px;height: 100px;" >
+          <ion-avatar class="profile_avatar">
             <img src="images/back.jpg">
           </ion-avatar>
             <div class='avatar'></div>
@@ -163,13 +163,13 @@ function load_profile_page() {
                   </ion-toolbar>
                 </ion-header>
                 <ion-content fullscreen> 
-                      <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+                      <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                           <ion-item class='hide_this_input'>
                               <ion-input></ion-input>
                           </ion-item>
                           <p class="skills_text">Enter your skills bellow</p>
                           <ion-item id="p">
-                              <ion-label position="stacked">Add Skills <ion-text color="danger">*</ion-text></ion-label>
+                              <ion-label class="add_skill_label" position="stacked">Add Skills <ion-text color="danger">*</ion-text></ion-label>
                               <ion-input id="item" placeholder="JavaScript" required type="text"></ion-input> 
                           </ion-item>
                           
@@ -192,7 +192,7 @@ function load_profile_page() {
                         var p = document.getElementById("p");  //getting element <ul> to add element to
                         if (skill.length > 2) {
 
-                            var li = '<ion-chip outline color="primary"><ion-icon name="build"></ion-icon><ion-label class="skill">' + skill + '</ion-label><ion-icon class="close" name="close-circle"></ion-icon></ion-chip>';  //creating li element to add
+                            var li = '<ion-chip outline color="primary"><ion-icon name="build"></ion-icon><ion-label class="add_skill_label skill">' + skill + '</ion-label><ion-icon class="close" name="close-circle"></ion-icon></ion-chip>';  //creating li element to add
                             p.insertAdjacentHTML('afterend', li);    //inserting text into newly created <li> element
                             document.getElementById('item').value = '';
 

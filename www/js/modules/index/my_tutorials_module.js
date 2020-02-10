@@ -40,14 +40,14 @@ function load_my_requested_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
-              </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons style="margin-top: -55px;" slot="start">
+                    <ion-back-button defaultHref="/"></ion-back-button>
+                </ion-buttons>
+                <ion-buttons style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title>
-                    <h1>Tutorial Request</h1>
+                    <h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1>
                 </ion-title>
                 <ion-segment> 
                     <ion-segment-button value="open_segment" checked>
@@ -119,14 +119,14 @@ function load_my_requested_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons slot="start">
+                <ion-buttons style="margin-top: -55px;" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title>
-                    <h1>Tutorial Request</h1>
+                    <h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1>
                 </ion-title>
                 <ion-segment> 
                     <ion-segment-button value="open_segment" checked>
@@ -486,13 +486,13 @@ function load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
                         <ion-toolbar>
-                            <ion-buttons slot="start">
+                            <ion-buttons style="margin-top: -55px;" slot="start">
                                 <ion-back-button defaultHref="/"></ion-back-button>
                             </ion-buttons>
-                            <ion-buttons slot="end">
+                            <ion-buttons style="margin-top: -55px;" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-                            <ion-title><h1>Tutorial</h1></ion-title>
+                            <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                         </ion-toolbar>
                     </ion-header>
 
@@ -604,13 +604,13 @@ function load_pending_tutorial_component_agreement_offered(this_tutorial, tutori
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
                                                             <ion-toolbar>
-                                                                <ion-buttons slot="start">
+                                                                <ion-buttons style="margin-top: -55px;" slot="start">
                                                                     <ion-back-button defaultHref="/"></ion-back-button>
                                                                 </ion-buttons>
-                                                                <ion-buttons slot="end">
+                                                                <ion-buttons style="margin-top: -55px;" slot="end">
                                                                     <ion-menu-button></ion-menu-button>
                                                                 </ion-buttons>
-                                                                <ion-title><h1>Tutorial</h1></ion-title>
+                                                                <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                                                             </ion-toolbar>
                                                         </ion-header>
 
@@ -796,13 +796,13 @@ function load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
     let tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons style="margin-top: -55px;" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons slot="end">
+                                    <ion-buttons style="margin-top: -55px;" slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
-                                    <ion-title><h1>Tutorial</h1></ion-title>
+                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                                 </ion-toolbar>
                             </ion-header>
 
@@ -915,13 +915,13 @@ function load_ongoing_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
     let tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons style="margin-top: -55px;" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons slot="end">
+                                    <ion-buttons style="margin-top: -55px;" slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
-                                    <ion-title><h1>Tutorial</h1></ion-title>
+                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                                 </ion-toolbar>
                             </ion-header>
 
@@ -1024,13 +1024,13 @@ function load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
     let tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons style="margin-top: -55px;" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons slot="end">
+                                    <ion-buttons style="margin-top: -55px;" slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
-                                    <ion-title><h1>Tutorial</h1></ion-title>
+                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                                 </ion-toolbar>
                             </ion-header>
 
@@ -1138,10 +1138,10 @@ function load_sign_accepted_agreement_component(this_tutorial) {
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
-                                        <ion-buttons slot="start">
+                                        <ion-buttons style="margin-top: -55px;" slot="start">
                                             <ion-back-button defaultHref="/"></ion-back-button>
                                             </ion-buttons>
-                                            <ion-buttons slot="end">
+                                            <ion-buttons style="margin-top: -55px;" slot="end">
                                                 <ion-menu-button></ion-menu-button>
                                             </ion-buttons>
                                         <ion-title><h1>Sign Agreement</h1></ion-title>
