@@ -447,11 +447,11 @@ function load_my_requested_tutorials() {
                         if (tutorial_status == "Open") {
                             load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
                         } else if (tutorial_status == "Pending") {
-                            if (this_tutorial.post_agreement_offered) { 
+                            if (this_tutorial.post_agreement_offered) {
                                 load_post_agreement_offered_component(nav, this_tutorial, tutorial_tag, tutorial_status);
-                            } else if (this_tutorial.post_agreement_signed) { 
-                                load_pending_tutorial_component_agreement_signed(nav, this_tutorial, tutorial_tag, tutorial_status) 
-                            } else { 
+                            } else if (this_tutorial.post_agreement_signed) {
+                                load_pending_tutorial_component_agreement_signed(nav, this_tutorial, tutorial_tag, tutorial_status)
+                            } else {
                                 load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
                             }
                         } else if (tutorial_status == "Ongoing") {
@@ -1194,3 +1194,5 @@ function load_sign_accepted_agreement_component(this_tutorial) {
 //        console.log(agreement_accepted_response);
 //    }
 //}
+    }
+}
