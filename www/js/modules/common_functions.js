@@ -1258,8 +1258,9 @@ async function accept_agreement(nav_controller, this_tutorial) {
 
             //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
             tutorials.add_ongoing_post(agreement_accepted_response.updated_tutorial);
-            tutorials.remove_tutorial_by_id(tutorials.pending_tutorials, agreement_accepted_response.updated_tutorial._id);
+            
             if(document.getElementById('ongoing_tutorials_header') !== null) {
+                tutorials.remove_tutorial_by_id(tutorials.pending_tutorials, agreement_accepted_response.updated_tutorial._id);
                 tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), this_tutorial);
             } 
             
