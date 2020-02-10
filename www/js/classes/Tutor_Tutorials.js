@@ -209,13 +209,13 @@ class Tutor_Tutorials extends User {
             }
         }
     }
-
-    remove_tutorial_from_DOM(segment, response, this_tutorial) {
+    
+    remove_tutor_tutorial_from_DOM(segment, response, this_tutorial) {
         let container;
         let total_tutorials;
         let tutorial_id;
         let tutorial;
-
+        
         if (segment == "Pending") {
             container = document.getElementById('tutor_tutorials_pending');
 
@@ -436,5 +436,7 @@ class Tutor_Tutorials extends User {
                 }
             }
         }
+        
+        console.log(this.pending_tutor_tutorials)
     }
 }

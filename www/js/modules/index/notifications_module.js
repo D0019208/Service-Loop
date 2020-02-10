@@ -306,7 +306,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
             let new_tutorial_request_event_handler = function () {
                 device_feedback();
-                load_new_tutorial_request_component(nav_notifications, this_notification);
+                load_new_tutorial_request_component(nav_notifications, this_notification, {post: null, is_forum: false});
             };
 
 
@@ -390,7 +390,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 </div>
           </ion-content>
         `;
-        } else if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered && user.getStatus() == "Tutor") {
+        } else if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered && user.getStatus() == "Tutor") { 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -411,6 +411,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
         } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered) {
+            alert("__")
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -424,7 +425,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
-            <p>${this_notification.notification_desc}</p> 
+            <p>${this_notification.notification_desc}</p>  
           </ion-content>
         `;
         } else {
@@ -438,13 +439,9 @@ document.querySelector('body').addEventListener('click', async function (event) 
         //The button to which we are applying the event listener
         let open_accepted_tutorial_post_button;
 
-        nav_notifications.push(nav_notification);
+        nav_notifications.push(nav_notification); 
 
-
-
-        let accepted_tutorial_request_event_handler;
-
-
+        let accepted_tutorial_request_event_handler; 
 
         let ionNavDidChangeEvent = async function () {
             if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered && user.getStatus() == "Student") {
@@ -517,7 +514,8 @@ document.querySelector('body').addEventListener('click', async function (event) 
         let nav_notification_html;
         console.log(this_post.post_status)
 
-        if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered) {
+        if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered) { 
+            alert("?")
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -538,6 +536,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
         } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered) {
+            alert("??")
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -558,6 +557,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
         } else {
+            alert("???")
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -575,7 +575,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
         }
-
+        
         nav_notification.innerHTML = nav_notification_html;
 
         //The button to which we are applying the event listener
@@ -591,16 +591,18 @@ document.querySelector('body').addEventListener('click', async function (event) 
             tutorial_status = "Pending";
         }
 
-        let ionNavDidChangeEvent = async function () {
+        let ionNavDidChangeEvent = async function () { 
             if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered && user.getStatus() == "Tutor") {
                 open_accepted_tutorial_post_button = document.getElementById('open_accepted_tutorial_agreement_form');
 
                 accepted_tutorial_request_event_handler = function () {
-                    device_feedback();
-                    load_pending_tutorial_component(this_post);
+                    device_feedback(); 
+                    load_pending_tutorial_component_not_signed(nav_notifications, this_post); 
                 };
-
-                open_accepted_tutorial_post_button.addEventListener('click', accepted_tutorial_request_event_handler, false);
+                
+                if(open_accepted_tutorial_post_button !== null) {
+                    open_accepted_tutorial_post_button.addEventListener('click', accepted_tutorial_request_event_handler, false);
+                } 
             } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered && user.getStatus() == "Tutor") {
                 //Agreement has been offered by tutor
                 open_accepted_tutorial_post_button = document.getElementById('open_accepted_tutorial');
@@ -610,8 +612,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
                     load_pending_tutorial_component_signed(nav_notifications, this_post, tutorial_status, tutorial_tag);
                 };
-
-                open_accepted_tutorial_post_button.addEventListener('click', accepted_tutorial_request_event_handler, false);
+                
+                if(open_accepted_tutorial_post_button !== null) {
+                    open_accepted_tutorial_post_button.addEventListener('click', accepted_tutorial_request_event_handler, false);
+                }  
             } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered && user.getStatus() == "Student") {
                 //Agreement has been offered by tutor and is being viewed by the student
                 open_accepted_tutorial_post_button = document.getElementById('open_accepted_tutorial');
@@ -626,6 +630,15 @@ document.querySelector('body').addEventListener('click', async function (event) 
                     open_accepted_tutorial_post_button.addEventListener('click', accepted_tutorial_request_event_handler, false);
                 }
                 
+            } else if(this_post.post_status == "In negotiation" && !this_post.post_agreement_offered && user.getStatus() == "Student") {
+                open_accepted_tutorial_post_button = document.getElementById('open_accepted_tutorial_agreement_form');
+
+                accepted_tutorial_request_event_handler = function () {
+                    device_feedback();
+                    load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                };
+
+                open_accepted_tutorial_post_button.addEventListener('click', accepted_tutorial_request_event_handler, false);
             }
 
 

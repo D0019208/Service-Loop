@@ -589,7 +589,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 text: 'Accept',
                 handler: () => {
                     console.log('Accepted');
-                    load_sign_accepted_agreement_component(this_tutorial);
+                    load_sign_accepted_agreement_component(nav_controller, this_post);
                 }
             },
             {
@@ -611,6 +611,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 text: 'Reject',
                 handler: () => {
                     console.log('Rejected')
+                    reject_this_agreement(nav_controller, this_post);
                 }
             },
             {
@@ -621,8 +622,13 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 }
             }
         ]);
+    }
+    
+    let validate_agreement;
+    let validate_agreement_handler = async function () {
+        device_feedback();
 
-        //reject_agreement(tutorial);
+        
     }
 
     let ionNavDidChangeEvent = async function () {
@@ -634,6 +640,10 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         if (document.getElementById('reject_agreement') !== null) {
             reject_agreement = document.getElementById("reject_agreement");
             reject_agreement.addEventListener('click', reject_agreement_handler, false);
+        }
+        
+        if (document.getElementById('verify_agreement') !== null) {
+            
         }
 
         let notifications_active_component = await nav_controller.getActive();
@@ -648,7 +658,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-async function accept_post(nav_controller, this_post, post, is_forum) {
+async function accept_post(nav_controller, this_post, post, is_forum, previous_view) {
     console.log("This_post")
     console.log(this_post)
     let post_acceptated_response = await access_route({tutor_email: user.getEmail(), tutor_name: user.getName(), post_id: this_post._id}, "post_accepted", function () {
@@ -672,19 +682,11 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
 
         tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
 
-        let name = post_acceptated_response.response.student_notification.response.notification_desc.split(' ').slice(0, 2).join(' ');
+        let name = post_acceptated_response.response.post.std_name;
 
         let success_screen_element = document.createElement('success_screen');
         success_screen_element.innerHTML =
-                `<ion-header translucent>
-            <ion-toolbar>
-                <ion-title><h1>Request Accepted</h1></ion-title>
-                <ion-buttons slot="end">
-                    <ion-menu-button></ion-menu-button>
-                </ion-buttons>
-            </ion-toolbar>
-        </ion-header>
-
+                `
         <ion-content fullscreen>
             <h1 class="success_name">Tutorial request accepted!</h1>
             <p class="success_img"><img  src="images/success_blue1.png" alt=""/></p>
@@ -702,8 +704,10 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
         </ion-content>`;
 
         let ok_btn;
+        let tab_bar = document.querySelector('ion-tab-bar');
+        tab_bar.style.display = 'none';
 
-        let ok_btn_handler = function () {
+        let ok_btn_handler = async function () {
             device_feedback();
 
             if (is_forum) {
@@ -720,22 +724,23 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
                 //Set the new array
                 posts.notification_posts = notification_posts;
 
-
-                if (posts.all_posts !== 0 && posts.total_posts !== 0) {
+                if (posts.all_posts.length !== 0 && posts.total_posts !== 0) {
                     posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-                    posts.total_posts = posts.total_posts - 1;
-
                     posts.removePostById(this_post._id);
                 }
-
-
-
-                nav_controller.popToRoot();
-            } else {
-                nav_controller.popToRoot();
             }
 
             posts.replace_notification_posts(post_acceptated_response.response.post);
+
+            if (post !== null) {
+                post.remove();
+            } 
+
+            if (previous_view === 'NAV-ALL-TUTORIALS') {
+                nav_controller.popTo(1);
+            } else if (previous_view === 'NAV-NOTIFICATION-TUTORIAL-REQUESTED') {
+                nav_controller.popTo(0);
+            }
         }
 
         nav_controller.push(success_screen_element);
@@ -754,6 +759,7 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
             //Remove the event listener when we no longer need it
             if (active_component.component.tagName !== "SUCCESS_SCREEN") {
                 ok_btn.removeEventListener("click", ok_btn_handler, false);
+                tab_bar.style.display = 'flex';
                 nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
             }
         };
@@ -802,7 +808,7 @@ async function accept_post(nav_controller, this_post, post, is_forum) {
     }
 }
 
-function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
+function load_pending_tutorial_component_not_signed(nav_controller, tutorial) { 
     let tutor_tutorial_element = document.createElement('tutorial');
     let date = new Date();
     let year = date.getFullYear();
@@ -902,6 +908,7 @@ async function generate_agreement(nav_controller, tutorial) {
 
             //tutor_tutorials.remove_tutorial_from_DOM("Pending", agreement_generated_response);
             tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
+            posts.replace_notification_posts(agreement_generated_response.updated_tutorial);
             //tutor_tutorials.add_tutorial_to_DOM("Ongoing", agreement_generated_response.updated_tutorial)
 
 
@@ -1049,7 +1056,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     nav_controller.push(tutor_tutorial_element);
 }
 
-async function load_new_tutorial_request_component(nav_controller, this_notification) {
+async function load_new_tutorial_request_component(nav_controller, this_notification, extra_information) {
 //    let notification_posts;
 //
 //    if (posts.get_notification_posts().length == 0) {
@@ -1123,9 +1130,12 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
         create_ionic_alert("Accept tutorial", "Are you sure you want to accept this tutorial? You cannot unasign yourself (yet) after you have accepted a tutorial.", [
             {
                 text: 'Accept',
-                handler: () => {
+                handler: async () => {
                     console.log('Accepted');
-                    accept_post(nav_controller, this_post, null, false);
+
+                    let previous_view = await nav_controller.getPrevious();
+
+                    accept_post(nav_controller, this_post, extra_information.post, extra_information.is_forum, previous_view.element.tagName);
                 }
             },
             {
@@ -1152,7 +1162,7 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
         let notifications_active_component = await nav_controller.getActive();
 
         //Remove the event listener when we no longer need it
-        if (notifications_active_component.component.tagName === "NAV-NOTIFICATION-TUTORIAL-REQUESTED") {
+        if (notifications_active_component.component.tagName !== "NAV-POST") {
             accept_request_btn.removeEventListener("click", handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
@@ -1160,3 +1170,148 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
+
+
+
+
+
+
+
+
+
+function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
+    let tutor_tutorial_element = document.createElement('sign-tutorial-agreement');
+    let date = new Date();
+    let year = date.getFullYear();
+    let current_date = year + "-" + parseInt(date.getMonth() + 1) + "-" + date.getDate();
+    console.log(current_date);
+    console.log(year)
+    let tutor_tutorial_element_html = `
+                                <ion-header translucent>
+                                    <ion-toolbar>
+                                        <ion-buttons slot="start">
+                                            <ion-back-button defaultHref="/"></ion-back-button>
+                                            </ion-buttons>
+                                            <ion-buttons slot="end">
+                                                <ion-menu-button></ion-menu-button>
+                                            </ion-buttons>
+                                        <ion-title><h1>Sign Agreement</h1></ion-title>
+                                    </ion-toolbar>
+                                </ion-header>
+                                <ion-content fullscreen> 
+                                    <p class="center">Please enter you signature</p>
+                                    <ion-item-divider class="divider">
+                                    </ion-item-divider>
+                                    <br><br>
+                                    <div class="wrapper">
+                                        <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
+                                    </div>
+                                    <div style="text-align:center"> 
+                                        <button id="undo">Undo</button>
+                                        <button id="clear">Clear</button>
+                                    </div>
+
+                                    <div class="ion-padding-top fields">
+                                        <ion-button expand="block" id="accept_agreement_button" type="submit" class="ion-no-margin">Accept agreement</ion-button>
+                                    </div>
+                                    <p class="success_text3">Please note, once accepted, you cannot cancel the agreement or not turn up. Failure to turn up will result in penalties being imposed.</p> 
+                            </ion-content>`;
+
+    tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
+    nav_controller.push(tutor_tutorial_element);
+
+    let accept_agreement_button;
+    let accept_agreement_handler = async function () {
+        device_feedback();
+
+        accept_agreement(nav_controller, this_tutorial);
+    }
+
+    let ionNavDidChangeEvent = async function () {
+        if (document.getElementById('signature-pad') !== null) {
+            await include("js/signature_pad.min.js", "signature_pad");
+            drawing_pad();
+            accept_agreement_button = document.getElementById("accept_agreement_button");
+            accept_agreement_button.addEventListener('click', accept_agreement_handler, false);
+        }
+
+        let notifications_active_component = await nav_controller.getActive();
+
+        if (notifications_active_component.component.tagName !== "SIGN-TUTORIAL-AGREEMENT" && typeof accept_agreement_button !== 'undefined') {
+            accept_agreement_button.removeEventListener("click", accept_agreement_handler, false);
+            nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+        }
+    };
+
+    nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+}
+
+async function accept_agreement(nav_controller, this_tutorial) { 
+    if (isCanvasBlank(document.getElementById('signature-pad'))) {
+        create_ionic_alert("Failed to accept agreement", "Please enter a signature to accept the agreement.", ["OK"]);
+    } else {
+        let agreement_accepted_response = await access_route({tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
+
+        if (!agreement_accepted_response.error) {
+            user_notifications.addToNotifications(agreement_accepted_response.student_notification.response);
+            user_notifications.sendAgreementRejectedNotification({response: agreement_accepted_response.student_notification.response}, agreement_accepted_response.updated_tutorial);
+
+            //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
+            tutorials.add_ongoing_post(agreement_accepted_response.updated_tutorial);
+            tutorials.remove_tutorial_by_id(tutorials.pending_tutorials, agreement_accepted_response.updated_tutorial._id);
+            if(document.getElementById('ongoing_tutorials_header') !== null) {
+                tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), this_tutorial);
+            } 
+            
+            tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
+        } else {
+            create_ionic_alert("Failed to accept agreement", agreement_accepted_response.response, ["OK"]);
+        }
+
+        console.log(agreement_accepted_response);
+    }
+    
+    nav_controller.popToRoot();
+}
+
+async function reject_this_agreement(nav_controller, this_tutorial) {
+    console.log("Test")
+    console.log(tutorials.open_tutorials)
+
+    let agreement_rejected_response = await access_route({tutorial_id: this_tutorial._id}, "reject_agreement");
+
+    if (!agreement_rejected_response.error) {
+        console.log(agreement_rejected_response)
+        console.log("Before");
+        console.log(tutorials.open_tutorials);
+        console.log("After");
+        console.log(tutorials.open_tutorials);
+
+//REMOVE THIS LATER
+agreement_rejected_response.updated_tutorial.post_agreement_offered = false;
+
+        user_notifications.addToNotifications(agreement_rejected_response.student_notification.response);
+        user_notifications.sendAgreementRejectedNotification({response: agreement_rejected_response.tutor_notification.response}, agreement_rejected_response.updated_tutorial);
+        posts.replace_notification_posts(agreement_rejected_response.updated_tutorial);
+        
+
+        let previous_view = await nav_controller.getPrevious();
+
+        if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
+            nav_controller.pop();
+        } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+            nav_controller.popTo(0);
+        } 
+        
+        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+        
+        if(document.getElementById('open_tutorials_header') !== null) { 
+            tutorials.add_post_to_segment("Open", document.getElementById('open_tutorials_header'), agreement_rejected_response.updated_tutorial);
+            tutorials.remove_tutorial_from_DOM("Pending", agreement_rejected_response, this_tutorial);
+        } 
+        
+        tutorials.update_my_tutorial("Pending", agreement_rejected_response.updated_tutorial);
+    } else {
+        create_ionic_alert("Failed to reject agreement", agreement_rejected_response.response, ["OK"]);
+    }
+} 

@@ -126,13 +126,13 @@ async function all_tutorials(nav) {
                     //if (notification !== null) {
                     //    notification_tags.push(notification.getAttribute('notification_tags'));
                     //}
-
+                    let active_component = await nav.getActive();
                     console.log(post);
                     //If we clicked on a post
                     //NEEDS TO BE CHANGED!!!!!!!
-                    if (post) {
+                    if (post && active_component.component == "nav-all-tutorials") { 
                         //Find a post from posts object that matches the ID of the clicked element.
-                        load_new_tutorial_request_component(nav, {post_id: post.getAttribute('post_id')});
+                        load_new_tutorial_request_component(nav, {post_id: post.getAttribute('post_id')}, {post: post, is_forum: true});
                     }
                 });
             }

@@ -18,11 +18,11 @@ class Notifications extends User {
             this.total_notifications = 0;
             this.unread_notifications = 0;
         }
-        
+
         this.notifications_length = 0;
         console.log(this.all_notifications);
     }
-    
+
     find_unopened_notifications_number() {
         if (typeof notifications !== "string") {
             let unopened_notifications_counter = 0;
@@ -30,14 +30,14 @@ class Notifications extends User {
                 if (!this.all_notifications[i]["notification_opened"]) {
                     unopened_notifications_counter++;
                 }
-            } 
-            
+            }
+
             return unopened_notifications_counter;
         } else {
             return 0;
         }
     }
-    
+
     addToTotalNotifications() {
         console.log("Total nots = " + this.total_notifications)
         this.total_notifications++;
@@ -51,7 +51,7 @@ class Notifications extends User {
     getTotalNotifications() {
         return this.total_notifications;
     } 
-    
+
     subtractUnreadNotifications() {
         if (this.unread_notifications != 0) {
             this.unread_notifications--;
@@ -90,7 +90,7 @@ class Notifications extends User {
         this.unread_notifications = unread_notifications;
     }
 
-    getUnreadNotifications() {
+    getNotifications() {
         return this.notifications;
     }
 
@@ -118,19 +118,19 @@ class Notifications extends User {
     addToNotifications(notification) {
         console.log("A notification")
         console.log(notification);
-         
+
         if (this.all_notifications == "There are no notifications to display!") {
             this.all_notifications = [notification];
         } else {
-            insert_to_array_by_index(this.all_notifications, 0, notification) 
+            insert_to_array_by_index(this.all_notifications, 0, notification)
         }
-        
+
         //Increase count of total notifications
-        this.addToTotalNotifications(); 
-        
+        this.addToTotalNotifications();
+
         if (document.getElementById('list') != null) {
-            document.getElementById("notifications_header").innerText = "NOTIFICATIONS"; 
-            
+            document.getElementById("notifications_header").innerText = "NOTIFICATIONS";
+
             this.addUnreadNotifications();
             const el = document.createElement('ion-list');
             el.classList.add('ion-activatable', 'ripple', 'not_read');
@@ -172,24 +172,24 @@ class Notifications extends User {
             return "No new notifications!"
         }
     }
-    
+
     addUnreadNotificationsToBadge(unread_notifications) {
-        if(!document.getElementById("new_notifications").length) {
+        if (!document.getElementById("new_notifications").length) {
             document.getElementById("new_notifications").innerText = unread_notifications;
         }
     }
-    
+
     //Add the notifications 
     appendNotifications(number, list) {
         let notifications = this.getAllNotifications();
-        
+
         console.log('length is', this.notifications_length);
         const originalLength = this.notifications_length;
         let read_class;
         console.log(notifications)
         for (var i = 0; i < number; i++) {
             const el = document.createElement('ion-list');
-            
+
             if (notifications[i + originalLength].notification_opened) {
                 read_class = "read";
             } else {
@@ -213,35 +213,51 @@ class Notifications extends User {
             
         `;
             list.appendChild(el);
-            
+
             this.notifications_length += 1;
         }
     }  
-    
+
     sendNewNotification(notification) {
         this.socket.emit('send_notification', notification);
     }
-    
+
     sendTutorialAcceptedNotification(notification, post) {
-        alert("test")
         this.socket.emit('tutorial_request_accepted', {the_notification: notification, the_post: post});
     }
+
+    sendAgreementRejectedNotification(notification, post) {
+        this.socket.emit('agreement_rejected', {the_notification: notification, the_post: post});
+    }
+
+    wait_for_agreement_rejected() {
+        let socket = this.socket;
+        
+        socket.on('agreement_rejected_tutor', (data) => {
+            tutor_tutorials.update_tutorial("Pending", data.post);
+            posts.replace_notification_posts(data.post);
+            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response);
+
+            console.log(data);
+        });
+    } 
 
     waitForNewNotifications() {
         let socket = this.socket;
 
-        socket.on('new_notification', (data) => { 
+        socket.on('new_notification', (data) => {
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
-        }); 
-        
-        socket.on('add_tutorial_request_accepted_notification', (data) => { 
-            posts.replace_notification_posts(data.post); 
-            
+        });
+
+        socket.on('add_tutorial_request_accepted_notification', (data) => {
+            posts.replace_notification_posts(data.post);
+
             //window.plugins.deviceFeedback.haptic();
-            this.addToNotifications(data.response); 
-            
+            this.addToNotifications(data.response);
+
             console.log(data);
         });
 

@@ -86,7 +86,7 @@ function load_request_tutorial() {
                     create_ionic_alert("Tutorial request failed", "Please fill in all required fields to proceed.", ["OK"]);
                     request_tutorial_button.disabled = false;
                     return;
-                } 
+                }
 
                 //Create new tutorial and get the response from the server
                 let tutorial_request_response = await access_route(data, "request_tutorial");
@@ -101,6 +101,47 @@ function load_request_tutorial() {
                     posts.sendNewTutorial(tutorial_request_response);
                     console.log(tutorial_request_response.response[0]);
                     posts.notification_posts.push(tutorial_request_response.response[0]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    //MAYBE USELESS CODE (1ST IF)
+                    if (document.getElementById('open-tutorials-infinite-scroll') !== null) {
+                        if (tutorials.total_open_tutorials == 0) {
+                            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
+                            
+                        }
+                        
+                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]); 
+                        console.log(tutorials.open_tutorials);
+                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+                        
+                        tutorials.appendPosts(1, document.getElementById('open-tutorials-infinite-scroll'), [tutorial_request_response.response[0]], tutorials.open_tutorials_length);
+                    } else {
+                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]);  
+                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+                    }
+
+
+                    
+
+
+
+
+
+
+
+
 
                     let toast_buttons = [
                         {
