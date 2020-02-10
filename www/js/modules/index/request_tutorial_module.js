@@ -7,7 +7,7 @@ function load_request_tutorial() {
             this.innerHTML = `
            <ion-header translucent>
             <ion-toolbar>
-              <ion-title>Tutorial Request</ion-title>
+              <ion-title style="margin-left: -25px;"><h1>Tutorial Request</h1></ion-title>
               <ion-buttons slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
@@ -17,7 +17,7 @@ function load_request_tutorial() {
             </ion-toolbar>
           </ion-header>
           <ion-content>
-              <ion-list class="fields" style="text-align:center;">
+              <ion-list style="text-align:center;">
             <p><strong>Post a tutorial request</strong></p>
             <p>Please fill out the fields below to request a tutorial. Our tutors will assign you a date and time for a tutorial once they are available.</p>
             
@@ -25,17 +25,17 @@ function load_request_tutorial() {
                 <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
                     <p></p>
                     <ion-item>
-                        <ion-label align="center" position="stacked">Request Title <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-label class="tut_req_title" align="center" position="stacked">Request Title <ion-text color="danger">*</ion-text></ion-label>
                         <ion-input align="center" placeholder="Brief request description" id="tutorial_title" required type="text"></ion-input>
                     </ion-item>
 
                     <ion-item>
-                        <ion-label align="center" position="stacked">Request Description <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-label class="tut_req_title" align="center" position="stacked">Request Description <ion-text color="danger">*</ion-text></ion-label>
                         <ion-textarea rows="6" align="center" placeholder="Tell us your request in detail" id="tutorial_description" required type="text"></ion-textarea>
                     </ion-item>
 
                     <ion-item lines="none">
-                        <ion-label style="margin-top:-40px;" align="center" position="stacked">Offer Specific Skill<ion-text color="danger">*</ion-text></ion-label> 
+                        <ion-label class="tut_req_title" style="margin-top:-40px;" align="center" position="stacked">Request Specific Skill<ion-text color="danger">*</ion-text></ion-label> 
                     </ion-item>
 
                     <ion-item style="margin-top:-30px;">
@@ -64,7 +64,7 @@ function load_request_tutorial() {
                 if (document.querySelector('.my-select') !== null) {
                     document.querySelector('.my-select').shadowRoot.querySelector('.select-icon').setAttribute('style', 'position:absolute; right:10px; bottom:15px');
                 }
-            }, 50);
+            }, 100);
             //Get the reference to the Request Tutorial button
             let request_tutorial_button = document.getElementById("request_tutorial");
             //Add an event listener to request a new tutorial on click

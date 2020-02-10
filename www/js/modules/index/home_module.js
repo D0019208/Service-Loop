@@ -136,7 +136,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <!--<ion-content padding>
                                 <ion-button expand="block" onclick="openMenu()">Open Menu</ion-button>
                             </ion-content>-->
-                            <h2 class="user_name"><strong>Welcome <p style="margin-top:0px;" id="user_name">John</p> <p style="margin-top:0px;" id="user_status">Student</p></strong></h2>
+                            
+                            <ion-avatar style="width: 80px;height: 80px; margin: auto; margin-top: -5px;" >
+                                <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y">
+                            </ion-avatar>
+                            <ion-label style="text-align:center;">
+                                <h1 style="color:white;"><strong id="user_name">John</strong></h1>
+                                <p style="color:white;" id="user_email">D00194503@student.dkit.ie</p>
+                                <br>
+                                <h2 style="color:white; margin-top:-5px;"><strong id="user_status">Student</strong></h2>
+                                <br>
+                            </ion-label>
                             <div class="white_backgound">
                                 <br><br><br>
                                 <!--<ion-button expand="block" >Post Offer</ion-button>
@@ -205,7 +215,16 @@ document.addEventListener("DOMContentLoaded", async function () {
                             <!--<ion-content padding>
                                 <ion-button expand="block" onclick="openMenu()">Open Menu</ion-button>
                             </ion-content>-->
-                            <h2 class="user_name"><strong>Welcome <p style="margin-top:0px;" id="user_name">John</p> <p style="margin-top:0px;" id="user_status">Student</p></strong></h2>
+                            <ion-avatar style="width: 80px;height: 80px; margin: auto; margin-top: -5px;" >
+                                <img src="https://gravatar.com/avatar/dba6bae8c566f9d4041fb9cd9ada7741?d=identicon&f=y">
+                            </ion-avatar>
+                            <ion-label style="text-align:center;">
+                                <h1 style="color:white;"><strong id="user_name">John</strong></h1>
+                                <p style="color:white;" id="user_email">D00194503@student.dkit.ie</p>
+                                <br>
+                                <h2 style="color:white; margin-top:-5px;"><strong id="user_status">Student</strong></h2>
+                                <br>
+                            </ion-label>
                             <div class="white_backgound">
                                 <br><br><br>
                                 <!--<ion-button expand="block" >Post Offer</ion-button>
@@ -252,10 +271,16 @@ document.addEventListener("DOMContentLoaded", async function () {
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
             if (user.getStatus() === "Tutor") {
-                document.getElementById('user_status').innerText = "Tutor";
+                document.getElementById('user_status').innerText = "TUTOR";
             } else {
-                document.getElementById('user_status').innerText = "Student";
+                document.getElementById('user_status').innerText = "STUDENT";
             }
+            
+            //Update the users Email depending on what the users email is
+            document.getElementById('user_email').innerText = user.getEmail();
+            
+            
+            
 
             //If the user is a tutor, we display the forum else we have a button to apply to become a tutor
             if (user.getStatus() === "Tutor") {
@@ -315,6 +340,12 @@ document.addEventListener("DOMContentLoaded", async function () {
                 device_feedback();
                 await include("js/modules/index/my_tutorials_module.js", "my_requested_tutorials_script");
                 load_my_requested_tutorials();
+            });
+
+            document.getElementById('profile').addEventListener('click', async function () {
+                device_feedback();
+                await include("js/modules/index/profile_module.js", "profile_script");
+                load_profile_page();
             });
 
             //Create My Tutorials page (If user is Tutor)

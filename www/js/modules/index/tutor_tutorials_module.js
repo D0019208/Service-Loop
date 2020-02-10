@@ -37,15 +37,13 @@ function all_tutor_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
-              </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons style="margin-top: -55px;" slot="start">
+                    <ion-back-button defaultHref="/"></ion-back-button>
+                </ion-buttons>
+                <ion-buttons style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-                <ion-title>
-                    <h1>Tutorial Request</h1>
-                </ion-title>
+                <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                 <ion-segment>  
                     <ion-segment-button value="tutor_tutorials_pending_segment" checked>
                         <ion-label>Pending</ion-label>
@@ -101,15 +99,13 @@ function all_tutor_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
-              </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons style="margin-top: -55px;" slot="start">
+                    <ion-back-button defaultHref="/"></ion-back-button>
+                </ion-buttons>
+                <ion-buttons style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-                <ion-title>
-                    <h1>Tutorial Request</h1>
-                </ion-title>
+                <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                 <ion-segment>  
                     <ion-segment-button value="tutor_tutorials_pending_segment" checked>
                         <ion-label>Pending</ion-label>

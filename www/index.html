@@ -38,13 +38,6 @@
                 //overflow: scroll;
             }
 
-            div ion-button
-            {
-                margin-left: 45px;
-                margin-right: 45px;
-                margin-top: 10px;
-            }
-
             .user_name
             {
                 text-align: center;
@@ -53,10 +46,6 @@
                 text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
             }
 
-            ion-button
-            {
-                margin-top: 10px;
-            }
             #logout
             {
                 position: absolute;
@@ -121,15 +110,16 @@
                 position: absolute;
                 color: white;
                 margin-left: 10px;
-                margin-top: 10px; 
+                margin-top: 0px; 
             }
             .home_buttons p
             {
                 position: absolute;
                 margin-left: 10px;
-                margin-top: 31px;
+                margin-top: 25px;
                 font-size: 12px;
                 color: white;
+                width: 70%;
             }
 
 
@@ -168,7 +158,7 @@
                 margin-top: -48px;
             }
             
-            .request_items ion-label
+            .request_items
             {
                 padding-left: 35%;
             }
@@ -182,6 +172,11 @@
                 position: absolute;
                 right: 10px;
                 bottom: 10px;
+            }
+            
+            .tut_req_title
+            {
+                padding-left: 35%;
             }
 
             /*forum*/
@@ -388,6 +383,118 @@
                 padding-right: 20%;
             }
             
+
+
+            
+            /*Profile*/
+            .divider
+            {
+                margin-top: -20px;
+            }
+            .divider2
+            {
+                margin-top: -15px;
+            }
+            .note
+            {
+                text-align: center;
+                filter: opacity(70%);
+            }
+            .date
+            {
+                position: absolute;
+                right: 10px;
+                top: 0px;
+                font-size: 12px;
+                filter: opacity(80%);
+            }
+            .profile_avatar
+            {
+                margin: auto;
+                width: 100px;
+                height: 100px;
+            }
+            .edit_skills
+            {
+                position: absolute;
+                top:15px;
+                right: 10px;
+                height: 25px;
+            }
+            ion-fab
+            {
+                position: absolute;
+                top: 135px;
+                right: 50%;
+                margin-right: -55px;
+                z-index: 1;
+            }
+            ion-fab-button
+            {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .skills_text
+            {
+                text-align: center;
+                filter: opacity(85%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .fields3
+            {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .add_skill_label
+            {
+                padding-left: 0px;
+            }
+            .skill
+            {
+                padding-left: 0%;
+            }
+            #add_skill
+            {
+                position: absolute;
+                width: 100px;
+                right: 10px;
+                top: 60px;
+                
+            }
+            #p
+            {
+                padding-right: 100px;
+                margin-top: 20px;
+            }
+            .hide_this_input
+            {
+                display: none;
+            }
+            #save_button
+            {
+                margin-top: 20px;
+            }
+            
+            /*accordion*/
+            .collapsible {
+              padding: 18px;
+              width: 100%;
+            }
+            .collapsible:after {
+              content: '\002B';
+            }
+
+            .active:after {
+              content: "\2212";
+            }
+
+            .content {
+              max-height: 0;
+              overflow: hidden;
+              transition: max-height 0.2s ease-out;
+            }
+            
             
             
             
@@ -427,6 +534,37 @@
               margin-left: -150px; /* This is half the width */
               margin-top: -100px; /* This is half the height */
             }
+            
+            
+            /*MENU*/
+            .menu_header
+            {
+                
+            }
+            .menu_avatar
+            {
+                margin-left: 20px;
+                margin-top: 10px;
+            }
+            .menu_name
+            {
+                margin-left: 20px;
+                margin-top: 5px;
+            }
+            .menu_email
+            {
+                margin-left: 20px;
+                margin-top: -5px;
+                margin-bottom: 5px;
+                opacity: 0.7;
+            }
+            
+            /*Terms And Conditions & Privacy Policy*/
+            .terms
+            {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
         </style>
     </head>
     <body>
@@ -435,29 +573,59 @@
         <!-- MENU -->
 
         <ion-menu side="start">
-            <ion-header>
-                <ion-toolbar translucent>
+            <ion-header class="menu_header">
+                <ion-avatar style="width: 55px;height: 55px;" class="menu_avatar">
+                   <img src="images/back.jpg">
+                </ion-avatar>
+                <h4 class="menu_name"><strong>German Luter</strong></h4>
+                <p class="menu_email">info@student.dkit.ie</p>
+                <!--<ion-toolbar translucent>
                     <ion-title>Menu</ion-title>
-                </ion-toolbar>
+                </ion-toolbar>-->
             </ion-header>
             <ion-content>
                 <ion-list>
-                    <ion-item>
-                        <ion-icon name="home" slot="start"></ion-icon>
-                        <ion-label>Home</ion-label>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon name="person" slot="start"></ion-icon>
-                        <ion-label>Profile</ion-label>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon name="chatbubbles" slot="start"></ion-icon>
-                        <ion-label>Messages</ion-label>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon name="settings" slot="start"></ion-icon>
-                        <ion-label>Settings</ion-label>
-                    </ion-item>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item style="margin-left:-16px;margin-bottom: 10px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="home" slot="start"></ion-icon>
+                                <ion-label>Home</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item style="margin-left:-16px; margin-bottom: 10px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="person" slot="start"></ion-icon>
+                                <ion-label>Profile</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item style="margin-left:-16px;margin-bottom: 10px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="chatbubbles" slot="start"></ion-icon>
+                                <ion-label>Messages</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item style="margin-left:-16px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="settings" slot="start"></ion-icon>
+                                <ion-label>Settings</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    
                 </ion-list>
             </ion-content>
         </ion-menu>
@@ -582,7 +750,7 @@
                         <ion-list-header>
                             LEGAL AND POLICIES
                         </ion-list-header>
-                        <ion-list class="ion-activatable ripple">
+                        <ion-list id="terms_and_conditons" class="ion-activatable ripple">
                             <ion-item lines='none'>
                                 <ion-avatar slot="start">
                                     <img src="images/i_terms.png">
@@ -594,7 +762,7 @@
                             </ion-item>
                             <ion-ripple-effect></ion-ripple-effect>
                         </ion-list>
-                        <ion-list class="ion-activatable ripple">
+                        <ion-list id="privacy_policy" class="ion-activatable ripple">
                             <ion-item lines='none'>
                                 <ion-avatar slot="start">
                                     <img src="images/i_privacy.png">
