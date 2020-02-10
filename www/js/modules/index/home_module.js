@@ -43,9 +43,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     ////Set status of user to tutor
-    user.setName("John Doe");
-    user.setStatus("Tutor");
-    user.setEmail("D00192082@student.dkit.ie");
+    user.setName("Nichita Postolachi");
+    user.setStatus("Student");
+    user.setEmail("nikito888@gmail.com");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -53,10 +53,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log(notifications_response);
     //Define our Navigation controller for the home tab
     nav = document.getElementById('nav-home');
-
-
-
-
+    
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
         let selected_tab = await tab_controller.getSelected();
@@ -353,6 +350,8 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             //Create My Tutorials page (If user is Tutor)
             if (user.getStatus() == "Tutor") {
+                user_notifications.wait_for_agreement_rejected();
+                
                 document.getElementById('my_tutorials').addEventListener('click', async function () {
                     device_feedback();
                     await include("js/modules/index/tutor_tutorials_module.js", "my_tutorials_script");
@@ -412,5 +411,5 @@ document.addEventListener("DOMContentLoaded", async function () {
         } else if (event.detail.tab === "settings") {
             await include("js/modules/index/settings_module.js", "settings_script");
         }
-    });
+    }); 
 });
