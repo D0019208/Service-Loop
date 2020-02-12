@@ -141,9 +141,9 @@ class Notifications extends User {
             <img src="${notification.notification_avatar}">
         </ion-avatar>
         <ion-label>
-            <h2>${notification.notification_title}</h2>
-            <span>${formatDate(notification.notification_posted_on)}</span>
-            <p>${notification.notification_desc_trunc}</p>
+            <p class="notification_title">${notification.notification_title}</p>
+            <span class="notification_date">${formatDate(notification.notification_posted_on)}</span>
+            <p class="notification_desc">${notification.notification_desc_trunc}</p>
         </ion-label>
             </ion-item>
             <ion-ripple-effect></ion-ripple-effect>
@@ -204,9 +204,9 @@ class Notifications extends User {
             <img src="${notifications[i + originalLength].notification_avatar}">
         </ion-avatar>
         <ion-label>
-            <h2>${notifications[i + originalLength].notification_title}</h2>
-            <span>${formatDate(notifications[i + originalLength].notification_posted_on)}</span>
-            <p>${notifications[i + originalLength].notification_desc_trunc}</p>
+            <p class="notification_title">${notifications[i + originalLength].notification_title}</p>
+            <span class="notification_date">${formatDate(notifications[i + originalLength].notification_posted_on)}</span>
+            <p class="notification_desc">${notifications[i + originalLength].notification_desc_trunc}</p>
         </ion-label>
             </ion-item>
             <ion-ripple-effect></ion-ripple-effect>

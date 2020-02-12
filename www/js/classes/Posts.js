@@ -50,7 +50,7 @@ class Posts extends User {
                                 <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
                             </ion-avatar>
                             <ion-label>
-                                <h2>${posts[i + originalLength].post_title}</h2>
+                                <p style="font-size:1em; color: black;">${posts[i + originalLength].post_title}</p>
                                 <p>${formatDate(posts[i + originalLength].post_posted_on)}</p>
                             </ion-label>
                         </ion-item>
@@ -147,7 +147,7 @@ class Posts extends User {
                                 <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
                             </ion-avatar>
                             <ion-label>
-                                <h2>${post.post_title}</h2>
+                                <p style="font-size:1em; color: black;">${post.post_title}</p>
                                 <p>${formatDate(post.post_posted_on)}</p>
                             </ion-label>
                         </ion-item>
