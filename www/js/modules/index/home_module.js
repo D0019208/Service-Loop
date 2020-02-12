@@ -100,15 +100,19 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
     
     let ionNavDidChangeEvent = async function () {
+        if (document.getElementById('continue_slides') !== null) {
             closeTutorial = document.getElementById("continue_slides");
             closeTutorial.addEventListener('click', closeTutorialHandler, false);
+        }
 
         let active_component = await nav.getActive();
 
         //Remove the event listener when we no longer need it
         if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
+            if (typeof closeTutorial !== 'undefined') {
             closeTutorial.removeEventListener("click", closeTutorialHandler, false);
             nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+        }
         }
     };
 
