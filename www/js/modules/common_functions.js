@@ -81,8 +81,8 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        const rawResponse = await fetch("http://localhost:3001/" + route, {
-            //const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
+        //const rawResponse = await fetch("http://localhost:3001/" + route, {
+        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -896,9 +896,9 @@ async function generate_agreement(nav_controller, tutorial) {
         let agreement_generated_response;
 
         if (typeof tutorial._id == 'undefined') {
-            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), email: user.getEmail(), name: user.getName(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
         } else {
-            agreement_generated_response = await access_route({tutorial_id: tutorial._id, email: user.getEmail(), name: user.getName(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
         }
 
         console.log(agreement_generated_response);
@@ -1264,7 +1264,9 @@ async function accept_agreement(nav_controller, this_tutorial) {
                 tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), this_tutorial);
             } 
             
-            tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
+            if(document.getElementById('pending_tutorials_header') !== null) {
+                tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
+            } 
         } else {
             create_ionic_alert("Failed to accept agreement", agreement_accepted_response.response, ["OK"]);
         }

@@ -410,8 +410,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 </div>
           </ion-content>
         `;
-        } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered) {
-            alert("__")
+        } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered) { 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -514,8 +513,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         let nav_notification_html;
         console.log(this_post.post_status)
 
-        if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered) { 
-            alert("?")
+        if (this_post.post_status == "In negotiation" && !this_post.post_agreement_offered) {  
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -535,8 +533,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 </div>
           </ion-content>
         `;
-        } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered) {
-            alert("??")
+        } else if (this_post.post_status == "In negotiation" && this_post.post_agreement_offered) { 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
@@ -556,8 +553,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 </div>
           </ion-content>
         `;
-        } else {
-            alert("???")
+        } else { 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
