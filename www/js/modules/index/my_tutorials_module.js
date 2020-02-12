@@ -486,10 +486,10 @@ function load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
                         <ion-toolbar>
-                            <ion-buttons style="margin-top: -55px;" slot="start">
+                            <ion-buttons slot="start">
                                 <ion-back-button defaultHref="/"></ion-back-button>
                             </ion-buttons>
-                            <ion-buttons style="margin-top: -55px;" slot="end">
+                            <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
                             <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
@@ -510,14 +510,14 @@ function load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
 
                         <ion-item-divider class="divider"></ion-item-divider>
                         <ion-item lines="none">
-                            <ion-label>
-                                <h2><strong>${this_tutorial.post_title}</strong></h2>
-                            </ion-label>
+                            
+                                <h6><strong>${this_tutorial.post_title}</strong></h6>
+                            
                         </ion-item>
-                        <ion-item style="margin-top:-15px;" lines="none">
-                            <h6>
+                        <ion-item style="margin-top:-10px;" lines="none">
+                            <p>
                                 ${this_tutorial.post_desc}
-                            </h6>
+                            </p>
                         </ion-item>
 
                         <ion-chip class="module" color="primary">
@@ -550,49 +550,22 @@ function load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
                                         <h2><strong>Tutorial stage</strong></h2>
                                     </ion-label>
                                 </ion-item>
-                                    <div class="timeline">
-                                  <div class="entry">
-                                    <div class="title">
-                                    </div>
-                                    <div class="body">
-                                      <p>Open</p>
-                                      <ul>
-                                        <li>Your tutorial has been requested successfully, it has currently not been assigned to a tutor. </li> 
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Pending</p>
-                                      <ul>
-                                        <li>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Ongoing</p>
-                                      <ul>
-                                        <li>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Done</p>
-                                      <ul>
-                                        <li>Tutorial has been compeleted.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-
-                                </div>
+                                    <div class="wrapper">
+                                    <ul class="StepProgress">
+                                      <li class="StepProgress-item current"><strong>Open</strong>
+                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                      </li>
+                                      <li class="StepProgress-item"><strong>Pending</strong>
+                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                      </li>
+                                      <li class="StepProgress-item"><strong>Ongoing</strong>
+                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                      </li>
+                                      <li class="StepProgress-item"><strong>Done</strong>
+                                      <span>Tutorial has been compeleted.</span>
+                                      </li>
+                                    </ul>
+                                </div><br><br>
                             </ion-content>`;
     tutorial_element.innerHTML = tutorial_element_html;
 
@@ -604,10 +577,10 @@ function load_pending_tutorial_component_agreement_offered(this_tutorial, tutori
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
                                                             <ion-toolbar>
-                                                                <ion-buttons style="margin-top: -55px;" slot="start">
+                                                                <ion-buttons slot="start">
                                                                     <ion-back-button defaultHref="/"></ion-back-button>
                                                                 </ion-buttons>
-                                                                <ion-buttons style="margin-top: -55px;" slot="end">
+                                                                <ion-buttons slot="end">
                                                                     <ion-menu-button></ion-menu-button>
                                                                 </ion-buttons>
                                                                 <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
@@ -628,14 +601,14 @@ function load_pending_tutorial_component_agreement_offered(this_tutorial, tutori
 
                                                             <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-item lines="none">
-                                                                <ion-label>
-                                                                    <h2><strong>${this_tutorial.post_title}</strong></h2>
-                                                                </ion-label>
+                                                                
+                                                                    <h6><strong>${this_tutorial.post_title}</strong></h6>
+                                                                
                                                             </ion-item>
-                                                            <ion-item style="margin-top:-15px;" lines="none">
-                                                                <h6>
+                                                            <ion-item style="margin-top:-10px;" lines="none">
+                                                                <p>
                                                                     ${this_tutorial.post_desc}
-                                                                </h6>
+                                                                </p>
                                                             </ion-item>
                                                                     <ion-chip class="module" color="primary">
                                                                 <ion-icon name="star"></ion-icon>
@@ -663,6 +636,7 @@ function load_pending_tutorial_component_agreement_offered(this_tutorial, tutori
                                                                 </h6>
 
                                                             </ion-item> 
+                                                            <ion-item-divider class="divider2"></ion-item-divider> 
                                                                 <div class="ion-padding-top">
                                                                     <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                                                      <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
@@ -675,49 +649,22 @@ function load_pending_tutorial_component_agreement_offered(this_tutorial, tutori
                                                                         <h2><strong>Tutorial stage</strong></h2>
                                                                     </ion-label>
                                                                 </ion-item>
-                                                                    <div class="timeline">
-                                                                  <div class="entry">
-                                                                    <div class="title">
-                                                                    </div>
-                                                                    <div class="body">
-                                                                      <p>Open</p>
-                                                                      <ul>
-                                                                        <li>Your tutorial has been requested successfully, it has currently not been assigned to a tutor. </li> 
-                                                                      </ul>
-                                                                    </div>
-                                                                  </div>
-                                                                  <div class="entry">
-                                                                    <div class="title"> 
-                                                                    </div>
-                                                                    <div class="body">
-                                                                      <p>Pending</p>
-                                                                      <ul>
-                                                                        <li>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</li>
-                                                                      </ul>
-                                                                    </div>
-                                                                  </div>
-                                                                  <div class="entry">
-                                                                    <div class="title"> 
-                                                                    </div>
-                                                                    <div class="body">
-                                                                      <p>Ongoing</p>
-                                                                      <ul>
-                                                                        <li>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</li>
-                                                                      </ul>
-                                                                    </div>
-                                                                  </div>
-                                                                  <div class="entry">
-                                                                    <div class="title"> 
-                                                                    </div>
-                                                                    <div class="body">
-                                                                      <p>Done</p>
-                                                                      <ul>
-                                                                        <li>Tutorial has been compeleted.</li>
-                                                                      </ul>
-                                                                    </div>
-                                                                  </div>
-
-                                                                </div>
+                                                                    <div class="wrapper">
+                                                            <ul class="StepProgress">
+                                                              <li class="StepProgress-item is-done"><strong>Open</strong>
+                                                              <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                                              </li>
+                                                              <li class="StepProgress-item current"><strong>Pending</strong>
+                                                              <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                                              </li>
+                                                              <li class="StepProgress-item"><strong>Ongoing</strong>
+                                                              <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                                              </li>
+                                                              <li class="StepProgress-item"><strong>Done</strong>
+                                                              <span>Tutorial has been compeleted.</span>
+                                                              </li>
+                                                            </ul>
+                                                        </div><br><br>
                                                             </ion-content>`;
     tutorial_element.innerHTML = tutorial_element_html;
 
@@ -797,10 +744,10 @@ function load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
     let tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons style="margin-top: -55px;" slot="start">
+                                    <ion-buttons slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons style="margin-top: -55px;" slot="end">
+                                    <ion-buttons slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
                                     <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
@@ -821,14 +768,14 @@ function load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
 
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
-                                    </ion-label>
+                                    
+                                        <h6><strong>${this_tutorial.post_title}</strong></h6>
+                                    
                                 </ion-item>
-                                <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
+                                <ion-item style="margin-top:-10px;" lines="none">
+                                    <p>
                                         ${this_tutorial.post_desc}
-                                    </h6>
+                                    </p>
                                 </ion-item>
                                         <ion-chip class="module" color="primary">
                                     <ion-icon name="star"></ion-icon>
@@ -861,49 +808,22 @@ function load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
                                         <h2><strong>Tutorial stage</strong></h2>
                                     </ion-label>
                                 </ion-item>
-                                    <div class="timeline">
-                                  <div class="entry">
-                                    <div class="title">
-                                    </div>
-                                    <div class="body">
-                                      <p>Open</p>
-                                      <ul>
-                                        <li>Your tutorial has been requested successfully, it has currently not been assigned to a tutor. </li> 
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Pending</p>
-                                      <ul>
-                                        <li>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Ongoing</p>
-                                      <ul>
-                                        <li>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Done</p>
-                                      <ul>
-                                        <li>Tutorial has been compeleted.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-
-                                </div>
+                                    <div class="wrapper">
+                                    <ul class="StepProgress">
+                                      <li class="StepProgress-item is-done"><strong>Open</strong>
+                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                      </li>
+                                      <li class="StepProgress-item current"><strong>Pending</strong>
+                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                      </li>
+                                      <li class="StepProgress-item"><strong>Ongoing</strong>
+                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                      </li>
+                                      <li class="StepProgress-item"><strong>Done</strong>
+                                      <span>Tutorial has been compeleted.</span>
+                                      </li>
+                                    </ul>
+                                </div><br><br>
                             </ion-content>`;
 
     tutorial_element.innerHTML = tutorial_element_html;
@@ -916,10 +836,10 @@ function load_ongoing_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
     let tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons style="margin-top: -55px;" slot="start">
+                                    <ion-buttons slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons style="margin-top: -55px;" slot="end">
+                                    <ion-buttons slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
                                     <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
@@ -940,14 +860,14 @@ function load_ongoing_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
 
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
-                                    </ion-label>
+                                    
+                                        <h6><strong>${this_tutorial.post_title}</strong></h6>
+                                    
                                 </ion-item>
-                                <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
+                                <ion-item style="margin-top:-10px;" lines="none">
+                                    <p>
                                         ${this_tutorial.post_desc}
-                                    </h6>
+                                    </p>
                                 </ion-item>
                                         <ion-chip class="module" color="primary">
                                     <ion-icon name="star"></ion-icon>
@@ -961,58 +881,34 @@ function load_ongoing_tutorial_component(this_tutorial, tutorial_tag, tutorial_s
                                     <ion-icon name="swap"></ion-icon>
                                     <ion-label>${tutorial_status}</ion-label>
                                 </ion-chip>
+                                <ion-item-divider class="divider2"></ion-item-divider>   
+                                <div class="ion-padding-top">
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                </div> 
                                  <ion-item-divider class="divider2"></ion-item-divider>   
-                                <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                <img class="pdf_button" src="images/pdf.png" width="100px" alt=""/>
-                                <img class="blockchain_button" src="images/blockchain.png" width="100px" alt=""/>
+                                
                             <ion-item lines="none">
                                     <ion-label>
                                         <h2><strong>Tutorial stage</strong></h2>
                                     </ion-label>
                                 </ion-item>
-                                    <div class="timeline">
-                                  <div class="entry">
-                                    <div class="title">
-                                    </div>
-                                    <div class="body">
-                                      <p>Open</p>
-                                      <ul>
-                                        <li>Your tutorial has been requested successfully, it has currently not been assigned to a tutor. </li> 
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Pending</p>
-                                      <ul>
-                                        <li>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Ongoing</p>
-                                      <ul>
-                                        <li>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Done</p>
-                                      <ul>
-                                        <li>Tutorial has been compeleted.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-
-                                </div>
+                                    <div class="wrapper">
+                                    <ul class="StepProgress">
+                                      <li class="StepProgress-item is-done"><strong>Open</strong>
+                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                      </li>
+                                      <li class="StepProgress-item is-done"><strong>Pending</strong>
+                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                      </li>
+                                      <li class="StepProgress-item current"><strong>Ongoing</strong>
+                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                      </li>
+                                      <li class="StepProgress-item"><strong>Done</strong>
+                                      <span>Tutorial has been compeleted.</span>
+                                      </li>
+                                    </ul>
+                                </div><br><br>
                             </ion-content>`;
 
     tutorial_element.innerHTML = tutorial_element_html;
@@ -1025,10 +921,10 @@ function load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
     let tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons style="margin-top: -55px;" slot="start">
+                                    <ion-buttons slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons style="margin-top: -55px;" slot="end">
+                                    <ion-buttons slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
                                     <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
@@ -1049,14 +945,14 @@ function load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
 
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.post_title}</strong></h2>
-                                    </ion-label>
+                                    
+                                        <h6><strong>${this_tutorial.post_title}</strong></h6>
+                                    
                                 </ion-item>
-                                <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
+                                <ion-item style="margin-top:-10px;" lines="none">
+                                    <p>
                                         ${this_tutorial.post_desc}
-                                    </h6>
+                                    </p>
                                 </ion-item>
                                         <ion-chip class="module" color="primary">
                                     <ion-icon name="star"></ion-icon>
@@ -1071,57 +967,32 @@ function load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_stat
                                     <ion-label>${tutorial_status}</ion-label>
                                 </ion-chip>
                                  <ion-item-divider class="divider2"></ion-item-divider>   
-                                <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                <img class="pdf_button" src="images/pdf.png" width="100px" alt=""/>
-                                <img class="blockchain_button" src="images/blockchain.png" width="100px" alt=""/>
+                                <div class="ion-padding-top">
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                </div> 
+                                 <ion-item-divider class="divider2"></ion-item-divider> 
                             <ion-item lines="none">
                                     <ion-label>
                                         <h2><strong>Tutorial stage</strong></h2>
                                     </ion-label>
                                 </ion-item>
-                                    <div class="timeline">
-                                  <div class="entry">
-                                    <div class="title">
-                                    </div>
-                                    <div class="body">
-                                      <p>Open</p>
-                                      <ul>
-                                        <li>Your tutorial has been requested successfully, it has currently not been assigned to a tutor. </li> 
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Pending</p>
-                                      <ul>
-                                        <li>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Ongoing</p>
-                                      <ul>
-                                        <li>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-                                  <div class="entry">
-                                    <div class="title"> 
-                                    </div>
-                                    <div class="body">
-                                      <p>Done</p>
-                                      <ul>
-                                        <li>Tutorial has been compeleted.</li>
-                                      </ul>
-                                    </div>
-                                  </div>
-
-                                </div>
+                                    <div class="wrapper">
+                                    <ul class="StepProgress">
+                                      <li class="StepProgress-item is-done"><strong>Open</strong>
+                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                      </li>
+                                      <li class="StepProgress-item is-done"><strong>Pending</strong>
+                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                      </li>
+                                      <li class="StepProgress-item is-done"><strong>Ongoing</strong>
+                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                      </li>
+                                      <li class="StepProgress-item current"><strong>Done</strong>
+                                      <span>Tutorial has been compeleted.</span>
+                                      </li>
+                                    </ul>
+                                </div><br><br>
                             </ion-content>`;
 
     tutorial_element.innerHTML = tutorial_element_html;

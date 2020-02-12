@@ -1,4 +1,121 @@
 "use strict"
+const nav_settings = document.getElementById('nav-settings');
+
+customElements.define('nav-settings', class NavSettings extends HTMLElement {
+    constructor() {
+        super();
+    }
+
+    async connectedCallback() {
+        this.innerHTML = `
+          <ion-header translucent>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-back-button></ion-back-button>
+                        </ion-buttons>
+                        <ion-buttons slot="end">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>
+                            <h1 style="margin-left: 8%;">Settings</h1>
+                        </ion-title>
+                    </ion-toolbar>
+                </ion-header>
+
+                <ion-content fullscreen>
+
+                    <ion-list>
+                        <ion-list-header>
+                            ACCOUNT SETTINGS
+                        </ion-list-header><!--<p>Manage information about you...</p>-->
+                        <ion-list class="ion-activatable ripple">
+                            <ion-item lines='none' >
+                                <ion-avatar slot="start">
+                                    <img src="images/i_person.png">
+                                </ion-avatar>
+                                <ion-label>
+                                    <h2>Personal Information</h2>
+                                    <p>Update your name, phone number</p>
+                                </ion-label>
+
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-list>
+                    </ion-list>
+                    <div class='space'></div>
+                    <ion-list>
+                        <ion-list-header>
+                            SECURITY
+                        </ion-list-header>
+                        <ion-list class="ion-activatable ripple">
+                            <ion-item lines='none'>
+                                <ion-avatar slot="start">
+                                    <img src="images/i_lock.png">
+                                </ion-avatar>
+                                <ion-label>
+                                    <h2>Change Password</h2>
+                                    <p>It's a good idea to use strong password</p>
+                                </ion-label>
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-list>
+                        <ion-list class="ion-activatable ripple" id="fingerprint_toggle">
+                            <ion-item lines='none'>
+                                <ion-avatar slot="start">
+                                    <img src="images/i_finger.png">
+                                </ion-avatar>
+                                <ion-label>
+                                    <h2>Fingerprint</h2>
+                                    <p id="fingerprint_message">Turn on fingerprint login</p>
+                                </ion-label>
+                                <ion-toggle slot="end" name="fingerprint_toggle"></ion-toggle>
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-list>
+                    </ion-list>
+                    <div class='space'></div>
+                    <ion-list>
+                        <ion-list-header>
+                            LEGAL AND POLICIES
+                        </ion-list-header>
+                        <ion-list id="terms_and_conditons" class="ion-activatable ripple">
+                            <ion-item lines='none'>
+                                <ion-avatar slot="start">
+                                    <img src="images/i_terms.png">
+                                </ion-avatar>
+                                <ion-label>
+                                    <h2>Terms And Conditions</h2>
+                                    <p>Legal agreement between user and service provider</p>
+                                </ion-label>
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-list>
+                        <ion-list id="privacy_policy" class="ion-activatable ripple">
+                            <ion-item lines='none'>
+                                <ion-avatar slot="start">
+                                    <img src="images/i_privacy.png">
+                                </ion-avatar>
+                                <ion-label>
+                                    <h2>Privacy Policy</h2>
+                                    <p>Declares policy on collecting information</p>
+                                </ion-label>
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-list>
+                    </ion-list>
+                    <div class='space'></div>
+                    <ion-list>
+                        <ion-item lines='none'>
+                            <ion-button id='logout' size='default' expand="block" color="danger">Logout</ion-button>
+                        </ion-item> 
+
+                    </ion-list>
+                </ion-content>
+                <ion-modal-controller></ion-modal-controller>
+        `;
+        
+    }
+});
 
 async function encrypt_fingerprint(currentModal, email, password, ionic_loading) {
     try {
@@ -294,6 +411,8 @@ async function logout(logout_button) {
  ******************************************************************************************************************
  ******************************************************************************************************************
  */
+active_nav = nav_settings;
+
 if (localStorage.getItem("fingerprint_setup") !== null) {
     document.getElementById('fingerprint_message').innerText = "Turn off fingerprint login";
     document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "true");
@@ -431,6 +550,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
         });
     }
 });
+
 
 document.getElementById('terms_and_conditons').addEventListener('click', async () => {
     device_feedback();

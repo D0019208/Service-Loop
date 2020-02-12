@@ -17,7 +17,7 @@
 
             h1
             {
-                margin-left: 8%;
+                
                 text-align: center;
                 font-weight: bold;
                 margin-top: 8px;
@@ -123,24 +123,36 @@
             }
 
 
-            .not_read p
+            .not_read .notification_desc, .not_read .notification_title
             {
                 color: black;
+                font-weight: bolder;
+                opacity: 0.86;
             }
-            .read h2
+            .read
             {
                 color: gray;
+            }
+            .notification_title
+            {
+                width: calc(100% - 65px);
+                font-size: 1em !important;
             }
             .not_read span, .read span
             {
                 position: absolute;
                 right: 10px;
-                top: 16px;
+                top: 14px;
                 font-size: 12px;
             }
             .read span
             {
-                color: gray;
+                color: #4e4e4e;
+            }
+            .not_read .notification_date
+            {
+                font-weight: bolder;
+                opacity: 0.86;
             }
 
             /*MODAL*/
@@ -207,13 +219,6 @@
             
             
             
-            h1
-            {
-                margin-left: 8%;
-                text-align: center;
-                font-weight: bold;
-                margin-top: 8px;
-            }
             .offer p
             {
                 color: gray;
@@ -253,13 +258,6 @@
                 --ion-safe-area-bottom: 0px;
             }
 
-            h1
-            {
-                margin-left: 8%;
-                text-align: center;
-                font-weight: bold;
-                margin-top: 8px;
-            }
             .offer p
             {
                 color: gray;
@@ -331,12 +329,6 @@
                 text-align: center;
                 font-size: 1.05em;
 
-            }
-            h1
-            { 
-                text-align: center;
-                font-weight: bold;
-                margin-top: 8px;
             }
             .success_img
             {
@@ -565,6 +557,40 @@
                 padding-left: 15px;
                 padding-right: 15px;
             }
+            
+            /*Tutorial page (accept, reject agreement style)*/
+            #accept_agreement
+            {
+                position:fixed;
+                width: 50%;
+                right:0px;
+                bottom: 0px;
+                z-index: 999;
+            }
+            #reject_agreement
+            {
+                position:fixed;
+                width: 50%;
+                bottom: 0px;
+                z-index: 999;
+            }
+            
+            /**/
+            .swiper-slide {
+              display: block;
+            }
+            ion-slide > h2 {
+              margin-top: 2.8rem;
+            }
+            ion-slide > img {
+              max-height: 50%;
+              max-width: 60%;
+              margin: 36px 0;
+            }
+            .swiper-slide
+            {
+                margin-top: -35px;
+            }
         </style>
     </head>
     <body>
@@ -572,13 +598,13 @@
 
         <!-- MENU -->
 
-        <ion-menu side="start">
+        <ion-menu side="start" menu-id="menu">
             <ion-header class="menu_header">
                 <ion-avatar style="width: 55px;height: 55px;" class="menu_avatar">
-                   <img src="images/back.jpg">
+                   <img src="images/avatar.jpg">
                 </ion-avatar>
-                <h4 class="menu_name"><strong>German Luter</strong></h4>
-                <p class="menu_email">info@student.dkit.ie</p>
+                <h4 class="menu_name"><strong id="user_name_menu">German Luter</strong></h4>
+                <p class="menu_email" id="user_email_menu">info@student.dkit.ie</p>
                 <!--<ion-toolbar translucent>
                     <ion-title>Menu</ion-title>
                 </ion-toolbar>-->
@@ -596,7 +622,7 @@
                         </ion-item>
                     </a>
                     <a href="#" style="text-decoration: none;">
-                        <ion-item style="margin-left:-16px; margin-bottom: 10px;" class="ion-activatable ripple">
+                        <ion-item id="profile" style="margin-left:-16px; margin-bottom: 10px;" class="ion-activatable ripple">
                             <ion-item lines="none">
                                 <ion-icon name="person" slot="start"></ion-icon>
                                 <ion-label>Profile</ion-label>
@@ -680,110 +706,9 @@
                 </ion-content>
             </ion-tab>-->
             <ion-tab tab="settings" root="nav-settings">
-                <ion-header translucent>
-                    <ion-toolbar>
-                        <ion-buttons slot="start">
-                            <ion-back-button></ion-back-button>
-                        </ion-buttons>
-                        <ion-buttons slot="end">
-                            <ion-menu-button></ion-menu-button>
-                        </ion-buttons>
-                        <ion-title>
-                            <h1>Settings</h1>
-                        </ion-title>
-                    </ion-toolbar>
-                </ion-header>
-
-                <ion-content fullscreen>
-
-                    <ion-list>
-                        <ion-list-header>
-                            ACCOUNT SETTINGS
-                        </ion-list-header><!--<p>Manage information about you...</p>-->
-                        <ion-list class="ion-activatable ripple">
-                            <ion-item lines='none' >
-                                <ion-avatar slot="start">
-                                    <img src="images/i_person.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Personal Information</h2>
-                                    <p>Update your name, phone number</p>
-                                </ion-label>
-
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                    </ion-list>
-                    <div class='space'></div>
-                    <ion-list>
-                        <ion-list-header>
-                            SECURITY
-                        </ion-list-header>
-                        <ion-list class="ion-activatable ripple">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_lock.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Change Password</h2>
-                                    <p>It's a good idea to use strong password</p>
-                                </ion-label>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                        <ion-list class="ion-activatable ripple" id="fingerprint_toggle">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_finger.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Fingerprint</h2>
-                                    <p id="fingerprint_message">Turn on fingerprint login</p>
-                                </ion-label>
-                                <ion-toggle slot="end" name="fingerprint_toggle"></ion-toggle>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                    </ion-list>
-                    <div class='space'></div>
-                    <ion-list>
-                        <ion-list-header>
-                            LEGAL AND POLICIES
-                        </ion-list-header>
-                        <ion-list id="terms_and_conditons" class="ion-activatable ripple">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_terms.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Terms And Conditions</h2>
-                                    <p>Legal agreement between user and service provider</p>
-                                </ion-label>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                        <ion-list id="privacy_policy" class="ion-activatable ripple">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_privacy.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Privacy Policy</h2>
-                                    <p>Declares policy on collecting information</p>
-                                </ion-label>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                    </ion-list>
-                    <div class='space'></div>
-                    <ion-list>
-                        <ion-item lines='none'>
-                            <ion-button id='logout' size='default' expand="block" color="danger">Logout</ion-button>
-                        </ion-item> 
-
-                    </ion-list>
-                </ion-content>
-                <ion-modal-controller></ion-modal-controller>
+                <ion-nav root="nav-settings" id="nav-settings">
+                    
+                </ion-nav>
             </ion-tab>
 
 
