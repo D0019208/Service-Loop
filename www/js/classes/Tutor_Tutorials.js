@@ -109,7 +109,7 @@ class Tutor_Tutorials extends User {
                                 <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
                             </ion-avatar>
                             <ion-label>
-                                <h2>${tutorial.post_title}</h2>
+                                <p style="font-size:1em; color: black;">${tutorial.post_title}</p>
                                 <p>${formatDate(tutorial.post_posted_on)}</p>
                             </ion-label>
                         </ion-item>
@@ -159,7 +159,7 @@ class Tutor_Tutorials extends User {
                                 <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
                             </ion-avatar>
                             <ion-label>
-                                <h2>${tutorials[i + originalLength].post_title}</h2>
+                                <p style="font-size:1em; color: black;">${tutorials[i + originalLength].post_title}</p>
                                 <p>${formatDate(tutorials[i + originalLength].post_posted_on)}</p>
                             </ion-label>
                         </ion-item>
@@ -316,7 +316,7 @@ class Tutor_Tutorials extends User {
                                 <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
                             </ion-avatar>
                             <ion-label>
-                                <h2>${this_tutorial.post_title}</h2>
+                                <p style="font-size:1em; color: black;">${this_tutorial.post_title}</p>
                                 <p>${formatDate(this_tutorial.post_posted_on)}</p>
                             </ion-label>
                         </ion-item>

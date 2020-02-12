@@ -1,4 +1,4 @@
-function load_profile_page() {
+function load_profile_page(nav_controller) {
     customElements.get('nav-profile') || customElements.define('nav-profile', class Profile extends HTMLElement {
         constructor() {
             super();
@@ -10,7 +10,7 @@ function load_profile_page() {
             <ion-header translucent>
             <ion-toolbar>
             <ion-buttons slot="start">
-                                <!--<ion-back-button default-href="home"></ion-back-button>-->
+                                <ion-back-button default-href="home"></ion-back-button>
                             </ion-buttons>
                             <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
@@ -22,7 +22,7 @@ function load_profile_page() {
         <ion-content fullscreen>
         <ion-item style="margin-top:15px;" lines="none">
           <ion-avatar class="profile_avatar">
-            <img src="images/back.jpg">
+            <img src="images/avatar.jpg">
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
@@ -34,10 +34,10 @@ function load_profile_page() {
             
         <ion-item lines="none" style="text-align:center;">
             <ion-label>
-                <h2><strong>German Luter</strong></h2>
-                <p>D00194503@student.dkit.ie</p>
+                <h2><strong id="user_name_profile">John</strong></h2>
+                <p id="user_email_profile">D00194503@student.dkit.ie</p>
                 <br>
-                <h2><strong>TUTOR</strong></h2>
+                <h2><strong id="user_status_profile">TUTOR</strong></h2>
             </ion-label>
         </ion-item>
             
@@ -122,7 +122,16 @@ function load_profile_page() {
 <ion-alert-controller></ion-alert-controller>
         `;
 
-
+            //Change user's info
+            document.getElementById('user_name_profile').innerText = user.getName();
+            document.getElementById('user_email_profile').innerText = user.getEmail();
+            if (user.getStatus() === "Tutor") {
+                document.getElementById('user_status_profile').innerText = "TUTOR";
+            } else {
+                document.getElementById('user_status_profile').innerText = "STUDENT";
+            }
+            console.log(user.getModules());
+            
             //var button = document.activeElement.tagName;
             //button.onclick = addItem;
 
@@ -262,6 +271,6 @@ function load_profile_page() {
         }
     });
 
-    nav.push('nav-profile');
+    nav_controller.push('nav-profile');
 }
 
