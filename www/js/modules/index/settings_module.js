@@ -50,7 +50,7 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                                     <h2>Slides</h2>
                                     <p>Tutorial Slides</p>
                                 </ion-label>
-                                <ion-toggle slot="end" name="blueberry"></ion-toggle>
+                                <ion-toggle slot="end" id="slides" name="slides_toggle"></ion-toggle>
                             </ion-item>
                             <ion-ripple-effect></ion-ripple-effect>
                         </ion-list>
@@ -127,6 +127,29 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                 <ion-modal-controller></ion-modal-controller>
         `;
         
+    }
+});
+
+//Set slides togle
+let tutorial_slides_status = localStorage.getItem("tutorial_slides");
+if(tutorial_slides_status !== "false")
+{
+    document.querySelector('ion-toggle[name="slides_toggle"]').setAttribute("checked", "true");
+}
+else
+{
+    document.querySelector('ion-toggle[name="slides_toggle"]').setAttribute("checked", "false");
+}
+
+let slides = document.getElementById("slides");
+slides.addEventListener('click', () => {
+    device_feedback();
+    if (tutorial_slides_status !== "false")
+    {
+        localStorage.setItem("tutorial_slides", "false");
+    } else
+    {
+        localStorage.setItem("tutorial_slides", "true");
     }
 });
 

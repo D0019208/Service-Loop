@@ -31,6 +31,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     let home_component;
     let notifications_response;
     let tab_controller = document.getElementById('tabs');
+    let tutorial_slides_status = localStorage.getItem("tutorial_slides");
     current_tab = 'home';
     previous_tab = 'home';
     //Check to make sure that the users session has not expired
@@ -56,6 +57,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log(notifications_response);
     //Define our Navigation controller for the home tab
     nav = document.getElementById('nav-home');
+
     //Shows tutorial slides
     let tab_bar = document.querySelector('ion-tab-bar');
     //tab_bar.style.display = 'none';
@@ -91,32 +93,87 @@ document.addEventListener("DOMContentLoaded", async function () {
       </ion-slides>
     </ion-content>`;
     //nav.push(tutorial_slides);
+
     
-    let closeTutorial;
-    let closeTutorialHandler = async function () {
-        device_feedback();
-        tab_bar.style.display = 'flex';
-        nav.pop();
-    }
     
-    let ionNavDidChangeEvent = async function () {
-        if (document.getElementById('continue_slides') !== null) {
-            closeTutorial = document.getElementById("continue_slides");
-            closeTutorial.addEventListener('click', closeTutorialHandler, false);
+    if(tutorial_slides_status !== "false")
+    {
+        //Shows tutorial slides
+            let tab_bar = document.querySelector('ion-tab-bar');
+        tab_bar.style.display = 'none';
+        let tutorial_slides = document.createElement('tutorial_slides');
+        tutorial_slides.innerHTML = `<ion-header translucent>
+          <ion-toolbar>
+            <ion-title><h1>Slides</h1></ion-title>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content fullscreen>
+          <ion-slides pager="true">
+
+            <ion-slide>
+
+              <img src="images/slide-1.png"/>
+
+
+            </ion-slide>
+
+            <ion-slide>
+              <img src="images/slide-3.png"/>
+            </ion-slide>
+
+            <ion-slide>
+              <h2>Ready to Start?</h2>
+              <img src="images/success_blue1.png" alt=""/>
+              <br>
+              <p><input type="checkbox" name="checkbox" value="check" id="show_tutorial_slides" /> Do not show again</p>
+              <ion-button id="continue_slides" fill="clear" >Continue <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+            </ion-slide>
+
+          </ion-slides>
+        </ion-content>`;
+        nav.push(tutorial_slides);
+
+        //Close Tutorial Slides
+        let closeTutorial;
+        let closeTutorialHandler = async function () {
+            device_feedback();
+            tab_bar.style.display = 'flex';
+            var checkBox = document.getElementById("show_tutorial_slides");
+            if (checkBox.checked == true){
+                localStorage.setItem("tutorial_slides", "false");
+            } 
+            else {
+                localStorage.setItem("tutorial_slides", "true");
+            }
+            nav.pop();
         }
 
-        let active_component = await nav.getActive();
+        let ionNavDidChangeEvent = async function () {
+            if (document.getElementById('continue_slides') !== null) {
+                closeTutorial = document.getElementById("continue_slides");
+                closeTutorial.addEventListener('click', closeTutorialHandler, false);
+            }
 
-        //Remove the event listener when we no longer need it
-        if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
-            if (typeof closeTutorial !== 'undefined') {
-            closeTutorial.removeEventListener("click", closeTutorialHandler, false);
-            nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-        }
-        }
-    };
+            let active_component = await nav.getActive();
+
 
     //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+
+            //Remove the event listener when we no longer need it
+            if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
+                if (typeof closeTutorial !== 'undefined') {
+                closeTutorial.removeEventListener("click", closeTutorialHandler, false);
+                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+            }
+            }
+        };
+        nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+    }
+    
+    
+    
+
     
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
@@ -208,6 +265,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <h2 style="color:white; margin-top:-5px;"><strong id="user_status">Student</strong></h2>
                                 <br>
                             </ion-label>
+                            <div class="white2"></div>
                             <div class="white_backgound">
                                 <br><br><br>
                                 <!--<ion-button expand="block" >Post Offer</ion-button>
@@ -254,6 +312,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
 
                             </div>
+                    
                         </ion-content>`;
                 //We get all the users notifications based off his email and modules
                 notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: true, user_modules: user.getModules()}}, "get_all_notifications");

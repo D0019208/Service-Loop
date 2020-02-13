@@ -553,3 +553,26 @@ function done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
     nav.push(tutor_tutorial_element);
 }
+let openPdf;
+let openPdfHandler = async function (this_tutorial) {
+            device_feedback();
+            openPDF(this_tutorial);
+            //console.log(this_tutorial);
+        }
+let ionNavDidChangeEvent = async function () {
+            if (document.getElementById('view_agreement') !== null) {
+                openPdf = document.getElementById("view_agreement");
+                openPdf.addEventListener('click', openPdfHandler, false);
+            }
+
+            let active_component = await nav.getActive();
+
+            //Remove the event listener when we no longer need it
+            if (active_component.component.tagName !== "TUTORIAL") {
+                if (typeof openPdf !== 'undefined') {
+                openPdf.removeEventListener("click", openPdfHandler, false);
+                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+            }
+            }
+        };
+        nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);

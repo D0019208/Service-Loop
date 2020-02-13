@@ -39,6 +39,13 @@ function create_ionic_alert(header, message, buttons, on_alert_dismiss_function 
 }
 
 
+//Function to view PDFs
+function openPDF(this_post)
+{
+    cordova.InAppBrowser.open('d00192082.alwaysdata.net/ServiceLoopServer/'+this_post.post_agreement_url, '_system', 'location=yes');
+}
+
+
 /*
  * A function that can create an Ionic Loading overlay. 
  * 
@@ -829,7 +836,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
                                         <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
                                     </div>
                                     <div style="text-align:center">
-                                        <button id="save">Save</button>
+                                        
                                         <button id="undo">Undo</button>
                                         <button id="clear">Clear</button>
                                     </div>
@@ -1144,10 +1151,10 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
-                                        <ion-buttons slot="start">
+                                        <ion-buttons style="margin-top: -55px;" slot="start">
                                             <ion-back-button defaultHref="/"></ion-back-button>
                                             </ion-buttons>
-                                            <ion-buttons slot="end">
+                                            <ion-buttons style="margin-top: -55px;" slot="end">
                                                 <ion-menu-button></ion-menu-button>
                                             </ion-buttons>
                                         <ion-title><h1>Sign Agreement</h1></ion-title>
@@ -1289,3 +1296,5 @@ agreement_rejected_response.updated_tutorial.post_agreement_offered = false;
         create_ionic_alert("Failed to reject agreement", agreement_rejected_response.response, ["OK"]);
     }
 } 
+
+
