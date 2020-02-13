@@ -187,7 +187,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -207,7 +207,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -291,7 +291,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -338,7 +338,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -382,7 +382,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -402,7 +402,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -422,7 +422,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -525,7 +525,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -545,7 +545,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -565,7 +565,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+              <ion-title>${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">

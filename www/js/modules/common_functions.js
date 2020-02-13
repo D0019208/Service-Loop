@@ -914,7 +914,7 @@ async function generate_agreement(nav_controller, tutorial) {
 
             nav_controller.pop();
         } else {
-            alert("Error")
+            create_ionic_alert("Tutorial request error", agreement_generated_response.response, ["OK"]);
         }
 
         console.log(agreement_generated_response);
@@ -1147,6 +1147,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
     let current_date = year + "-" + parseInt(date.getMonth() + 1) + "-" + date.getDate();
     console.log(current_date);
     console.log(year)
+    
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
@@ -1160,7 +1161,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
                                     </ion-toolbar>
                                 </ion-header>
                                 <ion-content fullscreen> 
-                                    <p class="center">Please enter you signature</p>
+                                    <p class="center">Please enter your signature</p>
                                     <ion-item-divider class="divider">
                                     </ion-item-divider>
                                     <br><br>

@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     ////Set status of user to tutor
     user.setName("Nichita Postolachi");
-    user.setStatus("Tutor");
+    user.setStatus("Student");
     user.setEmail("nikito888@gmail.com");
     //Set status of user to student
     //user.setName("Test User");
@@ -57,6 +57,43 @@ document.addEventListener("DOMContentLoaded", async function () {
     console.log(notifications_response);
     //Define our Navigation controller for the home tab
     nav = document.getElementById('nav-home');
+
+    //Shows tutorial slides
+    let tab_bar = document.querySelector('ion-tab-bar');
+    //tab_bar.style.display = 'none';
+    let tutorial_slides = document.createElement('tutorial_slides');
+    tutorial_slides.innerHTML = `<ion-header translucent>
+      <ion-toolbar>
+        <ion-title><h1>Slides</h1></ion-title>
+      </ion-toolbar>
+    </ion-header>
+
+    <ion-content fullscreen>
+      <ion-slides pager="true">
+
+        <ion-slide>
+            
+          <img src="images/slide-1.png"/>
+          
+          
+        </ion-slide>
+
+        <ion-slide>
+          <img src="images/slide-3.png"/>
+        </ion-slide>
+
+        <ion-slide>
+          <h2>Ready to Start?</h2>
+          <img src="images/success_blue1.png" alt=""/>
+          <br>
+          <p><input type="checkbox" name="checkbox" value="check" id="agree" /> Do not show again</p>
+          <ion-button id="continue_slides" fill="clear" >Continue <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
+        </ion-slide>
+
+      </ion-slides>
+    </ion-content>`;
+    //nav.push(tutorial_slides);
+
     
     
     if(tutorial_slides_status !== "false")
@@ -120,6 +157,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             let active_component = await nav.getActive();
 
+
+    //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+
             //Remove the event listener when we no longer need it
             if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
                 if (typeof closeTutorial !== 'undefined') {
@@ -133,6 +173,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     
     
     
+
     
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
