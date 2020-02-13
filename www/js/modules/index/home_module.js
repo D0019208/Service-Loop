@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     ////Set status of user to tutor
     user.setName("Nichita Postolachi");
-    user.setStatus("Tutor");
+    user.setStatus("Student");
     user.setEmail("nikito888@gmail.com");
     //Set status of user to student
     //user.setName("Test User");
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     nav = document.getElementById('nav-home');
     //Shows tutorial slides
     let tab_bar = document.querySelector('ion-tab-bar');
-    tab_bar.style.display = 'none';
+    //tab_bar.style.display = 'none';
     let tutorial_slides = document.createElement('tutorial_slides');
     tutorial_slides.innerHTML = `<ion-header translucent>
       <ion-toolbar>
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       </ion-slides>
     </ion-content>`;
-    nav.push(tutorial_slides);
+    //nav.push(tutorial_slides);
     
     let closeTutorial;
     let closeTutorialHandler = async function () {
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     };
 
-    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+    //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
     
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
