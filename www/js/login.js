@@ -17,6 +17,9 @@ if (localStorage.getItem("fingerprint_setup") !== null) {
 document.addEventListener("deviceready", function () {
     //Hide splashscreen
     navigator.splashscreen.hide();
+});
+
+document.addEventListener("DOMContentLoaded", function () { 
     
     let fingerprint_active = false;
     

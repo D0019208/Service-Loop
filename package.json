@@ -13,7 +13,8 @@
       "cordova-plugin-whitelist": {},
       "cordova-plugin-android-fingerprint-auth": {},
       "cordova-plugin-secure-key-store": {},
-      "cordova-plugin-velda-devicefeedback": {}
+      "cordova-plugin-velda-devicefeedback": {},
+      "cordova-plugin-inappbrowser": {}
     },
     "platforms": [
       "browser",

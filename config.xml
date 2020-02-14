@@ -2,10 +2,10 @@
 xmlns:android="http://schemas.android.com/apk/res/android"
 xmlns:cdv="http://cordova.apache.org/ns/1.0"
   version="1.0.0"
-  id="com.dkit.serviceloop" >
+  id="com.dkit.studentloop" >
 
-  <name>Service Loop</name>
-  <description>Service Loop - Stay in the loop with Service Loop</description>
+  <name>Student Loop</name>
+  <description>Student Loop - Stay in the loop with Student Loop</description>
 
   <access origin="*" />
   <allow-intent href="*" />

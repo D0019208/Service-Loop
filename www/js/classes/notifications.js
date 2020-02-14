@@ -225,15 +225,58 @@ class Notifications extends User {
     sendTutorialAcceptedNotification(notification, post) {
         this.socket.emit('tutorial_request_accepted', {the_notification: notification, the_post: post});
     }
+    
+    sendAgreementGeneratedNotification(notification, post) {
+        this.socket.emit('agreement_generated', {the_notification: notification, the_post: post});
+    }
 
     sendAgreementRejectedNotification(notification, post) {
         this.socket.emit('agreement_rejected', {the_notification: notification, the_post: post});
+    }
+    
+    sendAgreementAcceptedNotification(notification, post) {
+        this.socket.emit('agreement_accepted', {the_notification: notification, the_post: post});
     }
 
     wait_for_agreement_rejected() {
         let socket = this.socket;
         
         socket.on('agreement_rejected_tutor', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial agreement has been rejected!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
+            tutor_tutorials.update_tutorial("Pending", data.post);
+            posts.replace_notification_posts(data.post);
+            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response);
+
+            console.log(data);
+        });
+        
+        socket.on('agreement_accepted_tutor', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial agreement has been accepted!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
             tutor_tutorials.update_tutorial("Pending", data.post);
             posts.replace_notification_posts(data.post);
             //window.plugins.deviceFeedback.haptic();
@@ -246,13 +289,51 @@ class Notifications extends User {
     waitForNewNotifications() {
         let socket = this.socket;
 
-        socket.on('new_notification', (data) => {
+        socket.on('new_notification', (data) => { 
+            new_message_ping.play();
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
         });
+        
+        
 
         socket.on('add_tutorial_request_accepted_notification', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
+            posts.replace_notification_posts(data.post);
+
+            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response);
+
+            console.log(data);
+        });
+        
+        socket.on('add_agreement_created_notification', (data) => { 
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A new agreement has been created!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
             posts.replace_notification_posts(data.post);
 
             //window.plugins.deviceFeedback.haptic();
