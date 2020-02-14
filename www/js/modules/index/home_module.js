@@ -507,7 +507,7 @@ document.addEventListener("deviceready", async function () {
 
     });
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        console.log("Tab clicked")
+        console.log("Which tab clicked?")
         console.log(event)
 
         if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home" || event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications" || event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {

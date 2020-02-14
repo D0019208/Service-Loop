@@ -595,6 +595,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             {
                 text: 'Reject',
                 handler: () => {
+                    device_feedback();
                     console.log('Rejected')
                     reject_this_agreement(nav_controller, this_post);
                 }
@@ -603,6 +604,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 text: 'Cancel',
                 role: 'cancel',
                 handler: () => {
+                    device_feedback();
                     console.log('Cancel')
                 }
             }
@@ -1126,7 +1128,7 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
             {
                 text: 'Accept',
                 handler: async () => {
-                    console.log('Accepted');
+                    device_feedback();
 
                     let previous_view = await nav_controller.getPrevious();
 
@@ -1137,6 +1139,7 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
                 text: 'Cancel',
                 role: 'cancel',
                 handler: () => {
+                    device_feedback();
                     console.log('Cancel')
                 }
             }
@@ -1224,6 +1227,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
             {
                 text: 'Accept',
                 handler: () => {
+                    device_feedback();
                     console.log('Accepted');
                     accept_agreement(nav_controller, this_tutorial);
                 }
@@ -1232,6 +1236,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
                 text: 'Cancel',
                 role: 'cancel',
                 handler: () => {
+                    device_feedback();
                     console.log('Cancel')
                 }
             }
