@@ -1,5 +1,5 @@
 let posts_response;
-var posts_loaded = false;
+let posts_loaded = false;
 
 /*
  * A function that handles the forum functionality
@@ -82,7 +82,6 @@ async function all_tutorials(nav) {
                     console.log(posts.posts_length)
                     console.log(posts.getAllPosts().length);
 
-
                     if (posts.posts_length < posts.getAllPosts().length - 1) {
                         console.log('Loading data...');
                         await wait(500);
@@ -104,10 +103,10 @@ async function all_tutorials(nav) {
                 });
 
                 //If we have less than 7 tutorial requests we display all of them otherwise we display only 7
-                if (posts.getAllPosts().length <= 7) {
+                if (posts.getAllPosts().length <= 3) {
                     posts.appendPosts(posts.getAllPosts().length, list);
                 } else {
-                    posts.appendPosts(7, list);
+                    posts.appendPosts(3, list);
                 }
             }
 
@@ -127,99 +126,13 @@ async function all_tutorials(nav) {
                     //if (notification !== null) {
                     //    notification_tags.push(notification.getAttribute('notification_tags'));
                     //}
-
+                    let active_component = await nav.getActive();
                     console.log(post);
                     //If we clicked on a post
-                    if (post) {
+                    //NEEDS TO BE CHANGED!!!!!!!
+                    if (post && active_component.component == "nav-all-tutorials") { 
                         //Find a post from posts object that matches the ID of the clicked element.
-                        let this_post = posts.getPostDetailsById(post.getAttribute('post_id'));
-
-                        let modules = "";
-
-                        for (let i = 0; i < this_post.post_modules.length; i++) {
-                            modules += '<ion-chip class="module" color="primary"><ion-icon name="star"></ion-icon><ion-label>' + this_post.post_modules[i] + '</ion-label></ion-chip>';
-                        }
-
-                        let nav_post = document.createElement('nav-post');
-                        nav_post.innerHTML = `<ion-header translucent>
-                            <ion-toolbar>
-                                    <ion-buttons slot="start">
-                                        <ion-back-button defaultHref="/"></ion-back-button>
-                                    </ion-buttons>
-                                <ion-title><h1>Request Description</h1></ion-title>
-                            </ion-toolbar>
-                        </ion-header>
-                
-                        <ion-content fullscreen>
-                        <ion-item style="margin-top:10px;" lines="none">
-                          <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                            <img src="${this_post.std_avatar}">
-                          </ion-avatar>
-                          <ion-label>
-                            <h2><strong>${this_post.std_name}</strong></h2>
-                            <p>${this_post.std_email}</p>
-                          </ion-label>
-                        </ion-item>
-                            
-                            <ion-item-divider class="divider"></ion-item-divider>
-                        <ion-item lines="none">
-                            <ion-label>
-                                <h2><strong>${this_post.post_title}</strong></h2>
-                            </ion-label>
-                        </ion-item>
-                        <ion-item style="margin-top:-15px;" lines="none">
-                            <ion-label>
-                                <h2>${this_post.post_desc}</h2>
-                            </ion-label>
-                        </ion-item>
-                            
-                        ${modules}
-                            
-                            <ion-item-divider class="divider2"></ion-item-divider>
-                            <ion-button expand="block" type="submit" class="ion-margin accept_request_btn" id="accept_request_btn">Accept Request</ion-button>
-                        </ion-content>
-                                              `;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                        nav.push(nav_post);
-
-                        let accept_tutorial_request_button;
-
-                        let event_handler = function () {
-                            device_feedback();
-                            load_nav_post_functionality(this_post, post);
-                        };
-
-                        let ionNavDidChangeEvent = async function () {
-                            if (document.getElementById('accept_request_btn') !== null) {
-                                accept_tutorial_request_button = document.getElementById('accept_request_btn');
-
-                                accept_tutorial_request_button.addEventListener('click', event_handler, false);
-                            }
-
-                            let notifications_active_component = await nav.getActive();
-
-                            if (notifications_active_component.component === "nav-all-tutorials") {
-                                accept_tutorial_request_button.removeEventListener("click", event_handler, false);
-                                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-                            }
-                        };
-
-                        nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+                        load_new_tutorial_request_component(nav, {post_id: post.getAttribute('post_id')}, {post: post, is_forum: true});
                     }
                 });
             }
@@ -239,41 +152,4 @@ async function all_tutorials(nav) {
     });
 
     nav.push('nav-all-tutorials');
-}
-
-async function load_nav_post_functionality(this_post, post) { 
-    let post_acceptated_response = await access_route({tutor_email: user.getEmail(), post_id: post.getAttribute("post_id")}, "post_accepted", function () {
-        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"]);
-    });
-
-    if (!post_acceptated_response.error) {
-        user_notifications.addToNotifications(post_acceptated_response.response.tutor_notification);
-        user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification);
-
-        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"], function () {
-            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-            posts.total_posts = posts.total_posts - 1;
-
-            if (document.getElementById("forum_list").childNodes.length === 0) {
-                document.getElementById("forum_list").remove();
-            }
-
-            post.remove();
-            nav.popToRoot();
-
-            posts.removePostById(post.getAttribute("post_id"));
-        });
-    } else {
-        create_ionic_alert("Tutorial request error", post_acceptated_response.response, ["OK"], function () {
-            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-            posts.total_posts = posts.total_posts - 1;
-
-            if (document.getElementById("forum_list").childNodes.length === 0) {
-                document.getElementById("forum_list").remove();
-            }
-
-            post.remove();
-            nav.popToRoot();
-        });
-    }
-}
+} 

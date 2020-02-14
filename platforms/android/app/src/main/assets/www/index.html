@@ -8,6 +8,7 @@
         <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.esm.js"></script>
         <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>
+        <link href="css/style.css" rel="stylesheet" type="text/css"/>
         <style>
             :root {
                 --ion-safe-area-top: 0px;
@@ -16,7 +17,7 @@
 
             h1
             {
-                margin-left: 8%;
+                
                 text-align: center;
                 font-weight: bold;
                 margin-top: 8px;
@@ -36,12 +37,14 @@
                 border-radius: 100px;
                 //overflow: scroll;
             }
-
-            div ion-button
+            .white2
             {
-                margin-left: 45px;
-                margin-right: 45px;
-                margin-top: 10px;
+                position:absolute;
+                left:0px;
+                right:0px;
+                height:300px;
+                background-color: white;
+                top: 400px;
             }
 
             .user_name
@@ -52,10 +55,6 @@
                 text-shadow: 0px 0px 20px rgba(0, 0, 0, 0.5);
             }
 
-            ion-button
-            {
-                margin-top: 10px;
-            }
             #logout
             {
                 position: absolute;
@@ -120,36 +119,49 @@
                 position: absolute;
                 color: white;
                 margin-left: 10px;
-                margin-top: 10px; 
+                margin-top: 0px; 
             }
             .home_buttons p
             {
                 position: absolute;
                 margin-left: 10px;
-                margin-top: 31px;
+                margin-top: 25px;
                 font-size: 12px;
                 color: white;
+                width: 70%;
             }
 
 
-            .not_read p
+            .not_read .notification_desc, .not_read .notification_title
             {
                 color: black;
+                font-weight: bolder;
+                opacity: 0.86;
             }
-            .read h2
+            .read
             {
                 color: gray;
+            }
+            .notification_title
+            {
+                width: calc(100% - 65px);
+                font-size: 1em !important;
             }
             .not_read span, .read span
             {
                 position: absolute;
                 right: 10px;
-                top: 16px;
+                top: 14px;
                 font-size: 12px;
             }
             .read span
             {
-                color: gray;
+                color: #4e4e4e;
+            }
+            .not_read .notification_date
+            {
+                font-weight: bolder;
+                opacity: 0.86;
             }
 
             /*MODAL*/
@@ -167,7 +179,7 @@
                 margin-top: -48px;
             }
             
-            .request_items ion-label
+            .request_items
             {
                 padding-left: 35%;
             }
@@ -181,6 +193,11 @@
                 position: absolute;
                 right: 10px;
                 bottom: 10px;
+            }
+            
+            .tut_req_title
+            {
+                padding-left: 35%;
             }
 
             /*forum*/
@@ -208,6 +225,381 @@
             {
                 margin-top: -15px;
             }
+            
+            
+            
+            .offer p
+            {
+                color: gray;
+            }
+            .offer span
+            {
+                position: absolute;
+                right: 10px;
+                top: 16px;
+                font-size: 12px;
+            }
+            .test
+            {
+                margin-top: 0px;
+                margin-bottom: 10px;
+                
+            }
+            ion-list-header
+            {
+                margin-bottom: -10px;
+            }
+            .module2
+            {
+                margin-left: 0px;
+            }
+            ion-card-content
+            {
+                color: black;
+            }
+            
+            
+            
+            
+            
+            :root {
+                --ion-safe-area-top: 0px;
+                --ion-safe-area-bottom: 0px;
+            }
+
+            .offer p
+            {
+                color: gray;
+            }
+            .offer span
+            {
+                position: absolute;
+                right: 10px;
+                top: 16px;
+                font-size: 12px;
+            }
+            .state
+            {
+                height: 100%;
+                width: 5px;
+                background-color: lightsalmon;
+                position: absolute;
+                left: 0px;
+                top: 0px;
+            }
+            IonBadge
+            {
+                margin-top: -8px;
+            }
+            .hide
+            {
+                display: none
+            }
+            
+            
+            
+            
+            
+            .note
+            {
+                text-align: center;
+                filter: opacity(70%);
+            }
+            .date
+            {
+                position: absolute;
+                right: 10px;
+                top: 0px;
+                font-size: 12px;
+                filter: opacity(80%);
+            }
+            .pdf_button
+            {
+                position: absolute;
+                left: 15px;
+                margin-top: 15px;
+            }
+            .blockchain_button
+            {
+                position: absolute;
+                right: 15px;
+                margin-top: 15px;
+                opacity: 0.93;
+            }
+            
+            
+            
+            
+            
+            
+            
+            .center
+            {
+                text-align: center;
+                font-size: 1.05em;
+
+            }
+            .success_img
+            {
+                text-align: center;
+                margin-top: 50px;
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .success_name
+            {
+                margin-left: 0px;
+                text-align: center;
+                font-weight: bold;
+                filter: opacity(75%);
+                margin-top: 30px;
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .success_text
+            {
+                text-align: center;
+                filter: opacity(75%);
+                margin-top: 40px;
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .success_text2
+            {
+                text-align: center;
+                filter: opacity(75%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .success_text3
+            {
+                text-align: center;
+                filter: opacity(50%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .fields
+            {
+                padding-left: 10%;
+                padding-right: 10%;
+            }
+            .fields1
+            {
+                padding-left: 20%;
+                padding-right: 20%;
+            }
+            
+
+
+            
+            /*Profile*/
+            .divider
+            {
+                margin-top: -20px;
+            }
+            .divider2
+            {
+                margin-top: -15px;
+            }
+            .note
+            {
+                text-align: center;
+                filter: opacity(70%);
+            }
+            .date
+            {
+                position: absolute;
+                right: 10px;
+                top: 0px;
+                font-size: 12px;
+                filter: opacity(80%);
+            }
+            .profile_avatar
+            {
+                margin: auto;
+                width: 100px;
+                height: 100px;
+            }
+            .edit_skills
+            {
+                position: absolute;
+                top:15px;
+                right: 10px;
+                height: 25px;
+            }
+            ion-fab
+            {
+                position: absolute;
+                top: 135px;
+                right: 50%;
+                margin-right: -55px;
+                z-index: 1;
+            }
+            ion-fab-button
+            {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .skills_text
+            {
+                text-align: center;
+                filter: opacity(85%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            .fields3
+            {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            .add_skill_label
+            {
+                padding-left: 0px;
+            }
+            .skill
+            {
+                padding-left: 0%;
+            }
+            #add_skill
+            {
+                position: absolute;
+                width: 100px;
+                right: 10px;
+                top: 60px;
+                
+            }
+            #p
+            {
+                padding-right: 100px;
+                margin-top: 20px;
+            }
+            .hide_this_input
+            {
+                display: none;
+            }
+            #save_button
+            {
+                margin-top: 20px;
+            }
+            
+            /*accordion*/
+            .collapsible {
+              padding: 18px;
+              width: 100%;
+            }
+            .collapsible:after {
+              content: '\002B';
+            }
+
+            .active:after {
+              content: "\2212";
+            }
+
+            .content {
+              max-height: 0;
+              overflow: hidden;
+              transition: max-height 0.2s ease-out;
+            }
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            .success_text3
+            {
+                text-align: center;
+                filter: opacity(50%);
+                text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.25);
+            }
+            /*canvas*/
+            .wrapper {
+              position: relative;
+              width: 100%;
+              height: 200px;
+              -moz-user-select: none;
+              -webkit-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+            }
+
+            .signature-pad {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width:300px;
+              height:200px;
+              border: 1px solid #d8d8d8;
+              left: 50%;
+              top: 50%;
+              margin-left: -150px; /* This is half the width */
+              margin-top: -100px; /* This is half the height */
+            }
+            
+            
+            /*MENU*/
+            .menu_header
+            {
+                
+            }
+            .menu_avatar
+            {
+                margin-left: 20px;
+                margin-top: 10px;
+            }
+            .menu_name
+            {
+                margin-left: 20px;
+                margin-top: 5px;
+            }
+            .menu_email
+            {
+                margin-left: 20px;
+                margin-top: -5px;
+                margin-bottom: 5px;
+                opacity: 0.7;
+            }
+            
+            /*Terms And Conditions & Privacy Policy*/
+            .terms
+            {
+                padding-left: 15px;
+                padding-right: 15px;
+            }
+            
+            /*Tutorial page (accept, reject agreement style)*/
+            #accept_agreement
+            {
+                position:fixed;
+                width: 50%;
+                right:0px;
+                bottom: 0px;
+                z-index: 999;
+            }
+            #reject_agreement
+            {
+                position:fixed;
+                width: 50%;
+                bottom: 0px;
+                z-index: 999;
+            }
+            
+            /*Tutorial Slides*/
+            .swiper-slide {
+              display: block;
+            }
+            ion-slide > h2 {
+              margin-top: 2.8rem;
+            }
+            ion-slide > img {
+              max-height: 50%;
+              max-width: 60%;
+              margin: 36px 0;
+            }
+            .swiper-slide
+            {
+                margin-top: -35px;
+            }
         </style>
     </head>
     <body>
@@ -215,30 +607,50 @@
 
         <!-- MENU -->
 
-        <ion-menu side="start">
-            <ion-header>
-                <ion-toolbar translucent>
+        <ion-menu side="start" menu-id="menu">
+            <ion-header class="menu_header">
+                <ion-avatar style="width: 55px;height: 55px;" class="menu_avatar">
+                   <img src="images/avatar.jpg">
+                </ion-avatar>
+                <h4 class="menu_name"><strong id="user_name_menu">German Luter</strong></h4>
+                <p class="menu_email" id="user_email_menu">info@student.dkit.ie</p>
+                <!--<ion-toolbar translucent>
                     <ion-title>Menu</ion-title>
-                </ion-toolbar>
+                </ion-toolbar>-->
             </ion-header>
             <ion-content>
                 <ion-list>
-                    <ion-item>
-                        <ion-icon name="home" slot="start"></ion-icon>
-                        <ion-label>Home</ion-label>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon name="person" slot="start"></ion-icon>
-                        <ion-label>Profile</ion-label>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon name="chatbubbles" slot="start"></ion-icon>
-                        <ion-label>Messages</ion-label>
-                    </ion-item>
-                    <ion-item>
-                        <ion-icon name="settings" slot="start"></ion-icon>
-                        <ion-label>Settings</ion-label>
-                    </ion-item>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item id="profile" style="margin-left:-16px; margin-bottom: 10px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="person" slot="start"></ion-icon>
+                                <ion-label>Profile</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item style="margin-left:-16px;margin-bottom: 10px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="add" slot="start"></ion-icon>
+                                <ion-label>Request a tutorial</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    <a href="#" style="text-decoration: none;">
+                        <ion-item style="margin-left:-16px;" class="ion-activatable ripple">
+                            <ion-item lines="none">
+                                <ion-icon name="book" slot="start"></ion-icon>
+                                <ion-label>My tutorials</ion-label>
+                                
+                            </ion-item>
+                            <ion-ripple-effect></ion-ripple-effect>
+                        </ion-item>
+                    </a>
+                    
                 </ion-list>
             </ion-content>
         </ion-menu>
@@ -293,110 +705,9 @@
                 </ion-content>
             </ion-tab>-->
             <ion-tab tab="settings" root="nav-settings">
-                <ion-header translucent>
-                    <ion-toolbar>
-                        <ion-buttons slot="start">
-                            <ion-back-button></ion-back-button>
-                        </ion-buttons>
-                        <ion-buttons slot="end">
-                            <ion-menu-button></ion-menu-button>
-                        </ion-buttons>
-                        <ion-title>
-                            <h1>Settings</h1>
-                        </ion-title>
-                    </ion-toolbar>
-                </ion-header>
-
-                <ion-content fullscreen>
-
-                    <ion-list>
-                        <ion-list-header>
-                            ACCOUNT SETTINGS
-                        </ion-list-header><!--<p>Manage information about you...</p>-->
-                        <ion-list class="ion-activatable ripple">
-                            <ion-item lines='none' >
-                                <ion-avatar slot="start">
-                                    <img src="images/i_person.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Personal Information</h2>
-                                    <p>Update your name, phone number</p>
-                                </ion-label>
-
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                    </ion-list>
-                    <div class='space'></div>
-                    <ion-list>
-                        <ion-list-header>
-                            SECURITY
-                        </ion-list-header>
-                        <ion-list class="ion-activatable ripple">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_lock.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Change Password</h2>
-                                    <p>It's a good idea to use strong password</p>
-                                </ion-label>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                        <ion-list class="ion-activatable ripple" id="fingerprint_toggle">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_finger.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Fingerprint</h2>
-                                    <p id="fingerprint_message">Turn on fingerprint login</p>
-                                </ion-label>
-                                <ion-toggle slot="end" name="fingerprint_toggle"></ion-toggle>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                    </ion-list>
-                    <div class='space'></div>
-                    <ion-list>
-                        <ion-list-header>
-                            LEGAL AND POLICIES
-                        </ion-list-header>
-                        <ion-list class="ion-activatable ripple">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_terms.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Terms And Conditions</h2>
-                                    <p>Legal agreement between user and service provider</p>
-                                </ion-label>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                        <ion-list class="ion-activatable ripple">
-                            <ion-item lines='none'>
-                                <ion-avatar slot="start">
-                                    <img src="images/i_privacy.png">
-                                </ion-avatar>
-                                <ion-label>
-                                    <h2>Privacy Policy</h2>
-                                    <p>Declares policy on collecting information</p>
-                                </ion-label>
-                            </ion-item>
-                            <ion-ripple-effect></ion-ripple-effect>
-                        </ion-list>
-                    </ion-list>
-                    <div class='space'></div>
-                    <ion-list>
-                        <ion-item lines='none'>
-                            <ion-button id='logout' size='default' expand="block" color="danger">Logout</ion-button>
-                        </ion-item> 
-
-                    </ion-list>
-                </ion-content>
-                <ion-modal-controller></ion-modal-controller>
+                <ion-nav root="nav-settings" id="nav-settings">
+                    
+                </ion-nav>
             </ion-tab>
 
 
@@ -417,11 +728,7 @@
                 </ion-tab-button>
             </ion-tab-bar>
         </ion-tabs>
-    </ion-app> 
-    
-    <!-- Components -->
-    <script src="js/components/HomeComponent.js" type="text/javascript"></script>
-    <script src="js/components/RequestTutorial.js" type="text/javascript"></script>
+    </ion-app>  
     
     <!-- Pre Reqs --> 
     <script type="text/javascript" charset="utf-8" src="cordova.js"></script>
@@ -434,6 +741,9 @@
     <script src="js/classes/User.js" type="text/javascript"></script>
     <script src="js/classes/notifications.js" type="text/javascript"></script>
     <script src="js/classes/Posts.js" type="text/javascript"></script>
+    <script src="js/classes/Tutorials.js" type="text/javascript"></script>
+    <script src="js/classes/Tutor_Tutorials.js" type="text/javascript"></script>
+    
     <script src="js/modules/index/home_module.js" type="text/javascript"></script> 
     <script>
         function openMenu() {

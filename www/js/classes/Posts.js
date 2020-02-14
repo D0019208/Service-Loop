@@ -176,6 +176,19 @@ class Posts extends User {
         let socket = this.socket;
 
         socket.on('new_tutorial_request', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("New tutorial request available.", "dark", 3000, toast_buttons);
+            new_message_ping.play();
             this.addToPosts(data.response);
             //Add notification
             console.log(data);
@@ -196,6 +209,19 @@ class Posts extends User {
         let socket = this.socket;
 
         socket.on('tutorial_request_accepted', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
             user_notifications.addToNotifications(data.the_notification.response);
             //Add notification
             console.log(data);
@@ -207,18 +233,18 @@ class Posts extends User {
             this.all_posts = this.all_posts.filter(function (obj) {
                 return obj._id !== id;
             });
-        } 
-        
+        }
+
         console.log(this.total_posts)
         this.total_posts--;
         console.log(this.total_posts)
         console.log("Remove by id")
         console.log(this.all_posts);
-        
-        if(typeof document.getElementById('forum_list') !== 'undefined') {
+
+        if (typeof document.getElementById('forum_list') !== 'undefined') {
             document.querySelector('[post_id="' + id + '"]').parentNode.remove();
-            
-            if(this.all_posts.length == 0) {
+
+            if (this.all_posts.length == 0) {
                 document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
             }
         }

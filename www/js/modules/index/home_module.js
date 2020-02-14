@@ -12,6 +12,7 @@ var current_tab;
 var previous_tab;
 var signaturePad;
 var active_nav;
+var new_message_ping = new Audio('sounds/new_message.mp3');
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -26,7 +27,7 @@ Element.prototype.appendAfter = function (element) {
  */
 //deviceready
 //DOMContentLoaded
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("deviceready", async function () {
     user = new User();
     let home_component;
     let notifications_response;
@@ -35,20 +36,16 @@ document.addEventListener("DOMContentLoaded", async function () {
     current_tab = 'home';
     previous_tab = 'home';
     //Check to make sure that the users session has not expired
-    //await user.check_session();
+    await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    //user.setName(await get_secure_storage("user_name"));
-    //user.setEmail(await get_secure_storage("users_email"));
-    //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    user.setName(await get_secure_storage("user_name"));
+    user.setEmail(await get_secure_storage("users_email"));
+    user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
-    ////Set status of user to tutor
-    user.setName("Nichita Postolachi");
-    user.setStatus("Student");
-    user.setEmail("nikito888@gmail.com");
-    //Set status of user to student
-    //user.setName("Test User");
-    //user.setStatus("Student");
+    //Set status of user to tutor
+    //user.setName("John Doe");
+    //user.setStatus("Tutor");
     //user.setEmail("D00192082@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
@@ -94,17 +91,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     </ion-content>`;
     //nav.push(tutorial_slides);
 
-    
-    
-    if(tutorial_slides_status !== "false")
+
+
+    if (tutorial_slides_status !== "false")
     {
         //Shows tutorial slides
-            let tab_bar = document.querySelector('ion-tab-bar');
+        let tab_bar = document.querySelector('ion-tab-bar');
         tab_bar.style.display = 'none';
         let tutorial_slides = document.createElement('tutorial_slides');
         tutorial_slides.innerHTML = `<ion-header translucent>
           <ion-toolbar>
-            <ion-title><h1>Slides</h1></ion-title>
+            <ion-title><h1>Tutorial</h1></ion-title>
           </ion-toolbar>
         </ion-header>
 
@@ -126,7 +123,11 @@ document.addEventListener("DOMContentLoaded", async function () {
               <h2>Ready to Start?</h2>
               <img src="images/success_blue1.png" alt=""/>
               <br>
-              <p><input type="checkbox" name="checkbox" value="check" id="show_tutorial_slides" /> Do not show again</p>
+              <p>
+                <input type="checkbox" name="slides_check" id="show_tutorial_slides" value="slides_check"/>
+                <label for="show_tutorial_slides">Do not show again</label> 
+              </p>
+              
               <ion-button id="continue_slides" fill="clear" >Continue <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
             </ion-slide>
 
@@ -140,10 +141,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             device_feedback();
             tab_bar.style.display = 'flex';
             var checkBox = document.getElementById("show_tutorial_slides");
-            if (checkBox.checked == true){
+            if (checkBox.checked == true) {
                 localStorage.setItem("tutorial_slides", "false");
-            } 
-            else {
+            } else {
                 localStorage.setItem("tutorial_slides", "true");
             }
             nav.pop();
@@ -158,23 +158,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             let active_component = await nav.getActive();
 
 
-    //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+            //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 
             //Remove the event listener when we no longer need it
             if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
                 if (typeof closeTutorial !== 'undefined') {
-                closeTutorial.removeEventListener("click", closeTutorialHandler, false);
-                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-            }
+                    closeTutorial.removeEventListener("click", closeTutorialHandler, false);
+                    nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+                }
             }
         };
         nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
     }
-    
-    
-    
 
-    
+
+
+
+
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
         let selected_tab = await tab_controller.getSelected();
@@ -234,8 +234,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         async connectedCallback() {
             active_nav = nav;
             if (user.getStatus() === "Tutor") {
-                //user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-                user.setModules(["PHP", "JavaScript", "Java"]);
+                user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+                //user.setModules(["PHP", "JavaScript", "Java"]);
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -345,6 +345,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <h2 style="color:white; margin-top:-5px;"><strong id="user_status">Student</strong></h2>
                                 <br>
                             </ion-label>
+                            <div class="white2"></div>
                             <div class="white_backgound">
                                 <br><br><br>
                                 <!--<ion-button expand="block" >Post Offer</ion-button>
@@ -385,7 +386,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             this.innerHTML = home_component;
             //Hide splashscreen
-            //navigator.splashscreen.hide();
+            navigator.splashscreen.hide();
 
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
@@ -506,6 +507,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     });
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
+        device_feedback();
         console.log("??")
         console.log(event)
 
