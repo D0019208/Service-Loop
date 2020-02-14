@@ -1188,10 +1188,10 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
-                                        <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="start">
+                                        <ion-buttons onclick="device_feedback()" slot="start">
                                             <ion-back-button defaultHref="/"></ion-back-button>
                                             </ion-buttons>
-                                            <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="end">
+                                            <ion-buttons onclick="device_feedback()" slot="end">
                                                 <ion-menu-button></ion-menu-button>
                                             </ion-buttons>
                                         <ion-title><h1>Sign Agreement</h1></ion-title>
