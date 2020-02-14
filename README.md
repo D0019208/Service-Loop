@@ -25,7 +25,7 @@ A step by step series of examples that tell you how to get a development env run
 git pull origin master
 ```
 
-2.) In the app repository downloaded, go to www -> js -> modules -> index and locate "home_modules.js" and change the code like below
+2.) In the app repository downloaded, go to www -> js -> modules -> index and locate "home_modules.js" and change the code like below as we do not have access to phone functionality in a browser so we need to set the information manually.
 
 Change this:
 ```
@@ -35,6 +35,10 @@ To this:
 ```
 document.addEventListener("DOMContentLoaded", async function () {
 ```
+
+"deviceready" is a cordova event listener that wait for the phone to be ready, since we are not on a phone and we do not have access to this event listener we would be stuck on a blank screen.
+
+Now we need to check how we get the information itself, you can choose to be either a "Tutor" or "Studet" with any name you want but the email must match an email from the database.
 
 Change this:
 ```
@@ -67,6 +71,8 @@ user.setStatus(A STRING, "Tutot" OR "Student");
 user.setEmail(ANY EMAIL FROM DATABASE);
 ```
 
+This part sets your skills, if you are a tutor, you will only be able to tutor posts that match these skills.
+
 Change this:
 ```
 user.setModules(JSON.parse(await get_secure_storage("user_modules")));
@@ -78,58 +84,169 @@ To this:
 user.setModules(["PHP", "JavaScript", "Java"]);
 ```
 
-End with an example of getting some data out of the system or using it for a little demo
+Now we need to hide the function call that is ment to hide the splashscreen
 
-## Running the tests
+Change this:
+````
+//Hide splashscreen
+navigator.splashscreen.hide();
+````
 
-Explain how to run the automated tests for this system
+To this:
+````
+//Hide splashscreen
+//navigator.splashscreen.hide();
+````
 
-### Break down into end to end tests
+3.) In www -> js -> modules, find "common_functions.js", there we need to comment out the code that provides device feedback
 
-Explain what these tests test and why
-
+Change this:
 ```
-Give an example
+   window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+        if (feedback.haptic && feedback.acoustic) {
+            window.plugins.deviceFeedback.haptic();
+            window.plugins.deviceFeedback.acoustic();
+        } else if (feedback.haptic) {
+            window.plugins.deviceFeedback.haptic();
+        } else if (feedback.acoustic) {
+            window.plugins.deviceFeedback.acoustic();
+        }
+    });
+```
+To this:
+```
+//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+//        if (feedback.haptic && feedback.acoustic) {
+//            window.plugins.deviceFeedback.haptic();
+//            window.plugins.deviceFeedback.acoustic();
+//        } else if (feedback.haptic) {
+//            window.plugins.deviceFeedback.haptic();
+//        } else if (feedback.acoustic) {
+//            window.plugins.deviceFeedback.acoustic();
+//        }
+//    });
 ```
 
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
+Now you should be able to launch and run the app in a browser, to simulate a Tutor <--> Student interaction, open two broswers and change the Name, Email and Status values.
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+To deploy the application you first need to do the opposite of everything we just did to make it work on the browser.
+
+1.) In the app repository, go to www -> js -> modules -> index and locate "home_modules.js" and change the code like below to utilize all our phones functionality
+
+Change this:
+```
+document.addEventListener("DOMContentLoaded", async function () {
+```
+To this:
+```
+document.addEventListener("deviceready", async function () {
+```
+
+"DOMContentLoaded" waits for the DOM to render, however this does not mean that all the device functionality is ready, this is why we use the 'deviceready' event listener. Without it we will have no native functionality.
+
+Now we need to check how we get the information itself, our informaton will be stored on the phone itself using secure storage
+
+Change this:
+```
+//Check to make sure that the users session has not expired
+await user.check_session();
+
+//Once we are sure that the users session is valid, we populate the User class
+//user.setName(await get_secure_storage("user_name"));
+//user.setEmail(await get_secure_storage("users_email"));
+//user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+
+//Set status of user to tutor
+user.setName(ANY NAME);
+user.setStatus(A STRING, "Tutot" OR "Student");
+user.setEmail(ANY EMAIL FROM DATABASE);
+```
+To this:
+```
+//Check to make sure that the users session has not expired
+await user.check_session();
+
+//Once we are sure that the users session is valid, we populate the User class
+user.setName(await get_secure_storage("user_name"));
+user.setEmail(await get_secure_storage("users_email"));
+user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+
+//Set status of user to tutor
+//user.setName("John Doe");
+//user.setStatus("Tutor");
+//user.setEmail("D00192082@student.dkit.ie");
+```
+
+This part sets your skills, if you are a tutor, you will only be able to tutor posts that match these skills.
+
+Change this:
+```
+//user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+user.setModules(["PHP", "JavaScript", "Java"]);
+```
+To this:
+```
+user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+//user.setModules(["PHP", "JavaScript", "Java"]);
+```
+
+Now we need to uncomment the function call that is ment to hide the splashscreen
+
+Change this:
+````
+//Hide splashscreen
+//navigator.splashscreen.hide();
+````
+
+To this:
+````
+//Hide splashscreen
+navigator.splashscreen.hide();
+````
+
+3.) In www -> js -> modules, find "common_functions.js", there we need to uncomment the code that provides device feedback
+
+Change this:
+```
+//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+//        if (feedback.haptic && feedback.acoustic) {
+//            window.plugins.deviceFeedback.haptic();
+//            window.plugins.deviceFeedback.acoustic();
+//        } else if (feedback.haptic) {
+//            window.plugins.deviceFeedback.haptic();
+//        } else if (feedback.acoustic) {
+//            window.plugins.deviceFeedback.acoustic();
+//        }
+//    });
+
+```
+To this:
+```
+   window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+        if (feedback.haptic && feedback.acoustic) {
+            window.plugins.deviceFeedback.haptic();
+            window.plugins.deviceFeedback.acoustic();
+        } else if (feedback.haptic) {
+            window.plugins.deviceFeedback.haptic();
+        } else if (feedback.acoustic) {
+            window.plugins.deviceFeedback.acoustic();
+        }
+    });
+```
+
+Now you should be able to compile the app by uploading it to Phonegap.
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+* [Cordova](https://cordova.apache.org/) - The mobile application development framework used
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Nichita Postolachi** - *All major functionality* - [D0019208](https://github.com/D0019208)
+* **German Luter** - *UI and functionality* - [D00194503REAL](https://github.com/D00194503REAL) 
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
