@@ -52,7 +52,7 @@ customElements.define('nav-notifications', class NavNotifications extends HTMLEl
                             <ion-buttons slot="start">
                                 <!--<ion-back-button default-href="home"></ion-back-button>-->
                             </ion-buttons>
-                            <ion-buttons slot="end">
+                            <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
                             <ion-title>
@@ -181,10 +181,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             tutorial_request_sent_element_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -201,10 +201,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             tutorial_request_sent_element_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -285,10 +285,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_tutorial_requested.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -332,10 +332,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_tutorial_requested.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -376,10 +376,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -396,10 +396,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -416,10 +416,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -519,10 +519,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -539,10 +539,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -559,10 +559,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_html = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title>${this_notification.notification_title}</ion-title>
@@ -685,10 +685,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_tutorial_agreement_accepted.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
@@ -762,10 +762,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notification_tutorial_agreement_rejected.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
               <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
@@ -885,10 +885,10 @@ function load_tutorial_requested_component(this_post) {
     let tutorial_requested_component = document.createElement('tutorial_requested');
     tutorial_requested_component.innerHTML = `<ion-header translucent>
                         <ion-toolbar>
-                                <ion-buttons slot="start">
+                                <ion-buttons onclick="device_feedback()" slot="start">
                             <ion-back-button defaultHref="/"></ion-back-button>
                           </ion-buttons>
-                            <ion-buttons slot="end">
+                            <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
                             <ion-title><h1>Tutorial</h1></ion-title>
@@ -952,7 +952,7 @@ function load_post_agreement_signed_component(this_post) {
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `<ion-header translucent>
                                                         <ion-toolbar>
-                                                                <ion-buttons slot="start">
+                                                                <ion-buttons onclick="device_feedback()" slot="start">
                                                             <ion-back-button defaultHref="/"></ion-back-button>
                                                           </ion-buttons>
                                                             <ion-title><h1>Tutorial</h1></ion-title>
@@ -1050,10 +1050,10 @@ function load_pending_tutorial_component(this_post, tutorial_tag, tutorial_statu
     tutorial_accepted_component_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons onclick="device_feedback()" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons slot="end">
+                                    <ion-buttons onclick="device_feedback()" slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
                                     <ion-title><h1>Tutorial</h1></ion-title>

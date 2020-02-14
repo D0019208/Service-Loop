@@ -40,10 +40,10 @@ function load_my_requested_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons style="margin-top: -55px;" slot="start">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="start">
                     <ion-back-button defaultHref="/"></ion-back-button>
                 </ion-buttons>
-                <ion-buttons style="margin-top: -55px;" slot="end">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title>
@@ -119,10 +119,10 @@ function load_my_requested_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons style="margin-top: -55px;" slot="start">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons style="margin-top: -55px;" slot="end">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title>

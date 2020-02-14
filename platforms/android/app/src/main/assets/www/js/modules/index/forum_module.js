@@ -23,10 +23,10 @@ async function all_tutorials(nav) {
             this.innerHTML = `
                                                 <ion-header translucent>
                                                   <ion-toolbar>
-                                                      <ion-buttons slot="start">
+                                                      <ion-buttons onclick="device_feedback()" slot="start">
                                                       <ion-back-button defaultHref="/"></ion-back-button>
                                                     </ion-buttons>
-                                                      <ion-buttons slot="end">
+                                                      <ion-buttons onclick="device_feedback()" slot="end">
                                                           <ion-menu-button></ion-menu-button>
                                                       </ion-buttons>
                                                       <ion-title>

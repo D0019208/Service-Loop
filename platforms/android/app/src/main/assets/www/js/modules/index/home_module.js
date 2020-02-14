@@ -43,11 +43,10 @@ document.addEventListener("deviceready", async function () {
     user.setEmail(await get_secure_storage("users_email"));
     user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
-    ////Set status of user to tutor
+    //Set status of user to tutor
     //user.setName("John Doe");
     //user.setStatus("Tutor");
     //user.setEmail("D00192082@student.dkit.ie");
-    //Set status of user to student 
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -242,7 +241,7 @@ document.addEventListener("deviceready", async function () {
                                 <ion-buttons slot="start">
                                     <ion-back-button></ion-back-button>
                                 </ion-buttons>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                                     <ion-menu-button></ion-menu-button>
                                 </ion-buttons>
                                 <ion-title>
@@ -323,7 +322,7 @@ document.addEventListener("deviceready", async function () {
                                 <ion-buttons slot="start">
                                     <ion-back-button></ion-back-button>
                                 </ion-buttons>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                                     <ion-menu-button></ion-menu-button>
                                 </ion-buttons>
                                 <ion-title>
@@ -507,8 +506,7 @@ document.addEventListener("deviceready", async function () {
         }
 
     });
-    document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        device_feedback();
+    document.querySelector("ion-tabs").addEventListener('click', function (event) { 
         console.log("??")
         console.log(event)
 
@@ -517,20 +515,27 @@ document.addEventListener("deviceready", async function () {
             nav.popToRoot();
             if (event.target.innerText == "Home") {
                 if (typeof nav !== 'undefined') {
+                    device_feedback();
                     active_nav = nav;
                 }
             } else if (event.target.innerText == "Notifications") {
                 if (typeof nav_notifications !== 'undefined') {
+                    device_feedback();
                     active_nav = nav_notifications;
                 }
             } else if (event.target.innerText == "Settings") {
                 if (typeof nav_settings !== 'undefined') {
+                    device_feedback();
                     active_nav = nav_settings;
                 }
             }
 
             if (typeof nav_notifications !== 'undefined') {
                 nav_notifications.popToRoot();
+            } else if(typeof nav !== 'undefined') {
+                nav.popToRoot();
+            } else if(typeof nav_settings !== 'undefined') {
+                nav_settings.popToRoot();
             }
         }
     });

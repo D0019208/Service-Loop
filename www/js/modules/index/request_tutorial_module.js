@@ -8,10 +8,10 @@ function load_request_tutorial() {
            <ion-header translucent>
             <ion-toolbar>
               <ion-title style="margin-left: -25px;"><h1>Tutorial Request</h1></ion-title>
-              <ion-buttons slot="start">
+              <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
             </ion-toolbar>

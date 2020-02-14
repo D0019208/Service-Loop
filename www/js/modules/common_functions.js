@@ -353,16 +353,16 @@ function insert_to_array_by_index(array, index, value) {
 }
 
 function device_feedback() { 
-    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-        if (feedback.haptic && feedback.acoustic) {
-            window.plugins.deviceFeedback.haptic();
-            window.plugins.deviceFeedback.acoustic();
-        } else if (feedback.haptic) {
-            window.plugins.deviceFeedback.haptic();
-        } else if (feedback.acoustic) {
-            window.plugins.deviceFeedback.acoustic();
-        }
-    });
+//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+//        if (feedback.haptic && feedback.acoustic) {
+//            window.plugins.deviceFeedback.haptic();
+//            window.plugins.deviceFeedback.acoustic();
+//        } else if (feedback.haptic) {
+//            window.plugins.deviceFeedback.haptic();
+//        } else if (feedback.acoustic) {
+//            window.plugins.deviceFeedback.acoustic();
+//        }
+//    });
 }
 
 /*
@@ -487,10 +487,10 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
             <ion-toolbar>
-                <ion-buttons slot="start">
+                <ion-buttons onclick="device_feedback()" slot="start">
                     <ion-back-button defaultHref="/"></ion-back-button>
                 </ion-buttons>
-                <ion-buttons slot="end">
+                <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title><h1>Tutorial</h1></ion-title>
@@ -815,10 +815,10 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
-                                        <ion-buttons slot="start">
+                                        <ion-buttons onclick="device_feedback()" slot="start">
                                             <ion-back-button defaultHref="/"></ion-back-button>
                                             </ion-buttons>
-                                            <ion-buttons slot="end">
+                                            <ion-buttons onclick="device_feedback()" slot="end">
                                                 <ion-menu-button></ion-menu-button>
                                             </ion-buttons>
                                         <ion-title><h1>Agreement Details</h1></ion-title>
@@ -937,10 +937,10 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     let tutor_tutorial_element_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons onclick="device_feedback()" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons slot="end">
+                                    <ion-buttons onclick="device_feedback()" slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
                                     <ion-title><h1>Tutorial</h1></ion-title>
@@ -1080,7 +1080,7 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
     nav_post.innerHTML = `
                             <ion-header translucent>
                             <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons onclick="device_feedback()" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
                                 <ion-title><h1>Request Description</h1></ion-title>
@@ -1185,10 +1185,10 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
                                     <ion-toolbar>
-                                        <ion-buttons style="margin-top: -55px;" slot="start">
+                                        <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="start">
                                             <ion-back-button defaultHref="/"></ion-back-button>
                                             </ion-buttons>
-                                            <ion-buttons style="margin-top: -55px;" slot="end">
+                                            <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="end">
                                                 <ion-menu-button></ion-menu-button>
                                             </ion-buttons>
                                         <ion-title><h1>Sign Agreement</h1></ion-title>
@@ -1337,10 +1337,10 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     tutorial_accepted_component_html = `
                             <ion-header translucent>
                                 <ion-toolbar>
-                                    <ion-buttons slot="start">
+                                    <ion-buttons onclick="device_feedback()" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
-                                    <ion-buttons slot="end">
+                                    <ion-buttons onclick="device_feedback()" slot="end">
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>
                                     <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>

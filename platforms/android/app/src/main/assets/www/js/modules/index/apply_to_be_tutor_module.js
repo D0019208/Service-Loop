@@ -17,7 +17,7 @@ function apply_to_be_tutor(handler) {
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>Tutor application form</ion-title>
-            <ion-buttons slot="start">
+            <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button id="apply_to_be_tutor_back" defaultHref="/"></ion-back-button>
               </ion-buttons>
               <ion-buttons slot="end">

@@ -27,7 +27,7 @@ Element.prototype.appendAfter = function (element) {
  */
 //deviceready
 //DOMContentLoaded
-document.addEventListener("deviceready", async function () {
+document.addEventListener("DOMContentLoaded", async function () {
     user = new User();
     let home_component;
     let notifications_response;
@@ -36,17 +36,17 @@ document.addEventListener("deviceready", async function () {
     current_tab = 'home';
     previous_tab = 'home';
     //Check to make sure that the users session has not expired
-    await user.check_session();
+    //await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    user.setName(await get_secure_storage("user_name"));
-    user.setEmail(await get_secure_storage("users_email"));
-    user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    //user.setName(await get_secure_storage("user_name"));
+    //user.setEmail(await get_secure_storage("users_email"));
+    //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     //Set status of user to tutor
-    //user.setName("John Doe");
-    //user.setStatus("Tutor");
-    //user.setEmail("D00192082@student.dkit.ie");
+    user.setName("John Doe");
+    user.setStatus("Tutor");
+    user.setEmail("D00192082@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -234,14 +234,14 @@ document.addEventListener("deviceready", async function () {
         async connectedCallback() {
             active_nav = nav;
             if (user.getStatus() === "Tutor") {
-                user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-                //user.setModules(["PHP", "JavaScript", "Java"]);
+                //user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+                user.setModules(["PHP", "JavaScript", "Java"]);
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
                                     <ion-back-button></ion-back-button>
                                 </ion-buttons>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                                     <ion-menu-button></ion-menu-button>
                                 </ion-buttons>
                                 <ion-title>
@@ -322,7 +322,7 @@ document.addEventListener("deviceready", async function () {
                                 <ion-buttons slot="start">
                                     <ion-back-button></ion-back-button>
                                 </ion-buttons>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                                     <ion-menu-button></ion-menu-button>
                                 </ion-buttons>
                                 <ion-title>
@@ -386,7 +386,7 @@ document.addEventListener("deviceready", async function () {
 
             this.innerHTML = home_component;
             //Hide splashscreen
-            navigator.splashscreen.hide();
+            //navigator.splashscreen.hide();
 
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
@@ -506,8 +506,7 @@ document.addEventListener("deviceready", async function () {
         }
 
     });
-    document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        device_feedback();
+    document.querySelector("ion-tabs").addEventListener('click', function (event) { 
         console.log("??")
         console.log(event)
 
@@ -516,20 +515,27 @@ document.addEventListener("deviceready", async function () {
             nav.popToRoot();
             if (event.target.innerText == "Home") {
                 if (typeof nav !== 'undefined') {
+                    device_feedback();
                     active_nav = nav;
                 }
             } else if (event.target.innerText == "Notifications") {
                 if (typeof nav_notifications !== 'undefined') {
+                    device_feedback();
                     active_nav = nav_notifications;
                 }
             } else if (event.target.innerText == "Settings") {
                 if (typeof nav_settings !== 'undefined') {
+                    device_feedback();
                     active_nav = nav_settings;
                 }
             }
 
             if (typeof nav_notifications !== 'undefined') {
                 nav_notifications.popToRoot();
+            } else if(typeof nav !== 'undefined') {
+                nav.popToRoot();
+            } else if(typeof nav_settings !== 'undefined') {
+                nav_settings.popToRoot();
             }
         }
     });

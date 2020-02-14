@@ -10,10 +10,10 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
         this.innerHTML = `
           <ion-header translucent>
                     <ion-toolbar>
-                        <ion-buttons slot="start">
+                        <ion-buttons onclick="device_feedback()" slot="start">
                             <ion-back-button></ion-back-button>
                         </ion-buttons>
-                        <ion-buttons slot="end">
+                        <ion-buttons onclick="device_feedback()" slot="end">
                             <ion-menu-button></ion-menu-button>
                         </ion-buttons>
                         <ion-title>
@@ -497,7 +497,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>Fingerprint</ion-title>
-              <ion-buttons slot="end">
+              <ion-buttons onclick="device_feedback()" slot="end">
                 <ion-button id="modal_close">Close</ion-button>
               </ion-buttons>
             </ion-toolbar>
@@ -536,7 +536,6 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
             });
 
             document.getElementById("modal_close").addEventListener('click', () => {
-                device_feedback();
                 dismissModal(currentModal);
             });
         });
@@ -548,7 +547,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>Fingerprint</ion-title>
-              <ion-buttons slot="end">
+              <ion-buttons onclick="device_feedback()" slot="end">
                 <ion-button id="modal_close">Close</ion-button>
               </ion-buttons>
             </ion-toolbar>
@@ -587,8 +586,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
                 setup_fingerprint(currentModal);
             });
 
-            document.getElementById("modal_close").addEventListener('click', () => {
-                device_feedback();
+            document.getElementById("modal_close").addEventListener('click', () => { 
                 dismissModal(currentModal);
             });
         });
@@ -604,7 +602,7 @@ document.getElementById('terms_and_conditons').addEventListener('click', async (
           <ion-header translucent>
                             <ion-toolbar>
                                 <ion-title>Terms & conditions</ion-title>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                 <ion-button id="modal_close">Close</ion-button>
               </ion-buttons>
                             </ion-toolbar>
@@ -734,8 +732,7 @@ document.getElementById('terms_and_conditons').addEventListener('click', async (
     modal_created.present().then(() => {
         currentModal = modal_created;
 
-        document.getElementById("modal_close").addEventListener('click', () => {
-            device_feedback();
+        document.getElementById("modal_close").addEventListener('click', () => { 
             dismissModal(currentModal);
         });
     });
@@ -750,7 +747,7 @@ document.getElementById('privacy_policy').addEventListener('click', async () => 
           <ion-header translucent>
                             <ion-toolbar>
                                 <ion-title>Privacy Policy</ion-title>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                 <ion-button id="modal_close">Close</ion-button>
               </ion-buttons>
                             </ion-toolbar>
@@ -865,8 +862,7 @@ document.getElementById('privacy_policy').addEventListener('click', async () => 
     modal_created.present().then(() => {
         currentModal = modal_created;
 
-        document.getElementById("modal_close").addEventListener('click', () => {
-            device_feedback();
+        document.getElementById("modal_close").addEventListener('click', () => { 
             dismissModal(currentModal);
         });
     });

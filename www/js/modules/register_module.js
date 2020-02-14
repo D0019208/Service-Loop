@@ -232,7 +232,7 @@ async function sms_verification_setup() {
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>SMS Verification</ion-title>
-              <ion-buttons slot="end">
+              <ion-buttons onclick="device_feedback()" slot="end">
                 <ion-button id="modal_close">Close</ion-button>
               </ion-buttons>
             </ion-toolbar>
