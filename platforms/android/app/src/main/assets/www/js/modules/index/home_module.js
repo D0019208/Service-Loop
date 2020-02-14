@@ -44,9 +44,9 @@ document.addEventListener("deviceready", async function () {
     user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     //Set status of user to tutor
-    //user.setName("John Doe");
-    //user.setStatus("Tutor");
-    //user.setEmail("D00192082@student.dkit.ie");
+    //user.setName("Nichita Postolachi");
+    //user.setStatus("Student");
+    //user.setEmail("nikito888@gmail.com");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -506,35 +506,47 @@ document.addEventListener("deviceready", async function () {
         }
 
     });
-    document.querySelector("ion-tabs").addEventListener('click', function (event) { 
-        console.log("??")
+    document.querySelector("ion-tabs").addEventListener('click', function (event) {
+        console.log("Tab clicked")
         console.log(event)
 
         if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home" || event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications" || event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
             console.log("test")
             nav.popToRoot();
-            if (event.target.innerText == "Home") {
+            if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
                 if (typeof nav !== 'undefined') {
                     device_feedback();
                     active_nav = nav;
+
+                    if (typeof active_nav !== 'undefined') {
+                        active_nav.popToRoot();
+                    }
                 }
-            } else if (event.target.innerText == "Notifications") {
+            } else if (event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications") {
                 if (typeof nav_notifications !== 'undefined') {
                     device_feedback();
                     active_nav = nav_notifications;
+
+                    if (typeof active_nav !== 'undefined') {
+                        active_nav.popToRoot();
+                    }
                 }
-            } else if (event.target.innerText == "Settings") {
+            } else if (event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
                 if (typeof nav_settings !== 'undefined') {
                     device_feedback();
                     active_nav = nav_settings;
+
+                    if (typeof active_nav !== 'undefined') {
+                        active_nav.popToRoot();
+                    }
                 }
             }
 
             if (typeof nav_notifications !== 'undefined') {
                 nav_notifications.popToRoot();
-            } else if(typeof nav !== 'undefined') {
+            } else if (typeof nav !== 'undefined') {
                 nav.popToRoot();
-            } else if(typeof nav_settings !== 'undefined') {
+            } else if (typeof nav_settings !== 'undefined') {
                 nav_settings.popToRoot();
             }
         }

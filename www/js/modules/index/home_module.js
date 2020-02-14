@@ -27,7 +27,7 @@ Element.prototype.appendAfter = function (element) {
  */
 //deviceready
 //DOMContentLoaded
-document.addEventListener("DOMContentLoaded", async function () {
+document.addEventListener("deviceready", async function () {
     user = new User();
     let home_component;
     let notifications_response;
@@ -36,17 +36,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     current_tab = 'home';
     previous_tab = 'home';
     //Check to make sure that the users session has not expired
-    //await user.check_session();
+    await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    //user.setName(await get_secure_storage("user_name"));
-    //user.setEmail(await get_secure_storage("users_email"));
-    //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    user.setName(await get_secure_storage("user_name"));
+    user.setEmail(await get_secure_storage("users_email"));
+    user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     //Set status of user to tutor
-    user.setName("John Doe");
-    user.setStatus("Tutor");
-    user.setEmail("D00192082@student.dkit.ie");
+    //user.setName("Nichita Postolachi");
+    //user.setStatus("Student");
+    //user.setEmail("nikito888@gmail.com");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -234,8 +234,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         async connectedCallback() {
             active_nav = nav;
             if (user.getStatus() === "Tutor") {
-                //user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-                user.setModules(["PHP", "JavaScript", "Java"]);
+                user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+                //user.setModules(["PHP", "JavaScript", "Java"]);
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
             this.innerHTML = home_component;
             //Hide splashscreen
-            //navigator.splashscreen.hide();
+            navigator.splashscreen.hide();
 
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
@@ -506,35 +506,47 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
     });
-    document.querySelector("ion-tabs").addEventListener('click', function (event) { 
+    document.querySelector("ion-tabs").addEventListener('click', function (event) {
         console.log("Tab clicked")
         console.log(event)
 
         if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home" || event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications" || event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
             console.log("test")
             nav.popToRoot();
-            if (event.target.innerText == "Home") {
+            if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
                 if (typeof nav !== 'undefined') {
                     device_feedback();
                     active_nav = nav;
+
+                    if (typeof active_nav !== 'undefined') {
+                        active_nav.popToRoot();
+                    }
                 }
-            } else if (event.target.innerText == "Notifications") {
+            } else if (event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications") {
                 if (typeof nav_notifications !== 'undefined') {
                     device_feedback();
                     active_nav = nav_notifications;
+
+                    if (typeof active_nav !== 'undefined') {
+                        active_nav.popToRoot();
+                    }
                 }
-            } else if (event.target.innerText == "Settings") {
+            } else if (event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
                 if (typeof nav_settings !== 'undefined') {
                     device_feedback();
                     active_nav = nav_settings;
+
+                    if (typeof active_nav !== 'undefined') {
+                        active_nav.popToRoot();
+                    }
                 }
             }
 
             if (typeof nav_notifications !== 'undefined') {
                 nav_notifications.popToRoot();
-            } else if(typeof nav !== 'undefined') {
+            } else if (typeof nav !== 'undefined') {
                 nav.popToRoot();
-            } else if(typeof nav_settings !== 'undefined') {
+            } else if (typeof nav_settings !== 'undefined') {
                 nav_settings.popToRoot();
             }
         }
