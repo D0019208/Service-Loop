@@ -9,10 +9,10 @@ function load_profile_page(nav_controller) {
             this.innerHTML = `
             <ion-header translucent>
             <ion-toolbar>
-            <ion-buttons onclick="device_feedback()" slot="start">
-                                <ion-back-button default-href="home"></ion-back-button>
+            <ion-buttons slot="start">
+                                <ion-back-button onclick="device_feedback()" default-href="home"></ion-back-button>
                             </ion-buttons>
-                            <ion-buttons onclick="device_feedback()" slot="end">
+                            <ion-buttons slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
                 <ion-title><h1>Profile</h1></ion-title>
@@ -44,7 +44,7 @@ function load_profile_page(nav_controller) {
             <ion-item-divider class="divider"></ion-item-divider>
             
             
-                <ion-list-header class="collapsible">
+                <ion-list-header class="collapsible" onclick="device_feedback()">
                         <strong>MY TUTORIALS</strong>
                 </ion-list-header>
             <ion-list class="content">
@@ -68,7 +68,7 @@ function load_profile_page(nav_controller) {
                 </ion-item>
             </ion-list>
             
-                <ion-list-header class="collapsible">
+                <ion-list-header class="collapsible" onclick="device_feedback()">
                     <strong>MY TUTORED TUTORIALS</strong>
                 </ion-list-header>
             <ion-list class="content">
@@ -160,6 +160,7 @@ function load_profile_page(nav_controller) {
             }
 
             document.getElementById("edit_skills").addEventListener("click", async function () {
+                device_feedback();
                 let controller = document.querySelector('ion-modal-controller');
 
                 let modal_content = `
@@ -196,6 +197,7 @@ function load_profile_page(nav_controller) {
                     currentModal = modal_created;
 
                     function addItem() {
+                        device_feedback();
                         var textInput = document.getElementById("item");  //getting text input
                         var skill = textInput.value;   //getting value of text input element
                         var p = document.getElementById("p");  //getting element <ul> to add element to
@@ -234,6 +236,7 @@ function load_profile_page(nav_controller) {
                     });
 
                     document.getElementById('save_button').addEventListener('click', () => {
+                        device_feedback();
                         let toast_buttons = [
                             {
                                 side: 'end',
@@ -249,8 +252,7 @@ function load_profile_page(nav_controller) {
                         dismissModal(currentModal);
                     });
 
-                    document.getElementById("modal_close").addEventListener('click', () => {
-                        device_feedback();
+                    document.getElementById("modal_close").addEventListener('click', () => { 
                         dismissModal(currentModal);
                     });
                 });

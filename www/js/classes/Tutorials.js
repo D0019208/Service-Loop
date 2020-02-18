@@ -95,8 +95,7 @@ class Tutorials extends User {
         this.total_ongoing_tutorials = this.ongoing_tutorials.length;
     }
 
-    add_post_to_segment(segment, list, tutorial) {
-        alert("??")
+    add_post_to_segment(segment, list, tutorial) { 
         console.log(list)
         const el = document.createElement('ion-list');
         el.className = "ion-activatable ripple";
@@ -140,8 +139,7 @@ class Tutorials extends User {
                 document.getElementById('pending_tutorials_header').innerText = "PENDING TUTORIALS";
                 document.getElementById('pending_badge').innerText = this.total_pending_tutorials;
             }
-        } else if (segment == "Ongoing") {
-            alert("test")
+        } else if (segment == "Ongoing") { 
             if (this.total_ongoing_tutorials > 0) {
                 document.getElementById('ongoing_tutorials_header').innerText = "ONGOING TUTORIALS";
                 document.getElementById('ongoing_badge').innerText = this.total_ongoing_tutorials;
@@ -178,7 +176,7 @@ class Tutorials extends User {
 //            }
 
             el.classList.add('ion-activatable', 'ripple', "not_read");
-
+            el.setAttribute('onClick', 'device_feedback()'); 
             el.innerHTML = `
                 <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">

@@ -39,13 +39,14 @@ document.addEventListener("deviceready", async function () {
     await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    user.setName(await get_secure_storage("user_name"));
+    let name = await get_secure_storage("user_name")
+    user.setName(name.replace(/\s+$/, ''));
     user.setEmail(await get_secure_storage("users_email"));
     user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     //Set status of user to tutor
-    //user.setName("Nichita Postolachi");
-    //user.setStatus("Student");
+    //user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+    //user.setStatus("Tutor");
     //user.setEmail("nikito888@gmail.com");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
@@ -171,64 +172,6 @@ document.addEventListener("deviceready", async function () {
         nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
     }
 
-
-
-
-
-    //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
-    document.addEventListener("backbutton", async function () {
-        let selected_tab = await tab_controller.getSelected();
-        console.log(selected_tab)
-
-        let home_active_component = await nav.getActive();
-        //Checking if the main home nav router is defined
-        if (typeof nav !== 'undefined') {
-            //Checking if the notifications nav router is defined
-            if (typeof nav_notifications !== 'undefined') {
-                //We check here if there is an open component
-                let can_go_back_home = await nav.canGoBack();
-                //If there is an active component and the active compoent matches our criteria, we go back
-                if (can_go_back_home) {
-                    nav.pop();
-                }
-
-                //let notifications_active_component = await nav_notifications.getActive();
-                let can_go_back_notifications = await nav_notifications.canGoBack();
-                console.log(can_go_back_notifications)
-
-                //Check if the routers have any content, if not, we go back to the previous content, if empty, go to previous tab
-                if (can_go_back_notifications) {
-                    nav_notifications.pop();
-                } else {
-                    if (current_tab !== previous_tab) {
-                        tab_controller.select(previous_tab);
-                    }
-                }
-
-                //If there is no active component in either the notifications router or home router, we exit the app
-                if (!can_go_back_notifications && !can_go_back_home && selected_tab === "home") {
-                    navigator.app.exitApp();
-                }
-            } else {
-                //If the nav_notifications router is not defined we check if the main router can go back
-                let can_go_back_home = await nav.canGoBack();
-                //Check if the routers have any content, if not, we go back to the previous content, if empty, go to previous tab
-                if (can_go_back_home) {
-                    nav.pop();
-                } else {
-                    if (current_tab !== previous_tab) {
-                        tab_controller.select(previous_tab);
-                    }
-                }
-
-                console.log(home_active_component)
-
-                if (!can_go_back_home && selected_tab === "home") {
-                    navigator.app.exitApp();
-                }
-            }
-        }
-    }, false);
     //Create home component 
     customElements.define('nav-home', class Home extends HTMLElement {
         async connectedCallback() {
@@ -460,16 +403,18 @@ document.addEventListener("deviceready", async function () {
             //Create My Profile page
             document.getElementById('profile').addEventListener('click', async function () {
                 device_feedback();
+                
                 await include("js/modules/index/profile_module.js", "profile_script");
                 load_profile_page(active_nav);
+                
                 closeMenu();
             });
             document.getElementById('profile_home').addEventListener('click', async function () {
                 device_feedback();
+                
                 await include("js/modules/index/profile_module.js", "profile_script");
-                console.log("Active now");
-                console.log(active_nav);
                 load_profile_page(active_nav);
+                
                 closeMenu();
             });
             //Create My Tutorials page (If user is Tutor)
@@ -506,57 +451,77 @@ document.addEventListener("deviceready", async function () {
         }
 
     });
+
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        console.log("Tab clicked")
+        console.log("Which tab clicked?")
         console.log(event)
+        if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
+            device_feedback();
 
-        if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home" || event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications" || event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
-            console.log("test")
-            nav.popToRoot();
-            if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
-                if (typeof nav !== 'undefined') {
-                    device_feedback();
-                    active_nav = nav;
+            if (typeof nav !== 'undefined') {
+                active_nav = nav;
 
-                    if (typeof active_nav !== 'undefined') {
-                        active_nav.popToRoot();
-                    }
-                }
-            } else if (event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications") {
+                nav.popToRoot();
+
                 if (typeof nav_notifications !== 'undefined') {
-                    device_feedback();
-                    active_nav = nav_notifications;
-
-                    if (typeof active_nav !== 'undefined') {
-                        active_nav.popToRoot();
-                    }
+                    nav_notifications.popToRoot();
                 }
-            } else if (event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
-                if (typeof nav_settings !== 'undefined') {
-                    device_feedback();
-                    active_nav = nav_settings;
 
-                    if (typeof active_nav !== 'undefined') {
-                        active_nav.popToRoot();
-                    }
+                if (typeof nav_settings !== 'undefined') {
+                    nav_settings.popToRoot();
                 }
             }
+        } else if (event.target.innerText == "Notifications" || event.target.parentNode.innerText.includes("Notifications") || event.target.parentNode.innerText == "Notifications" || event.target.innerText.includes("Notifications")) {
+            device_feedback();
 
             if (typeof nav_notifications !== 'undefined') {
+                active_nav = nav_notifications;
+
                 nav_notifications.popToRoot();
-            } else if (typeof nav !== 'undefined') {
-                nav.popToRoot();
-            } else if (typeof nav_settings !== 'undefined') {
+
+                if (typeof nav !== 'undefined') {
+                    nav.popToRoot();
+                }
+
+                if (typeof nav_settings !== 'undefined') {
+                    nav_settings.popToRoot();
+                }
+            }
+        } else if (event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
+            device_feedback();
+
+            if (typeof nav_settings !== 'undefined') {
+                active_nav = nav_settings;
+
                 nav_settings.popToRoot();
+
+                if (typeof nav !== 'undefined') {
+                    nav.popToRoot();
+                }
+
+                if (typeof nav_notifications !== 'undefined') {
+                    nav_notifications.popToRoot();
+                }
             }
         }
     });
+
     //Lazy loading - once user clicks on tab, only then do we launch JavaScript
     document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', async function (event) {
         previous_tab = current_tab;
         current_tab = await tab_controller.getSelected();
-        console.log("previous tab " + previous_tab);
-        console.log('current tab ' + current_tab)
+        
+        if(current_tab === 'home') {
+            active_nav = nav;
+        } else if(current_tab === 'notifications') {
+            if(typeof nav_notifications !== 'undefined') {
+                active_nav = nav_notifications;
+            } 
+        } else {
+            if(typeof nav_settings !== 'undefined') {
+                active_nav = nav_settings;
+            }
+        }
 
         if (event.detail.tab === "notifications") {
             await include("js/modules/index/notifications_module.js", "notifications_script");
@@ -564,4 +529,25 @@ document.addEventListener("deviceready", async function () {
             await include("js/modules/index/settings_module.js", "settings_script");
         }
     });
+    
+    //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
+    document.addEventListener("backbutton", async function () {
+        let selected_tab = await tab_controller.getSelected(); 
+        let can_go_back = await active_nav.canGoBack(); 
+
+        if (can_go_back) {
+            active_nav.pop();
+        }
+
+        if (!can_go_back && selected_tab === "home") {
+            navigator.app.exitApp();
+        }
+
+        if (!can_go_back && selected_tab !== "home") {
+            if (current_tab !== previous_tab) {
+                tab_controller.select(previous_tab);
+            }
+        } 
+
+    }, false);
 });
