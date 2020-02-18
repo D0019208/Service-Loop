@@ -90,7 +90,7 @@ class User {
         this.socket = socket;
 
         console.log(socket);
-    } 
+    }
 
     async ascendToTutor(user_notifications, user_modules, handler) {
         //We update the users modules, status and socket as he is now a tutor
@@ -145,6 +145,7 @@ class User {
 
         let my_tutorials = document.createElement('ion-list');
         my_tutorials.classList.add("home_buttons", "ion-activatable", "ripple", "md", "list-md", "hydrated");
+        my_tutorials.id = "my_tutorials";
         my_tutorials.innerHTML = `
                                     <h6>My tutorials</h6>
                                     <p>View all tutorials that are tutored by you</p>
@@ -165,6 +166,11 @@ class User {
         //Load the forum script
         include("js/modules/index/forum_module.js", "forum_script");
 
+        my_tutorials.addEventListener("click", async function () {
+            device_feedback();
+            await include("js/modules/index/my_tutorials_module.js", "my_requested_tutorials_script");
+            load_my_requested_tutorials();
+        });
         tutor_application_button.addEventListener("click", function () {
             all_tutorials(nav);
         });

@@ -151,7 +151,7 @@ class Tutor_Tutorials extends User {
 //            }
 
             el.classList.add('ion-activatable', 'ripple', "not_read");
-
+            el.setAttribute('onClick', 'device_feedback()'); 
             el.innerHTML = `
                 <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">

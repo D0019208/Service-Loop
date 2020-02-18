@@ -274,14 +274,11 @@ class Posts extends User {
 
     async getAllNotificationPosts() {
         //The list containing all the notifications
-        let notification_list = document.getElementById("list");
-        //The children of the notification list
-        let notification_list_children = notification_list.children;
+        let notification_list = user_notifications.getAllNotifications();
         let post_ids = [];
 
-        console.log(notification_list.children[0].firstElementChild.attributes[3].value)
-        for (let i = 0; i < notification_list_children.length; i++) {
-            post_ids.push(notification_list.children[i].firstElementChild.attributes[3].value);
+        for (let i = 0; i < notification_list.length; i++) {
+            post_ids.push(notification_list[i].post_id);
         }
 
         let notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");

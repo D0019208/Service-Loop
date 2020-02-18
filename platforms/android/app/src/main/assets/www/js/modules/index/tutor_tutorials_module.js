@@ -45,15 +45,15 @@ function all_tutor_tutorials() {
                 </ion-buttons>
                 <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                 <ion-segment>  
-                    <ion-segment-button value="tutor_tutorials_pending_segment" checked>
+                    <ion-segment-button value="tutor_tutorials_pending_segment" checked onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
                         <IonBadge color="primary" id="pending_tutorials_badge">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="tutor_tutorials_ongoing_segment">
+                    <ion-segment-button value="tutor_tutorials_ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
                         <IonBadge color="primary" id="ongoing_tutorials_badge">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="tutor_tutorials_done_segment">
+                    <ion-segment-button value="tutor_tutorials_done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
                         <IonBadge color="primary" id="done_tutorials_badge">0</IonBadge>
                     </ion-segment-button>
@@ -107,15 +107,15 @@ function all_tutor_tutorials() {
                 </ion-buttons>
                 <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
                 <ion-segment>  
-                    <ion-segment-button value="tutor_tutorials_pending_segment" checked>
+                    <ion-segment-button value="tutor_tutorials_pending_segment" checked onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
                         <IonBadge color="primary" id="pending_tutorials_badge">${tutor_tutorials.total_tutor_pending_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="tutor_tutorials_ongoing_segment">
+                    <ion-segment-button value="tutor_tutorials_ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
                         <IonBadge color="primary" id="ongoing_tutorials_badge">${tutor_tutorials.total_tutor_ongoing_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="tutor_tutorials_done_segment">
+                    <ion-segment-button value="tutor_tutorials_done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
                         <IonBadge color="primary" id="done_tutorials_badge">${tutor_tutorials.total_tutor_done_tutorials}</IonBadge>
                     </ion-segment-button>
@@ -346,6 +346,7 @@ function all_tutor_tutorials() {
                         //Find a post from posts object that matches the ID of the clicked element.
                         let tutorial_tag = tutorial.getAttribute('post_modules');
                         let tutorial_status = tutorial.getAttribute('post_status');
+                        
                         let this_tutorial = tutor_tutorials.getTutorTutorialDetailsById(tutorial.getAttribute('post_id'), tutorial_status);
 
                         if (tutorial_status == "In negotiation") {
@@ -361,9 +362,10 @@ function all_tutor_tutorials() {
                                 load_pending_tutorial_component_signed(nav, this_tutorial, tutorial_status, tutorial_tag)
                             }
                         } else if (tutorial_status == "Ongoing") {
-                            load_ongoing_tutorial_component(this_tutorial, tutorial_status, tutorial_tag);
+                            console.log(this_tutorial)
+                            load_ongoing_tutorial_component(nav, this_tutorial, tutorial_status, tutorial_tag);
                         } else {
-                            load_done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag);
+                            load_done_tutorial_component(nav, this_tutorial, tutorial_status, tutorial_tag);
                         }
                     }
                 });

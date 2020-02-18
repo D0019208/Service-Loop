@@ -32,8 +32,7 @@ async function login_user(user_email, user_password) {
         //Dismiss the loading indicator
         loading.dismiss();
 
-        if (content.status === 200) {
-
+        if (content.status === 200) { 
             await set_secure_storage("jwt_session", content.token);
             await set_secure_storage("users_email", user_email);
             await set_secure_storage("user_name", content.user_name);

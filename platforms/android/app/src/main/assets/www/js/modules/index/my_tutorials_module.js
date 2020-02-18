@@ -50,19 +50,19 @@ function load_my_requested_tutorials() {
                     <h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1>
                 </ion-title>
                 <ion-segment> 
-                    <ion-segment-button value="open_segment" checked>
+                    <ion-segment-button value="open_segment" checked onclick="device_feedback();">
                         <ion-label>Open</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="pending_segment">
+                    <ion-segment-button value="pending_segment" onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="ongoing_segment">
+                    <ion-segment-button value="ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="done_segment">
+                    <ion-segment-button value="done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
@@ -129,19 +129,19 @@ function load_my_requested_tutorials() {
                     <h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1>
                 </ion-title>
                 <ion-segment> 
-                    <ion-segment-button value="open_segment" checked>
+                    <ion-segment-button value="open_segment" checked onclick="device_feedback();">
                         <ion-label>Open</ion-label>
                         <IonBadge id="open_badge" color="primary">${tutorials.total_open_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="pending_segment">
+                    <ion-segment-button value="pending_segment" onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
                         <IonBadge id="pending_badge" color="primary">${tutorials.total_pending_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="ongoing_segment">
+                    <ion-segment-button value="ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
                         <IonBadge id="ongoing_badge" color="primary">${tutorials.total_ongoing_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="done_segment">
+                    <ion-segment-button value="done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
                         <IonBadge id="done_badge" color="primary">${tutorials.total_done_tutorials}</IonBadge>
                     </ion-segment-button>
@@ -298,7 +298,7 @@ function load_my_requested_tutorials() {
 
             const segments = document.querySelectorAll('ion-segment')
             for (let i = 0; i < segments.length; i++) {
-                segments[i].addEventListener('ionChange', (ev) => {
+                segments[i].addEventListener('ionChange', (ev) => { 
                     if (ev.detail.value === "open_segment") {
                         segment_elements.open.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
@@ -425,8 +425,7 @@ function load_my_requested_tutorials() {
             if (!my_requested_posts_event_listener_added) {
                 document.querySelector('body').addEventListener('click', async function (event) {
                     //Get closest element with specified class
-                    let tutorial = getClosest(event.target, '.test');
-                    let tutorial_tags = [];
+                    let tutorial = getClosest(event.target, '.test'); 
 
                     console.log(tutorial);
 
@@ -439,25 +438,22 @@ function load_my_requested_tutorials() {
 
                         if (tutorial_status == "In negotiation") {
                             tutorial_status = "Pending";
-                        }
-
-                        let tutorial_element = document.createElement('tutorial');
-                        let tutorial_element_html;
+                        } 
 
                         if (tutorial_status == "Open") {
-                            load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                            load_open_tutorial_component(nav, this_tutorial);
                         } else if (tutorial_status == "Pending") {
                             if (this_tutorial.post_agreement_offered) {
                                 load_post_agreement_offered_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                             } else if (this_tutorial.post_agreement_signed) {
                                 load_pending_tutorial_component_agreement_signed(nav, this_tutorial, tutorial_tag, tutorial_status)
                             } else {
-                                load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                                load_pending_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                             }
                         } else if (tutorial_status == "Ongoing") {
                             load_ongoing_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                         } else {
-                            load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                            load_done_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                         }
                     }
                 });
