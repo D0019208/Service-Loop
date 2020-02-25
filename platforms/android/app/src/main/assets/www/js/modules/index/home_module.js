@@ -241,9 +241,19 @@ document.addEventListener("deviceready", async function () {
                                     <img class='i_post' src="images/i_posts.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
                                 </ion-list>
-                                <hr><hr>
+                                <hr><hr> 
                                 <ion-list class='home_buttons ion-activatable ripple' id='my_requested_tutorials'>
                                     <h6>My requested tutorials</h6>
+                                    <p>View all the tutorials requested by you</p>
+                                    <img class='b_circle' src="images/circle.png" alt=""/>
+                                    <img class='i_exchange' src="images/i_exchange.png" alt=""/>
+                                    <ion-ripple-effect></ion-ripple-effect>
+                                </ion-list>
+                                
+                                <hr><hr> 
+                
+                                 <ion-list class='home_buttons ion-activatable ripple' id='barcode_scanner'>
+                                    <h6>Barcode scanner</h6>
                                     <p>View all the tutorials requested by you</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
@@ -251,9 +261,7 @@ document.addEventListener("deviceready", async function () {
                                 </ion-list> 
                                 <!--<ion-item onclick="navigateForward()">
                                     Navigate Forward
-                                </ion-item>-->
-
-
+                                </ion-item>--> 
                             </div>
                     
                         </ion-content>`;
@@ -403,18 +411,18 @@ document.addEventListener("deviceready", async function () {
             //Create My Profile page
             document.getElementById('profile').addEventListener('click', async function () {
                 device_feedback();
-                
+
                 await include("js/modules/index/profile_module.js", "profile_script");
                 load_profile_page(active_nav);
-                
+
                 closeMenu();
             });
             document.getElementById('profile_home').addEventListener('click', async function () {
                 device_feedback();
-                
+
                 await include("js/modules/index/profile_module.js", "profile_script");
                 load_profile_page(active_nav);
-                
+
                 closeMenu();
             });
             //Create My Tutorials page (If user is Tutor)
@@ -426,6 +434,17 @@ document.addEventListener("deviceready", async function () {
                     all_tutor_tutorials(active_nav);
                 });
             }
+
+
+
+
+
+
+
+            //Barcode scanner call
+            document.getElementById('barcode_scanner').addEventListener('click', () => {
+                activate_bar_code_scanner();
+            });
 
         }
 
@@ -510,15 +529,15 @@ document.addEventListener("deviceready", async function () {
     document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', async function (event) {
         previous_tab = current_tab;
         current_tab = await tab_controller.getSelected();
-        
-        if(current_tab === 'home') {
+
+        if (current_tab === 'home') {
             active_nav = nav;
-        } else if(current_tab === 'notifications') {
-            if(typeof nav_notifications !== 'undefined') {
+        } else if (current_tab === 'notifications') {
+            if (typeof nav_notifications !== 'undefined') {
                 active_nav = nav_notifications;
-            } 
+            }
         } else {
-            if(typeof nav_settings !== 'undefined') {
+            if (typeof nav_settings !== 'undefined') {
                 active_nav = nav_settings;
             }
         }
@@ -529,11 +548,11 @@ document.addEventListener("deviceready", async function () {
             await include("js/modules/index/settings_module.js", "settings_script");
         }
     });
-    
+
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
-        let selected_tab = await tab_controller.getSelected(); 
-        let can_go_back = await active_nav.canGoBack(); 
+        let selected_tab = await tab_controller.getSelected();
+        let can_go_back = await active_nav.canGoBack();
 
         if (can_go_back) {
             active_nav.pop();
@@ -547,7 +566,7 @@ document.addEventListener("deviceready", async function () {
             if (current_tab !== previous_tab) {
                 tab_controller.select(previous_tab);
             }
-        } 
+        }
 
     }, false);
 });

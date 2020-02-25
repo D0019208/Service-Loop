@@ -88,9 +88,9 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        //const rawResponse = await fetch("http://localhost:3001/" + route, {
+        const rawResponse = await fetch("http://localhost:3001/" + route, {
 
-        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
+            //const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
 
             method: 'POST',
             headers: {
@@ -352,17 +352,17 @@ function insert_to_array_by_index(array, index, value) {
     array.splice(index, 0, value);
 }
 
-function device_feedback() { 
-    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-        if (feedback.haptic && feedback.acoustic) {
-            window.plugins.deviceFeedback.haptic();
-            window.plugins.deviceFeedback.acoustic();
-        } else if (feedback.haptic) {
-            window.plugins.deviceFeedback.haptic();
-        } else if (feedback.acoustic) {
-            window.plugins.deviceFeedback.acoustic();
-        }
-    });
+function device_feedback() {
+//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+//        if (feedback.haptic && feedback.acoustic) {
+//            window.plugins.deviceFeedback.haptic();
+//            window.plugins.deviceFeedback.acoustic();
+//        } else if (feedback.haptic) {
+//            window.plugins.deviceFeedback.haptic();
+//        } else if (feedback.acoustic) {
+//            window.plugins.deviceFeedback.acoustic();
+//        }
+//    });
 }
 
 /*
@@ -550,6 +550,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             <div class="ion-padding-top">
                 <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                 <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                 <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="accept_agreement">Accept<br/>agreement</ion-button>
                 <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="reject_agreement">Reject<br/>agreement</ion-button>
             </div>               
@@ -580,6 +581,11 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
 
     nav_controller.push(tutorial_element);
 
+    let tutorial_log;
+    let tutorial_log_handler = async function () {
+        load_blockchain_component(nav_controller, this_post._id);
+    };
+
     let accept_agreement;
     let accept_agreement_handler = async function () {
         device_feedback();
@@ -594,7 +600,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         create_ionic_alert("Reject agreement", "Please confirm that you wish to reject this agreement.", [
             {
                 text: 'Reject',
-                handler: () => { 
+                handler: () => {
                     console.log('Rejected')
                     reject_this_agreement(nav_controller, this_post);
                 }
@@ -602,7 +608,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             {
                 text: 'Cancel',
                 role: 'cancel',
-                handler: () => { 
+                handler: () => {
                     console.log('Cancel')
                 }
             }
@@ -613,8 +619,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let validate_agreement_handler = async function () {
         device_feedback();
 
-
-    }
+        validate_digital_signatures({tutor_email: this_post.post_tutor_email, pdf: this_post.post_agreement_url, verify_single: true});
+    };
 
     let openPdf;
     let openPdfHandler = async function () {
@@ -624,6 +630,11 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     }
 
     let ionNavDidChangeEvent = async function () {
+        if (document.getElementById('tutorial_log') !== null) {
+            tutorial_log = document.getElementById('tutorial_log');
+            tutorial_log.addEventListener('click', tutorial_log_handler, false);
+        }
+
         if (document.getElementById('view_agreement') !== null) {
             openPdf = document.getElementById("view_agreement");
             openPdf.addEventListener('click', openPdfHandler, false);
@@ -640,15 +651,17 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         }
 
         if (document.getElementById('verify_agreement') !== null) {
-
+            validate_agreement = document.getElementById('verify_agreement');
+            validate_agreement.addEventListener('click', validate_agreement_handler, false);
         }
 
         let notifications_active_component = await nav_controller.getActive();
 
-        if (notifications_active_component.component.tagName !== "TUTORIAL") {
+        if (notifications_active_component.component.tagName !== "TUTORIAL" && notifications_active_component.component.tagName !== "SIGN-TUTORIAL-AGREEMENT" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
             openPdf.removeEventListener("click", openPdfHandler, false);
             accept_agreement.removeEventListener("click", accept_agreement_handler, false);
             reject_agreement.removeEventListener("click", reject_agreement_handler, false);
+            validate_agreement.removeEventListener("click", validate_agreement_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
@@ -879,6 +892,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                                 <div class="ion-padding-top">
                                                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                                                 </div> 
                                                                 <ion-item-divider class="divider2"></ion-item-divider> 
                                                         <ion-item lines="none">
@@ -907,6 +921,18 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
     nav_controller.push(tutor_tutorial_element);
 
+    let tutorial_log;
+    let tutorial_log_handler = async function () {
+        load_blockchain_component(nav_controller, this_tutorial._id);
+    };
+
+    let validate_agreement;
+    let validate_agreement_handler = async function () {
+        device_feedback();
+
+        validate_digital_signatures({tutor_email: this_tutorial.post_tutor_email, student_email: this_tutorial.std_email, pdf: this_tutorial.post_agreement_url, verify_single: false});
+    };
+
     let openPdf;
     let openPdfHandler = async function () {
         device_feedback();
@@ -920,10 +946,22 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
             openPdf.addEventListener('click', openPdfHandler, false);
         }
 
+        if (document.getElementById('verify_agreement') !== null) {
+            validate_agreement = document.getElementById("verify_agreement");
+            validate_agreement.addEventListener('click', validate_agreement_handler, false);
+        }
+
+        if (document.getElementById('tutorial_log') !== null) {
+            tutorial_log = document.getElementById('tutorial_log');
+            tutorial_log.addEventListener('click', tutorial_log_handler, false);
+        }
+
         let notifications_active_component = await nav_controller.getActive();
 
-        if (notifications_active_component.component.tagName !== "TUTORIAL") {
+        if (notifications_active_component.component.tagName !== "TUTORIAL" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
             openPdf.removeEventListener("click", openPdfHandler, false);
+            validate_agreement.removeEventListener('click', validate_agreement_handler, false);
+            tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
@@ -995,6 +1033,10 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                         and create an agreement.
                                     </h6>
                                 </ion-item>    
+                                <ion-item-divider class="divider2"></ion-item-divider>   
+                                    <div class="ion-padding-top">
+                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                    </div> 
                                 <ion-item-divider class="divider2"></ion-item-divider> 
                             <ion-item lines="none">
                                                             <ion-label>
@@ -1022,7 +1064,28 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_controller.push(tutorial_accepted_component);
-}  
+
+    let tutorial_log;
+    let tutorial_log_handler = async function () {
+        load_blockchain_component(nav_controller, this_post._id);
+    };
+
+    let ionNavDidChangeEvent = async function () { 
+        if (document.getElementById('tutorial_log') !== null) {
+            tutorial_log = document.getElementById('tutorial_log');
+            tutorial_log.addEventListener('click', tutorial_log_handler, false);
+        } 
+
+        let notifications_active_component = await nav_controller.getActive();
+
+        if (notifications_active_component.component.tagName !== "TUTORIAL_REQUESTED" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {  
+            tutorial_log.removeEventListener("click", tutorial_log_handler, false); 
+            nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+        }
+    };
+
+    nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+}
 
 function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     let tutor_tutorial_element = document.createElement('tutorial');
@@ -1335,7 +1398,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
         create_ionic_alert("Accept agreement", "Please confirm that you wish to accept this agreement.", [
             {
                 text: 'Accept',
-                handler: () => { 
+                handler: () => {
                     console.log('Accepted');
                     accept_agreement(nav_controller, this_tutorial);
                 }
@@ -1343,7 +1406,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
             {
                 text: 'Cancel',
                 role: 'cancel',
-                handler: () => { 
+                handler: () => {
                     console.log('Cancel')
                 }
             }
@@ -1389,7 +1452,7 @@ async function accept_agreement(nav_controller, this_tutorial) {
             //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
             posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
             tutorials.add_ongoing_post(agreement_accepted_response.updated_tutorial);
-            
+
             if (document.getElementById('ongoing_tutorials_header') !== null) {
                 tutorials.remove_tutorial_by_id(tutorials.pending_tutorials, agreement_accepted_response.updated_tutorial._id);
                 tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), this_tutorial);
@@ -1512,6 +1575,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
                                 </div> 
                                  <ion-item-divider class="divider2"></ion-item-divider>   
@@ -1543,6 +1607,18 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 
     nav_controller.push(tutorial_accepted_component);
 
+    let tutorial_log;
+    let tutorial_log_handler = async function () {
+        load_blockchain_component(nav_controller, this_post._id);
+    };
+
+    let validate_agreement;
+    let validate_agreement_handler = async function () {
+        device_feedback();
+
+        validate_digital_signatures({tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
+    };
+
     let openPdf;
     let openPdfHandler = async function () {
         device_feedback();
@@ -1556,19 +1632,31 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
             openPdf.addEventListener('click', openPdfHandler, false);
         }
 
+        if (document.getElementById('tutorial_log') !== null) {
+            tutorial_log = document.getElementById('tutorial_log');
+            tutorial_log.addEventListener('click', tutorial_log_handler, false);
+        }
+
+        if (document.getElementById('verify_agreement') !== null) {
+            validate_agreement = document.getElementById("verify_agreement");
+            validate_agreement.addEventListener('click', validate_agreement_handler, false);
+        }
+
         let notifications_active_component = await nav_controller.getActive();
 
-        if (notifications_active_component.component.tagName !== "TUTORIAL_AGREEMENT_ACCEPTED") {
+        if (notifications_active_component.component.tagName !== "TUTORIAL_AGREEMENT_ACCEPTED" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
             openPdf.removeEventListener("click", openPdfHandler, false);
+            tutorial_log.removeEventListener("click", tutorial_log_handler, false);
+            validate_agreement.removeEventListener('click', validate_agreement_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-}  
+}
 
 
-function load_open_tutorial_component (nav_controller, this_post) {
+function load_open_tutorial_component(nav_controller, this_post) {
     let tutorial_status = this_post.post_status;
 
     if (tutorial_status == "In Negotiation") {
@@ -1657,5 +1745,156 @@ function load_open_tutorial_component (nav_controller, this_post) {
                                                             </ul>
                                                         </div><br><br>
                                                     </ion-content>`;
-    nav_controller.push(tutorial_requested_component); 
+    nav_controller.push(tutorial_requested_component);
+}
+
+function activate_bar_code_scanner() {
+    cordova.plugins.barcodeScanner.scan(
+            function (result) {
+//                alert("We got a barcode\n" +
+//                        "Result: " + result.text + "\n" +
+//                        "Format: " + result.format + "\n" +
+//                        "Cancelled: " + result.cancelled);
+
+                if (result.cancelled) {
+                    let toast_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Barcode scanning cancelled.", "dark", 2000, toast_buttons);
+                } else if (result.format === "CODE_39" && result.text !== "") {
+                    let toast_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Student email is: " + result.text + "@student.dkit.ie", "dark", 2000, toast_buttons);
+
+                    return result.text;
+                }
+            },
+            function (error) {
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Scanning failed: " + error, "dark", 2000, toast_buttons);
+            },
+            {
+                preferFrontCamera: false, // iOS and Android
+                showFlipCameraButton: true, // iOS and Android
+                showTorchButton: true, // iOS and Android
+                torchOn: false, // Android, launch with the torch switched on (if available)
+                saveHistory: true, // Android, save scan history (default false)
+                prompt: "Place a barcode inside the scan area", // Android
+                resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+                formats: "BAR_CODE", // default: all but PDF_417 and RSS_EXPANDED
+                orientation: "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
+                disableAnimations: true, // iOS
+                disableSuccessBeep: false // iOS and Android
+            }
+    );
+}
+
+async function validate_digital_signatures(data_object) {
+    let validate_digital_signatures_response = await access_route(data_object, "validate_digital_signatures");
+
+    if (validate_digital_signatures_response.error) {
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast("A digital signature for this agreement has been compromised!", "dark", 5000, toast_buttons);
+    } else {
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast(validate_digital_signatures_response.response, "dark", 5000, toast_buttons);
+    }
+}
+
+function load_blockchain_component(nav_controller, this_post_id) {
+    let blockchain_component = document.createElement('blockchain_audit_log');
+    blockchain_component.innerHTML = `<ion-header translucent>
+                        <ion-toolbar>
+                                <ion-buttons onclick="device_feedback()" slot="start">
+                            <ion-back-button defaultHref="/"></ion-back-button>
+                          </ion-buttons>
+                            <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+                            <ion-title><h1>Tutorial Log</h1></ion-title>
+                        </ion-toolbar>
+                    </ion-header>
+
+                    <ion-content fullscreen> 
+    <p style="text-align: center; padding-left: 15px; padding-right: 15px;">This is a log that keeps track of all the activities that have occured for this tutorial. </p>
+            <ion-item-divider style="margin-top: -30px;"></ion-item-divider>
+<section class="blockchain">
+   <div class="blockchain_line" id="blockchain_container"></div>
+</section>
+
+</ion-content>`;
+
+    nav_controller.push(blockchain_component);
+
+    //blockchain.load_blockchain_content(this_post_id);
+}
+
+function convertDate(inputFormat) {
+    function pad(s) {
+        return (s < 10) ? '0' + s : s;
+    }
+    var d = new Date(inputFormat);
+    return [pad(d.getDate()), pad(d.getMonth() + 1), d.getFullYear()].join('/');
+}
+
+function conver_to_time(date) {
+    let hours = date.getHours();
+    let minutes = date.getMinutes();
+
+    if (hours < 10) {
+        hours = '0' + hours;
+    }
+
+    if (minutes < 10) {
+        minutes = '0' + minutes;
+    }
+
+    return hours + ":" + minutes;
 }
