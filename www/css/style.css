@@ -10,6 +10,7 @@
   padding-left: 45px;
   list-style: none;
   margin-bottom: 100px;
+  padding-right: 5px;
 }
 .StepProgress span
 {
@@ -81,4 +82,89 @@
 }
 .StepProgress strong {
   display: block;
+} 
+
+/*new blockchain*/
+.blockchain
+{
+    position: relative; 
+    font-size: 80%; 
+    font-weight: 300; 
+    padding: 10px 0px; 
+    width: 95%; 
+    margin: 0px auto;
+}
+.blockchain_line
+{
+    position: absolute; 
+    top: 0px; 
+    height: 100%; 
+    width: 2px; 
+    background: #b6daff; 
+    left: 16px;
+}
+.blockchain_entry
+{
+    position: relative; 
+    margin: 10px 0px; 
+    padding-left: 45px; 
+    text-align: left;
+}
+.blockchain_cube
+{
+    position: absolute; 
+    top: 0px; 
+    border-radius: 50%; 
+    width: 30px; 
+    height: 30px; 
+    margin-left: 1px; 
+    background: rgb(233, 240, 245); 
+    border: 2px solid #3880ff; 
+    display: flex; 
+    color: rgb(227, 79, 38); 
+    left: 0px;
+}
+.blockchain_icon
+{
+    display: flex; 
+    width: 32px; 
+    height: 32px; 
+    position: relative; 
+    justify-content: center; 
+    cursor: pointer; 
+    align-self: center; 
+    align-items: center;
+}
+.blockchain_block
+{
+    box-shadow: rgba(0, 0, 0, 0.118) 0px 1px 6px, rgba(0, 0, 0, 0.118) 0px 1px 4px; 
+    background-color: rgb(255, 255, 255); position: relative; width: 100%;
+}
+.blockchain_title
+{
+    background-color: #3880ff; 
+    padding: 10px; 
+    color: rgb(255, 255, 255); 
+    font-size: 13pt;
+    font-weight: bold;
+}
+.blockchain_body
+{
+    background-color: rgb(255, 255, 255); 
+    margin-bottom: 1em; 
+    line-height: 1.6; 
+    padding: 10px;
+    padding-top: 0px;
+    min-height: 40px;
+    font-size:10.6pt;
+    margin-top: -5px;
+}
+.blockchain_body p
+{
+    font-weight: 100;
+}
+.blockchain_clear
+{
+    clear: both; 
+    display: table;
 }

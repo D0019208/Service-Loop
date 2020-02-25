@@ -352,7 +352,7 @@ function insert_to_array_by_index(array, index, value) {
     array.splice(index, 0, value);
 }
 
-function device_feedback() { 
+function device_feedback() {
     window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
         if (feedback.haptic && feedback.acoustic) {
             window.plugins.deviceFeedback.haptic();
@@ -594,7 +594,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         create_ionic_alert("Reject agreement", "Please confirm that you wish to reject this agreement.", [
             {
                 text: 'Reject',
-                handler: () => { 
+                handler: () => {
                     console.log('Rejected')
                     reject_this_agreement(nav_controller, this_post);
                 }
@@ -602,7 +602,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             {
                 text: 'Cancel',
                 role: 'cancel',
-                handler: () => { 
+                handler: () => {
                     console.log('Cancel')
                 }
             }
@@ -1022,7 +1022,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_controller.push(tutorial_accepted_component);
-}  
+}
 
 function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     let tutor_tutorial_element = document.createElement('tutorial');
@@ -1335,7 +1335,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
         create_ionic_alert("Accept agreement", "Please confirm that you wish to accept this agreement.", [
             {
                 text: 'Accept',
-                handler: () => { 
+                handler: () => {
                     console.log('Accepted');
                     accept_agreement(nav_controller, this_tutorial);
                 }
@@ -1343,7 +1343,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
             {
                 text: 'Cancel',
                 role: 'cancel',
-                handler: () => { 
+                handler: () => {
                     console.log('Cancel')
                 }
             }
@@ -1389,7 +1389,7 @@ async function accept_agreement(nav_controller, this_tutorial) {
             //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
             posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
             tutorials.add_ongoing_post(agreement_accepted_response.updated_tutorial);
-            
+
             if (document.getElementById('ongoing_tutorials_header') !== null) {
                 tutorials.remove_tutorial_by_id(tutorials.pending_tutorials, agreement_accepted_response.updated_tutorial._id);
                 tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), this_tutorial);
@@ -1565,10 +1565,10 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     };
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-}  
+}
 
 
-function load_open_tutorial_component (nav_controller, this_post) {
+function load_open_tutorial_component(nav_controller, this_post) {
     let tutorial_status = this_post.post_status;
 
     if (tutorial_status == "In Negotiation") {
@@ -1657,5 +1657,73 @@ function load_open_tutorial_component (nav_controller, this_post) {
                                                             </ul>
                                                         </div><br><br>
                                                     </ion-content>`;
-    nav_controller.push(tutorial_requested_component); 
+    nav_controller.push(tutorial_requested_component);
+}
+
+function activate_bar_code_scanner() {
+    cordova.plugins.barcodeScanner.scan(
+            function (result) {
+//                alert("We got a barcode\n" +
+//                        "Result: " + result.text + "\n" +
+//                        "Format: " + result.format + "\n" +
+//                        "Cancelled: " + result.cancelled);
+
+                if (result.cancelled) {
+                    let toast_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Barcode scanning cancelled.", "dark", 2000, toast_buttons);
+                } else if (result.format === "CODE_39" && result.text !== "") {
+                    let toast_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Student email is: " + result.text + "@student.dkit.ie", "dark", 2000, toast_buttons);
+
+                    return result.text;
+                }
+            },
+            function (error) {
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Scanning failed: " + error, "dark", 2000, toast_buttons); 
+            },
+            {
+                preferFrontCamera: false, // iOS and Android
+                showFlipCameraButton: true, // iOS and Android
+                showTorchButton: true, // iOS and Android
+                torchOn: true, // Android, launch with the torch switched on (if available)
+                saveHistory: true, // Android, save scan history (default false)
+                prompt: "Place a barcode inside the scan area", // Android
+                resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+                formats: "BAR_CODE", // default: all but PDF_417 and RSS_EXPANDED
+                orientation: "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
+                disableAnimations: true, // iOS
+                disableSuccessBeep: false // iOS and Android
+            }
+    );
 }
