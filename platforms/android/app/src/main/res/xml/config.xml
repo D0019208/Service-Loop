@@ -1,5 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.dkit.serviceloop" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.dkit.studentloop" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:android="http://schemas.android.com/apk/res/android" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <feature name="InAppBrowser">
+        <param name="android-package" value="org.apache.cordova.inappbrowser.InAppBrowser" />
+    </feature>
     <feature name="Notification">
         <param name="android-package" value="org.apache.cordova.dialogs.Notification" />
     </feature>
@@ -11,9 +14,6 @@
         <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
         <param name="onload" value="true" />
     </feature>
-    <feature name="FingerprintAuth">
-        <param name="android-package" value="com.cordova.plugin.android.fingerprintauth.FingerprintAuth" />
-    </feature>
     <feature name="SecureKeyStore">
         <param name="android-package" value="com.securekeystore.plugin.SecureKeyStore" />
     </feature>
@@ -21,8 +21,14 @@
         <param name="android-package" value="cz.Velda.cordova.plugin.devicefeedback.DeviceFeedback" />
         <param name="onload" value="true" />
     </feature>
-    <name>Service Loop</name>
-    <description>Service Loop - Stay in the loop with Service Loop</description>
+    <feature name="FingerprintAuth">
+        <param name="android-package" value="com.cordova.plugin.android.fingerprintauth.FingerprintAuth" />
+    </feature>
+    <feature name="BarcodeScanner">
+        <param name="android-package" value="com.phonegap.plugins.barcodescanner.BarcodeScanner" />
+    </feature>
+    <name>Student Loop</name>
+    <description>Student Loop - Stay in the loop with Student Loop</description>
     <access origin="*" />
     <allow-intent href="*" />
     <allow-navigation href="*" />

@@ -17,7 +17,7 @@ function apply_to_be_tutor(handler) {
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>Tutor application form</ion-title>
-            <ion-buttons slot="start">
+            <ion-buttons onclick="device_feedback()" slot="start">
                 <ion-back-button id="apply_to_be_tutor_back" defaultHref="/"></ion-back-button>
               </ion-buttons>
               <ion-buttons slot="end">
@@ -86,8 +86,12 @@ function apply_to_be_tutor(handler) {
 
                 if (!tutor_added_response.error) {
                     //We update the user so he becomes a tutor
-                    user.ascendToTutor(user_notifications, document.getElementById("tutor_modules").value, handler)
-                    user.setModules(document.getElementById("tutor_modules").value); 
+                    user.setStatus("Tutor");
+                    user.setModules(document.getElementById("tutor_modules").value);
+                    
+                    set_secure_storage("user_status", true);
+                    set_secure_storage("user_modules", document.getElementById("tutor_modules").value); 
+                    user.ascendToTutor(user_notifications, document.getElementById("tutor_modules").value, handler); 
                 } else {
                     tutor_apply_button.disabled = false;
                     create_ionic_alert("Tutor application failed", tutor_added_response.response, ["OK"]);

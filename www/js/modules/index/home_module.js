@@ -1,5 +1,6 @@
 "use strict"
-var notifications_object
+var notifications_object;
+var blockchain;
 var unopened_notifications_counter = 0;
 var user;
 var user_notifications;
@@ -28,6 +29,8 @@ Element.prototype.appendAfter = function (element) {
 //deviceready
 //DOMContentLoaded
 document.addEventListener("DOMContentLoaded", async function () {
+    let test = await access_route({}, "test")
+    console.log(test);
     user = new User();
     let home_component;
     let notifications_response;
@@ -45,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
     //Set status of user to tutor
-    user.setName("Nichita Postolachi");
+    user.setName("Nichita Postolachi".replace(/\s+$/, ''));
     user.setStatus("Tutor");
     user.setEmail("nikito888@gmail.com");
 
@@ -241,9 +244,19 @@ document.addEventListener("DOMContentLoaded", async function () {
                                     <img class='i_post' src="images/i_posts.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
                                 </ion-list>
-                                <hr><hr>
+                                <hr><hr> 
                                 <ion-list class='home_buttons ion-activatable ripple' id='my_requested_tutorials'>
                                     <h6>My requested tutorials</h6>
+                                    <p>View all the tutorials requested by you</p>
+                                    <img class='b_circle' src="images/circle.png" alt=""/>
+                                    <img class='i_exchange' src="images/i_exchange.png" alt=""/>
+                                    <ion-ripple-effect></ion-ripple-effect>
+                                </ion-list>
+                                
+                                <hr><hr> 
+                
+                                 <ion-list class='home_buttons ion-activatable ripple' id='barcode_scanner'>
+                                    <h6>Barcode scanner</h6>
                                     <p>View all the tutorials requested by you</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
@@ -251,9 +264,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 </ion-list> 
                                 <!--<ion-item onclick="navigateForward()">
                                     Navigate Forward
-                                </ion-item>-->
-
-
+                                </ion-item>--> 
                             </div>
                     
                         </ion-content>`;
@@ -375,6 +386,8 @@ document.addEventListener("DOMContentLoaded", async function () {
                 tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
                 tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
             }
+            
+            blockchain = new Blockchain();
 
             posts.waitForTutorialAccepted();
             //Create a Notifications class to store all the details and functions relating to the notifications
@@ -409,11 +422,11 @@ document.addEventListener("DOMContentLoaded", async function () {
                     await include("js/modules/index/profile_module.js", "profile_script");
                     load_profile_page(active_nav);
                 }
-                
                 closeMenu();
             });
             document.getElementById('profile_home').addEventListener('click', async function () {
                 device_feedback();
+
                 if(active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
                 {
                     await include("js/modules/index/profile_module.js", "profile_script");
@@ -431,6 +444,17 @@ document.addEventListener("DOMContentLoaded", async function () {
                     all_tutor_tutorials(active_nav);
                 });
             }
+
+
+
+
+
+
+
+            //Barcode scanner call
+            document.getElementById('barcode_scanner').addEventListener('click', () => {
+                activate_bar_code_scanner();
+            });
 
         }
 
@@ -515,6 +539,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', async function (event) {
         previous_tab = current_tab;
         current_tab = await tab_controller.getSelected();
+
         
         if(current_tab === 'home') {
             active_nav = nav;
@@ -534,11 +559,13 @@ document.addEventListener("DOMContentLoaded", async function () {
             await include("js/modules/index/settings_module.js", "settings_script");
         }
     });
+
     
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
         let selected_tab = await tab_controller.getSelected(); 
         let can_go_back = await active_nav.canGoBack(); 
+
 
         if (can_go_back) {
             active_nav.pop();
@@ -553,6 +580,5 @@ document.addEventListener("DOMContentLoaded", async function () {
                 tab_controller.select(previous_tab);
             }
         } 
-
     }, false);
 });

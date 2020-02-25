@@ -1,33 +1,33 @@
 {
-  "_from": "cordova-plugin-dialogs@^2.0.1",
-  "_id": "cordova-plugin-dialogs@2.0.2",
+  "_from": "cordova-plugin-dialogs@2.0.1",
+  "_id": "cordova-plugin-dialogs@2.0.1",
   "_inBundle": false,
-  "_integrity": "sha512-FUHI6eEVeoz2VkxbF0P56QlUQLGzXcvw3i4xuXyM9gEct6Y+FA3Xzgl2pJTZcTg5wRqLWzN08kgNoHPkom15pw==",
+  "_integrity": "sha1-N/7xUSWWyNXflUP7eHJFkPdn3PM=",
   "_location": "/cordova-plugin-dialogs",
   "_phantomChildren": {},
   "_requested": {
-    "type": "range",
+    "type": "version",
     "registry": true,
-    "raw": "cordova-plugin-dialogs@^2.0.1",
+    "raw": "cordova-plugin-dialogs@2.0.1",
     "name": "cordova-plugin-dialogs",
     "escapedName": "cordova-plugin-dialogs",
-    "rawSpec": "^2.0.1",
+    "rawSpec": "2.0.1",
     "saveSpec": null,
-    "fetchSpec": "^2.0.1"
+    "fetchSpec": "2.0.1"
   },
   "_requiredBy": [
     "#DEV:/",
     "#USER"
   ],
-  "_resolved": "https://registry.npmjs.org/cordova-plugin-dialogs/-/cordova-plugin-dialogs-2.0.2.tgz",
-  "_shasum": "ac3ce8b73bc885ff847078d5b533e7a4ed418a2f",
-  "_spec": "cordova-plugin-dialogs@^2.0.1",
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-dialogs/-/cordova-plugin-dialogs-2.0.1.tgz",
+  "_shasum": "37fef1512596c8d5df9543fb78724590f767dcf3",
+  "_spec": "cordova-plugin-dialogs@2.0.1",
   "_where": "E:\\Computing Level 8\\DK821 Year 4\\Semester 1\\Team Project\\Code\\Service Loop",
   "author": {
     "name": "Apache Software Foundation"
   },
   "bugs": {
-    "url": "https://github.com/apache/cordova-plugin-dialogs/issues"
+    "url": "https://issues.apache.org/jira/browse/CB"
   },
   "bundleDependencies": false,
   "cordova": {
@@ -78,5 +78,5 @@
     "test": "npm run eslint"
   },
   "types": "./types/index.d.ts",
-  "version": "2.0.2"
+  "version": "2.0.1"
 }

@@ -21,10 +21,12 @@ xmlns:cdv="http://cordova.apache.org/ns/1.0"
   <plugin name="cordova-plugin-secure-key-store" spec="*" />
   <plugin name="cordova-plugin-velda-devicefeedback" spec="*" /> 
   <plugin name="cordova-plugin-android-fingerprint-auth" spec="*" />
+  <plugin name="cordova-plugin-qr-barcode-scanner" spec="*" />
+  
   <platform name="android">
-    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
+   <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
       <application android:usesCleartextTraffic="true" />
-  </edit-config>
+	</edit-config>
     <preference name="SplashMaintainAspectRatio" value="true" />
     <preference name="SplashShowOnlyFirstTime" value="true" />
 	

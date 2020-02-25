@@ -278,6 +278,8 @@ function load_profile_page(nav_controller) {
                     
                     //Function that adds skill to the page
                     function addItem() {
+
+                        device_feedback();
                         var textInput = document.getElementById("profile_tutorial_modules");  //getting text input
                         var skill = textInput.value;   //getting value of text input element
                         var p = document.getElementById("p");  //getting element <ul> to add element to
