@@ -1873,7 +1873,7 @@ function load_blockchain_component(nav_controller, this_post_id) {
 
     nav_controller.push(blockchain_component);
 
-    //blockchain.load_blockchain_content(this_post_id);
+    blockchain.load_blockchain_content(this_post_id);
 }
 
 function convertDate(inputFormat) {
