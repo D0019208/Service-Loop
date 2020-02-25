@@ -40,29 +40,29 @@ function load_my_requested_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons style="margin-top: -55px;" slot="start">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="start">
                     <ion-back-button defaultHref="/"></ion-back-button>
                 </ion-buttons>
-                <ion-buttons style="margin-top: -55px;" slot="end">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title>
                     <h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1>
                 </ion-title>
                 <ion-segment> 
-                    <ion-segment-button value="open_segment" checked>
+                    <ion-segment-button value="open_segment" checked onclick="device_feedback();">
                         <ion-label>Open</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="pending_segment">
+                    <ion-segment-button value="pending_segment" onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="ongoing_segment">
+                    <ion-segment-button value="ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="done_segment">
+                    <ion-segment-button value="done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
                         <IonBadge color="primary">0</IonBadge>
                     </ion-segment-button>
@@ -119,29 +119,29 @@ function load_my_requested_tutorials() {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
-                <ion-buttons style="margin-top: -55px;" slot="start">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="start">
                 <ion-back-button defaultHref="/"></ion-back-button>
               </ion-buttons>
-                <ion-buttons style="margin-top: -55px;" slot="end">
+                <ion-buttons onclick="device_feedback()" style="margin-top: -55px;" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
                 <ion-title>
                     <h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1>
                 </ion-title>
                 <ion-segment> 
-                    <ion-segment-button value="open_segment" checked>
+                    <ion-segment-button value="open_segment" checked onclick="device_feedback();">
                         <ion-label>Open</ion-label>
                         <IonBadge id="open_badge" color="primary">${tutorials.total_open_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="pending_segment">
+                    <ion-segment-button value="pending_segment" onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
                         <IonBadge id="pending_badge" color="primary">${tutorials.total_pending_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="ongoing_segment">
+                    <ion-segment-button value="ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
                         <IonBadge id="ongoing_badge" color="primary">${tutorials.total_ongoing_tutorials}</IonBadge>
                     </ion-segment-button>
-                    <ion-segment-button value="done_segment">
+                    <ion-segment-button value="done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
                         <IonBadge id="done_badge" color="primary">${tutorials.total_done_tutorials}</IonBadge>
                     </ion-segment-button>
@@ -298,7 +298,7 @@ function load_my_requested_tutorials() {
 
             const segments = document.querySelectorAll('ion-segment')
             for (let i = 0; i < segments.length; i++) {
-                segments[i].addEventListener('ionChange', (ev) => {
+                segments[i].addEventListener('ionChange', (ev) => { 
                     if (ev.detail.value === "open_segment") {
                         segment_elements.open.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
@@ -425,8 +425,7 @@ function load_my_requested_tutorials() {
             if (!my_requested_posts_event_listener_added) {
                 document.querySelector('body').addEventListener('click', async function (event) {
                     //Get closest element with specified class
-                    let tutorial = getClosest(event.target, '.test');
-                    let tutorial_tags = [];
+                    let tutorial = getClosest(event.target, '.test'); 
 
                     console.log(tutorial);
 
@@ -439,25 +438,22 @@ function load_my_requested_tutorials() {
 
                         if (tutorial_status == "In negotiation") {
                             tutorial_status = "Pending";
-                        }
-
-                        let tutorial_element = document.createElement('tutorial');
-                        let tutorial_element_html;
+                        } 
 
                         if (tutorial_status == "Open") {
-                            load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                            load_open_tutorial_component(nav, this_tutorial);
                         } else if (tutorial_status == "Pending") {
                             if (this_tutorial.post_agreement_offered) {
                                 load_post_agreement_offered_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                             } else if (this_tutorial.post_agreement_signed) {
                                 load_pending_tutorial_component_agreement_signed(nav, this_tutorial, tutorial_tag, tutorial_status)
                             } else {
-                                load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                                load_pending_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                             }
                         } else if (tutorial_status == "Ongoing") {
-                            load_ongoing_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                            load_ongoing_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                         } else {
-                            load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_status);
+                            load_done_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
                         }
                     }
                 });
@@ -480,613 +476,4 @@ function load_my_requested_tutorials() {
     });
 
     nav.push('nav-my-requested-tutorials');
-}
-
-function load_open_tutorial_component(this_tutorial, tutorial_tag, tutorial_status) {
-    let tutorial_element = document.createElement('tutorial');
-    let tutorial_element_html = `<ion-header translucent>
-                        <ion-toolbar>
-                            <ion-buttons slot="start">
-                                <ion-back-button defaultHref="/"></ion-back-button>
-                            </ion-buttons>
-                            <ion-buttons slot="end">
-                                <ion-menu-button></ion-menu-button>
-                            </ion-buttons>
-                            <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
-                        </ion-toolbar>
-                    </ion-header>
-
-                    <ion-content fullscreen>
-                        <ion-item style="margin-top:10px;" lines="none">
-                            <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                <img src="${this_tutorial.std_avatar}">
-                            </ion-avatar>
-                            <ion-label>
-                                <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                <p>${this_tutorial.std_email}</p>
-                            </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                        </ion-item>
-
-
-                        <ion-item-divider class="divider"></ion-item-divider>
-                        <ion-item lines="none">
-                            
-                                <h6><strong>${this_tutorial.post_title}</strong></h6>
-                            
-                        </ion-item>
-                        <ion-item style="margin-top:-10px;" lines="none">
-                            <p>
-                                ${this_tutorial.post_desc}
-                            </p>
-                        </ion-item>
-
-                        <ion-chip class="module" color="primary">
-                            <ion-icon name="star"></ion-icon>
-                            <ion-label>${tutorial_tag}</ion-label>
-                        </ion-chip>
-                        <!--<ion-chip class="module2" color="danger">
-                          <ion-icon name="close"></ion-icon>
-                          <ion-label>Closed</ion-label>
-                        </ion-chip>-->
-                        <ion-chip color="success">
-                            <ion-icon name="swap"></ion-icon>
-                            <ion-label>${tutorial_status}</ion-label>
-                        </ion-chip> 
-                            <ion-item-divider class="divider2"></ion-item-divider>  
-                                  <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>Extra information</strong></h2>
-                                    </ion-label>
-                                </ion-item>      
-                                 <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
-                                        A tutor has not yet accepted your agreement. Please be patient
-                                        as we have limited tutors.
-                                    </h6>
-                                </ion-item>    
-                                <ion-item-divider class="divider2"></ion-item-divider> 
-                                <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>Tutorial stage</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                                    <div class="wrapper">
-                                    <ul class="StepProgress">
-                                      <li class="StepProgress-item current"><strong>Open</strong>
-                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Pending</strong>
-                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Ongoing</strong>
-                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Done</strong>
-                                      <span>Tutorial has been compeleted.</span>
-                                      </li>
-                                    </ul>
-                                </div><br><br>
-                            </ion-content>`;
-    tutorial_element.innerHTML = tutorial_element_html;
-
-    nav.push(tutorial_element);
-
-}
-
-function load_pending_tutorial_component_agreement_offered(this_tutorial, tutorial_tag, tutorial_status) {
-    let tutorial_element = document.createElement('tutorial');
-    let tutorial_element_html = `<ion-header translucent>
-                                                            <ion-toolbar>
-                                                                <ion-buttons slot="start">
-                                                                    <ion-back-button defaultHref="/"></ion-back-button>
-                                                                </ion-buttons>
-                                                                <ion-buttons slot="end">
-                                                                    <ion-menu-button></ion-menu-button>
-                                                                </ion-buttons>
-                                                                <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
-                                                            </ion-toolbar>
-                                                        </ion-header>
-
-                                                        <ion-content fullscreen>
-                                                            <ion-item style="margin-top:10px;" lines="none">
-                                                                <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                                                    <img src="${this_tutorial.std_avatar}">
-                                                                </ion-avatar>
-                                                                <ion-label>
-                                                                    <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                                                    <p>${this_tutorial.std_email}</p>
-                                                                </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                                                            </ion-item>
-
-
-                                                            <ion-item-divider class="divider"></ion-item-divider>
-                                                            <ion-item lines="none">
-                                                                
-                                                                    <h6><strong>${this_tutorial.post_title}</strong></h6>
-                                                                
-                                                            </ion-item>
-                                                            <ion-item style="margin-top:-10px;" lines="none">
-                                                                <p>
-                                                                    ${this_tutorial.post_desc}
-                                                                </p>
-                                                            </ion-item>
-                                                                    <ion-chip class="module" color="primary">
-                                                                <ion-icon name="star"></ion-icon>
-                                                                <ion-label>${tutorial_tag}</ion-label>
-                                                            </ion-chip>
-                                                            <!--<ion-chip class="module2" color="danger">
-                                                              <ion-icon name="close"></ion-icon>
-                                                              <ion-label>Closed</ion-label>
-                                                            </ion-chip>-->
-                                                            <ion-chip color="success">
-                                                                <ion-icon name="swap"></ion-icon>
-                                                                <ion-label>${tutorial_status}</ion-label>
-                                                            </ion-chip>
-                                                             <ion-item-divider class="divider2"></ion-item-divider>  
-                                                              <ion-item lines="none">
-                                                                <ion-label>
-                                                                    <h2><strong>Extra information</strong></h2>
-                                                                </ion-label>
-                                                            </ion-item>      
-                                                             <ion-item style="margin-top:-15px;" lines="none">
-                                                                <h6>
-                                                                    Your tutor, ${this_tutorial.post_tutor_name} has sent you an agreement regarding your tutorial request, please
-                                                                    review it before accepting or rejecting it. If you have any questions, contact him through his college email at 
-                                                                    '${this_tutorial.post_tutor_email}' 
-                                                                </h6>
-
-                                                            </ion-item> 
-                                                            <ion-item-divider class="divider2"></ion-item-divider> 
-                                                                <div class="ion-padding-top">
-                                                                    <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                                                     <ion-button expand="block" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                                                    <ion-button id="accept_agreement" color="success">Accept agreement</ion-button>
-                                                                    <ion-button id="reject_agreement" color="danger">Reject agreement</ion-button>
-                                                                </div>            
-                                                            <ion-item-divider class="divider2"></ion-item-divider> 
-                                                                <ion-item lines="none">
-                                                                    <ion-label>
-                                                                        <h2><strong>Tutorial stage</strong></h2>
-                                                                    </ion-label>
-                                                                </ion-item>
-                                                                    <div class="wrapper">
-                                                            <ul class="StepProgress">
-                                                              <li class="StepProgress-item is-done"><strong>Open</strong>
-                                                              <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                                                              </li>
-                                                              <li class="StepProgress-item current"><strong>Pending</strong>
-                                                              <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                                                              </li>
-                                                              <li class="StepProgress-item"><strong>Ongoing</strong>
-                                                              <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                                                              </li>
-                                                              <li class="StepProgress-item"><strong>Done</strong>
-                                                              <span>Tutorial has been compeleted.</span>
-                                                              </li>
-                                                            </ul>
-                                                        </div><br><br>
-                                                            </ion-content>`;
-    tutorial_element.innerHTML = tutorial_element_html;
-
-    nav.push(tutorial_element);
-
-    let accept_agreement;
-    let accept_agreement_handler = async function () {
-        device_feedback();
-
-        create_ionic_alert("Accept agreement", "Please confirm that you wish to accept this agreement.", [
-            {
-                text: 'Accept',
-                handler: () => {
-                    console.log('Accepted');
-                    load_sign_accepted_agreement_component(this_tutorial);
-                }
-            },
-            {
-                text: 'Cancel',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel')
-                }
-            }
-        ]);
-    }
-
-    let reject_agreement;
-    let reject_agreement_handler = async function () {
-        device_feedback();
-
-        create_ionic_alert("Reject agreement", "Please confirm that you wish to reject this agreement.", [
-            {
-                text: 'Reject',
-                handler: () => {
-                    console.log('Rejected')
-                }
-            },
-            {
-                text: 'Cancel',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel')
-                }
-            }
-        ]);
-
-        //reject_agreement(tutorial);
-    }
-
-    let ionNavDidChangeEvent = async function () {
-        if (document.getElementById('accept_agreement') !== null) {
-            accept_agreement = document.getElementById("accept_agreement");
-            accept_agreement.addEventListener('click', accept_agreement_handler, false);
-        }
-
-        if (document.getElementById('reject_agreement') !== null) {
-            reject_agreement = document.getElementById("reject_agreement");
-            reject_agreement.addEventListener('click', reject_agreement_handler, false);
-        }
-
-        let notifications_active_component = await nav.getActive();
-
-        if (notifications_active_component.component.tagName !== "TUTORIAL") {
-            accept_agreement.removeEventListener("click", accept_agreement_handler, false);
-            reject_agreement.removeEventListener("click", reject_agreement_handler, false);
-            nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-        }
-    };
-
-    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-}
-
-
-function load_pending_tutorial_component(this_tutorial, tutorial_tag, tutorial_status) {
-    let tutorial_element = document.createElement('tutorial');
-    let tutorial_element_html = `
-                            <ion-header translucent>
-                                <ion-toolbar>
-                                    <ion-buttons slot="start">
-                                        <ion-back-button defaultHref="/"></ion-back-button>
-                                    </ion-buttons>
-                                    <ion-buttons slot="end">
-                                        <ion-menu-button></ion-menu-button>
-                                    </ion-buttons>
-                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
-                                </ion-toolbar>
-                            </ion-header>
-
-                            <ion-content fullscreen>
-                                <ion-item style="margin-top:10px;" lines="none">
-                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                        <img src="${this_tutorial.std_avatar}">
-                                    </ion-avatar>
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                        <p>${this_tutorial.std_email}</p>
-                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                                </ion-item>
-
-
-                                <ion-item-divider class="divider"></ion-item-divider>
-                                <ion-item lines="none">
-                                    
-                                        <h6><strong>${this_tutorial.post_title}</strong></h6>
-                                    
-                                </ion-item>
-                                <ion-item style="margin-top:-10px;" lines="none">
-                                    <p>
-                                        ${this_tutorial.post_desc}
-                                    </p>
-                                </ion-item>
-                                        <ion-chip class="module" color="primary">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-label>${tutorial_tag}</ion-label>
-                                </ion-chip>
-                                <!--<ion-chip class="module2" color="danger">
-                                  <ion-icon name="close"></ion-icon>
-                                  <ion-label>Closed</ion-label>
-                                </ion-chip>-->
-                                <ion-chip color="success">
-                                    <ion-icon name="swap"></ion-icon>
-                                    <ion-label>${tutorial_status}</ion-label>
-                                </ion-chip>
-                                 <ion-item-divider class="divider2"></ion-item-divider>  
-                                  <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>Extra information</strong></h2>
-                                    </ion-label>
-                                </ion-item>      
-                                 <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
-                                        ${this_tutorial.post_tutor_name} has agreed to be your tutor, please get in contact with him
-                                        through his college email '${this_tutorial.post_tutor_email}' to discuss the details of your tutorial
-                                        and create an agreement.
-                                    </h6>
-                                </ion-item>    
-                                <ion-item-divider class="divider2"></ion-item-divider> 
-                            <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>Tutorial stage</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                                    <div class="wrapper">
-                                    <ul class="StepProgress">
-                                      <li class="StepProgress-item is-done"><strong>Open</strong>
-                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                                      </li>
-                                      <li class="StepProgress-item current"><strong>Pending</strong>
-                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Ongoing</strong>
-                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Done</strong>
-                                      <span>Tutorial has been compeleted.</span>
-                                      </li>
-                                    </ul>
-                                </div><br><br>
-                            </ion-content>`;
-
-    tutorial_element.innerHTML = tutorial_element_html;
-
-    nav.push(tutorial_element);
-}
-
-function load_ongoing_tutorial_component(this_tutorial, tutorial_tag, tutorial_status) {
-    let tutorial_element = document.createElement('tutorial');
-    let tutorial_element_html = `
-                            <ion-header translucent>
-                                <ion-toolbar>
-                                    <ion-buttons slot="start">
-                                        <ion-back-button defaultHref="/"></ion-back-button>
-                                    </ion-buttons>
-                                    <ion-buttons slot="end">
-                                        <ion-menu-button></ion-menu-button>
-                                    </ion-buttons>
-                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
-                                </ion-toolbar>
-                            </ion-header>
-
-                            <ion-content fullscreen>
-                                <ion-item style="margin-top:10px;" lines="none">
-                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                        <img src="${this_tutorial.std_avatar}">
-                                    </ion-avatar>
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                        <p>${this_tutorial.std_email}</p>
-                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                                </ion-item>
-
-
-                                <ion-item-divider class="divider"></ion-item-divider>
-                                <ion-item lines="none">
-                                    
-                                        <h6><strong>${this_tutorial.post_title}</strong></h6>
-                                    
-                                </ion-item>
-                                <ion-item style="margin-top:-10px;" lines="none">
-                                    <p>
-                                        ${this_tutorial.post_desc}
-                                    </p>
-                                </ion-item>
-                                        <ion-chip class="module" color="primary">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-label>${tutorial_tag}</ion-label>
-                                </ion-chip>
-                                <!--<ion-chip class="module2" color="danger">
-                                  <ion-icon name="close"></ion-icon>
-                                  <ion-label>Closed</ion-label>
-                                </ion-chip>-->
-                                <ion-chip color="success">
-                                    <ion-icon name="swap"></ion-icon>
-                                    <ion-label>${tutorial_status}</ion-label>
-                                </ion-chip>
-                                <ion-item-divider class="divider2"></ion-item-divider>   
-                                <div class="ion-padding-top">
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                </div> 
-                                 <ion-item-divider class="divider2"></ion-item-divider>   
-                                
-                            <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>Tutorial stage</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                                    <div class="wrapper">
-                                    <ul class="StepProgress">
-                                      <li class="StepProgress-item is-done"><strong>Open</strong>
-                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                                      </li>
-                                      <li class="StepProgress-item is-done"><strong>Pending</strong>
-                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                                      </li>
-                                      <li class="StepProgress-item current"><strong>Ongoing</strong>
-                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Done</strong>
-                                      <span>Tutorial has been compeleted.</span>
-                                      </li>
-                                    </ul>
-                                </div><br><br>
-                            </ion-content>`;
-
-    tutorial_element.innerHTML = tutorial_element_html;
-
-    nav.push(tutorial_element);
-}
-
-function load_done_tutorial_component(this_tutorial, tutorial_tag, tutorial_status) {
-    let tutorial_element = document.createElement('tutorial');
-    let tutorial_element_html = `
-                            <ion-header translucent>
-                                <ion-toolbar>
-                                    <ion-buttons slot="start">
-                                        <ion-back-button defaultHref="/"></ion-back-button>
-                                    </ion-buttons>
-                                    <ion-buttons slot="end">
-                                        <ion-menu-button></ion-menu-button>
-                                    </ion-buttons>
-                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
-                                </ion-toolbar>
-                            </ion-header>
-
-                            <ion-content fullscreen>
-                                <ion-item style="margin-top:10px;" lines="none">
-                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
-                                        <img src="${this_tutorial.std_avatar}">
-                                    </ion-avatar>
-                                    <ion-label>
-                                        <h2><strong>${this_tutorial.std_name}</strong></h2>
-                                        <p>${this_tutorial.std_email}</p>
-                                    </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
-                                </ion-item>
-
-
-                                <ion-item-divider class="divider"></ion-item-divider>
-                                <ion-item lines="none">
-                                    
-                                        <h6><strong>${this_tutorial.post_title}</strong></h6>
-                                    
-                                </ion-item>
-                                <ion-item style="margin-top:-10px;" lines="none">
-                                    <p>
-                                        ${this_tutorial.post_desc}
-                                    </p>
-                                </ion-item>
-                                        <ion-chip class="module" color="primary">
-                                    <ion-icon name="star"></ion-icon>
-                                    <ion-label>${tutorial_tag}</ion-label>
-                                </ion-chip>
-                                <!--<ion-chip class="module2" color="danger">
-                                  <ion-icon name="close"></ion-icon>
-                                  <ion-label>Closed</ion-label>
-                                </ion-chip>-->
-                                <ion-chip color="success">
-                                    <ion-icon name="swap"></ion-icon>
-                                    <ion-label>${tutorial_status}</ion-label>
-                                </ion-chip>
-                                 <ion-item-divider class="divider2"></ion-item-divider>   
-                                <div class="ion-padding-top">
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                </div> 
-                                 <ion-item-divider class="divider2"></ion-item-divider> 
-                            <ion-item lines="none">
-                                    <ion-label>
-                                        <h2><strong>Tutorial stage</strong></h2>
-                                    </ion-label>
-                                </ion-item>
-                                    <div class="wrapper">
-                                    <ul class="StepProgress">
-                                      <li class="StepProgress-item is-done"><strong>Open</strong>
-                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                                      </li>
-                                      <li class="StepProgress-item is-done"><strong>Pending</strong>
-                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                                      </li>
-                                      <li class="StepProgress-item is-done"><strong>Ongoing</strong>
-                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                                      </li>
-                                      <li class="StepProgress-item current"><strong>Done</strong>
-                                      <span>Tutorial has been compeleted.</span>
-                                      </li>
-                                    </ul>
-                                </div><br><br>
-                            </ion-content>`;
-
-    tutorial_element.innerHTML = tutorial_element_html;
-
-    nav.push(tutorial_element);
-
-}
-
-function load_sign_accepted_agreement_component(this_tutorial) {
-    let tutor_tutorial_element = document.createElement('sign-tutorial-agreement');
-    let date = new Date();
-    let year = date.getFullYear();
-    let current_date = year + "-" + parseInt(date.getMonth() + 1) + "-" + date.getDate();
-    console.log(current_date);
-    console.log(year)
-    let tutor_tutorial_element_html = `
-                                <ion-header translucent>
-                                    <ion-toolbar>
-                                        <ion-buttons style="margin-top: -55px;" slot="start">
-                                            <ion-back-button defaultHref="/"></ion-back-button>
-                                            </ion-buttons>
-                                            <ion-buttons style="margin-top: -55px;" slot="end">
-                                                <ion-menu-button></ion-menu-button>
-                                            </ion-buttons>
-                                        <ion-title><h1>Sign Agreement</h1></ion-title>
-                                    </ion-toolbar>
-                                </ion-header>
-                                <ion-content fullscreen> 
-                                    <p class="center">Please enter you signature</p>
-                                    <ion-item-divider class="divider">
-                                    </ion-item-divider>
-                                    <br><br>
-                                    <div class="wrapper">
-                                        <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
-                                    </div>
-                                    <div style="text-align:center"> 
-                                        <button id="undo">Undo</button>
-                                        <button id="clear">Clear</button>
-                                    </div>
-
-                                    <div class="ion-padding-top fields">
-                                        <ion-button expand="block" id="accept_agreement_button" type="submit" class="ion-no-margin">Accept agreement</ion-button>
-                                    </div>
-                                    <p class="success_text3">Please note, once accepted, you cannot cancel the agreement or not turn up. Failure to turn up will result in penalties being imposed.</p> 
-                            </ion-content>`;
-
-    tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
-    nav.push(tutor_tutorial_element);
-
-    let accept_agreement_button;
-    let accept_agreement_handler = async function () {
-        device_feedback();
-
-//async function accept_agreement(this_tutorial) {
-//    if (isCanvasBlank(document.getElementById('signature-pad'))) {
-//        create_ionic_alert("Failed to accept agreement", "Please enter a signature to accept the agreement.", ["OK"]);
-//    } else {
-//        let agreement_accepted_response = await access_route({tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
-//
-//        if (!agreement_accepted_response.error) {
-//            user_notifications.addToNotifications(agreement_accepted_response.tutor_notification.response);
-//            //user_notifications.sendTutorialAcceptedNotification(agreement_generated_response.student_notification.response);
-//
-//            tutor_tutorials.update_tutorial("Pending", agreement_accepted_response.updated_tutorial);
-//            tutor_tutorials.remove_tutor_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
-//        } else {
-//            alert("Error")
-//        }
-//
-//        console.log(agreement_accepted_response);
-//    }
-//}
-    }
-}
-let openPdf;
-let openPdfHandler = async function (this_tutorial) {
-            device_feedback();
-            openPDF(this_tutorial);
-            //console.log(this_tutorial);
-        }
-let ionNavDidChangeEvent = async function () {
-            if (document.getElementById('view_agreement') !== null) {
-                openPdf = document.getElementById("view_agreement");
-                openPdf.addEventListener('click', openPdfHandler, false);
-            }
-
-            let active_component = await nav.getActive();
-
-            //Remove the event listener when we no longer need it
-            if (active_component.component.tagName !== "TUTORIAL") {
-                if (typeof openPdf !== 'undefined') {
-                openPdf.removeEventListener("click", openPdfHandler, false);
-                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-            }
-            }
-        };
-        nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+} 

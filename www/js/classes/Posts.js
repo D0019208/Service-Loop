@@ -176,6 +176,19 @@ class Posts extends User {
         let socket = this.socket;
 
         socket.on('new_tutorial_request', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("New tutorial request available.", "dark", 3000, toast_buttons);
+            new_message_ping.play();
             this.addToPosts(data.response);
             //Add notification
             console.log(data);
@@ -196,6 +209,19 @@ class Posts extends User {
         let socket = this.socket;
 
         socket.on('tutorial_request_accepted', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
             user_notifications.addToNotifications(data.the_notification.response);
             //Add notification
             console.log(data);
@@ -207,18 +233,18 @@ class Posts extends User {
             this.all_posts = this.all_posts.filter(function (obj) {
                 return obj._id !== id;
             });
-        } 
-        
+        }
+
         console.log(this.total_posts)
         this.total_posts--;
         console.log(this.total_posts)
         console.log("Remove by id")
         console.log(this.all_posts);
-        
-        if(typeof document.getElementById('forum_list') !== 'undefined') {
+
+        if (typeof document.getElementById('forum_list') !== 'undefined') {
             document.querySelector('[post_id="' + id + '"]').parentNode.remove();
-            
-            if(this.all_posts.length == 0) {
+
+            if (this.all_posts.length == 0) {
                 document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
             }
         }
@@ -248,14 +274,11 @@ class Posts extends User {
 
     async getAllNotificationPosts() {
         //The list containing all the notifications
-        let notification_list = document.getElementById("list");
-        //The children of the notification list
-        let notification_list_children = notification_list.children;
+        let notification_list = user_notifications.getAllNotifications();
         let post_ids = [];
 
-        console.log(notification_list.children[0].firstElementChild.attributes[3].value)
-        for (let i = 0; i < notification_list_children.length; i++) {
-            post_ids.push(notification_list.children[i].firstElementChild.attributes[3].value);
+        for (let i = 0; i < notification_list.length; i++) {
+            post_ids.push(notification_list[i].post_id);
         }
 
         let notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");

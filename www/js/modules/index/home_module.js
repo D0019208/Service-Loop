@@ -12,6 +12,7 @@ var current_tab;
 var previous_tab;
 var signaturePad;
 var active_nav;
+var new_message_ping = new Audio('sounds/new_message.mp3');
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -38,18 +39,15 @@ document.addEventListener("DOMContentLoaded", async function () {
     //await user.check_session();
 
     //Once we are sure that the users session is valid, we populate the User class
-    //user.setName(await get_secure_storage("user_name"));
+    //let name = await get_secure_storage("user_name")
+    //user.setName(name.replace(/\s+$/, ''));
     //user.setEmail(await get_secure_storage("users_email"));
     //user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
 
-    ////Set status of user to tutor
+    //Set status of user to tutor
     user.setName("Nichita Postolachi");
-    user.setStatus("Student");
+    user.setStatus("Tutor");
     user.setEmail("nikito888@gmail.com");
-    //Set status of user to student
-    //user.setName("Test User");
-    //user.setStatus("Student");
-    //user.setEmail("D00192082@student.dkit.ie");
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -94,17 +92,17 @@ document.addEventListener("DOMContentLoaded", async function () {
     </ion-content>`;
     //nav.push(tutorial_slides);
 
-    
-    
-    if(tutorial_slides_status !== "false")
+
+
+    if (tutorial_slides_status !== "false")
     {
         //Shows tutorial slides
-            let tab_bar = document.querySelector('ion-tab-bar');
+        let tab_bar = document.querySelector('ion-tab-bar');
         tab_bar.style.display = 'none';
         let tutorial_slides = document.createElement('tutorial_slides');
         tutorial_slides.innerHTML = `<ion-header translucent>
           <ion-toolbar>
-            <ion-title><h1>Slides</h1></ion-title>
+            <ion-title><h1>Tutorial</h1></ion-title>
           </ion-toolbar>
         </ion-header>
 
@@ -126,7 +124,11 @@ document.addEventListener("DOMContentLoaded", async function () {
               <h2>Ready to Start?</h2>
               <img src="images/success_blue1.png" alt=""/>
               <br>
-              <p><input type="checkbox" name="checkbox" value="check" id="show_tutorial_slides" /> Do not show again</p>
+              <p>
+                <input type="checkbox" name="slides_check" id="show_tutorial_slides" value="slides_check"/>
+                <label for="show_tutorial_slides">Do not show again</label> 
+              </p>
+              
               <ion-button id="continue_slides" fill="clear" >Continue <ion-icon slot="end" name="arrow-forward"></ion-icon></ion-button>
             </ion-slide>
 
@@ -140,10 +142,9 @@ document.addEventListener("DOMContentLoaded", async function () {
             device_feedback();
             tab_bar.style.display = 'flex';
             var checkBox = document.getElementById("show_tutorial_slides");
-            if (checkBox.checked == true){
+            if (checkBox.checked == true) {
                 localStorage.setItem("tutorial_slides", "false");
-            } 
-            else {
+            } else {
                 localStorage.setItem("tutorial_slides", "true");
             }
             nav.pop();
@@ -158,77 +159,19 @@ document.addEventListener("DOMContentLoaded", async function () {
             let active_component = await nav.getActive();
 
 
-    //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+            //nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 
             //Remove the event listener when we no longer need it
             if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
                 if (typeof closeTutorial !== 'undefined') {
-                closeTutorial.removeEventListener("click", closeTutorialHandler, false);
-                nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-            }
+                    closeTutorial.removeEventListener("click", closeTutorialHandler, false);
+                    nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+                }
             }
         };
         nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
     }
-    
-    
-    
 
-    
-    //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
-    document.addEventListener("backbutton", async function () {
-        let selected_tab = await tab_controller.getSelected();
-        console.log(selected_tab)
-
-        let home_active_component = await nav.getActive();
-        //Checking if the main home nav router is defined
-        if (typeof nav !== 'undefined') {
-            //Checking if the notifications nav router is defined
-            if (typeof nav_notifications !== 'undefined') {
-                //We check here if there is an open component
-                let can_go_back_home = await nav.canGoBack();
-                //If there is an active component and the active compoent matches our criteria, we go back
-                if (can_go_back_home) {
-                    nav.pop();
-                }
-
-                //let notifications_active_component = await nav_notifications.getActive();
-                let can_go_back_notifications = await nav_notifications.canGoBack();
-                console.log(can_go_back_notifications)
-
-                //Check if the routers have any content, if not, we go back to the previous content, if empty, go to previous tab
-                if (can_go_back_notifications) {
-                    nav_notifications.pop();
-                } else {
-                    if (current_tab !== previous_tab) {
-                        tab_controller.select(previous_tab);
-                    }
-                }
-
-                //If there is no active component in either the notifications router or home router, we exit the app
-                if (!can_go_back_notifications && !can_go_back_home && selected_tab === "home") {
-                    navigator.app.exitApp();
-                }
-            } else {
-                //If the nav_notifications router is not defined we check if the main router can go back
-                let can_go_back_home = await nav.canGoBack();
-                //Check if the routers have any content, if not, we go back to the previous content, if empty, go to previous tab
-                if (can_go_back_home) {
-                    nav.pop();
-                } else {
-                    if (current_tab !== previous_tab) {
-                        tab_controller.select(previous_tab);
-                    }
-                }
-
-                console.log(home_active_component)
-
-                if (!can_go_back_home && selected_tab === "home") {
-                    navigator.app.exitApp();
-                }
-            }
-        }
-    }, false);
     //Create home component 
     customElements.define('nav-home', class Home extends HTMLElement {
         async connectedCallback() {
@@ -241,7 +184,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <ion-buttons slot="start">
                                     <ion-back-button></ion-back-button>
                                 </ion-buttons>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                                     <ion-menu-button></ion-menu-button>
                                 </ion-buttons>
                                 <ion-title>
@@ -322,7 +265,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <ion-buttons slot="start">
                                     <ion-back-button></ion-back-button>
                                 </ion-buttons>
-                                <ion-buttons slot="end">
+                                <ion-buttons onclick="device_feedback()" slot="end">
                                     <ion-menu-button></ion-menu-button>
                                 </ion-buttons>
                                 <ion-title>
@@ -345,6 +288,7 @@ document.addEventListener("DOMContentLoaded", async function () {
                                 <h2 style="color:white; margin-top:-5px;"><strong id="user_status">Student</strong></h2>
                                 <br>
                             </ion-label>
+                            <div class="white2"></div>
                             <div class="white_backgound">
                                 <br><br><br>
                                 <!--<ion-button expand="block" >Post Offer</ion-button>
@@ -459,16 +403,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             //Create My Profile page
             document.getElementById('profile').addEventListener('click', async function () {
                 device_feedback();
-                await include("js/modules/index/profile_module.js", "profile_script");
-                load_profile_page(active_nav);
+                
+                if(active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
+                {
+                    await include("js/modules/index/profile_module.js", "profile_script");
+                    load_profile_page(active_nav);
+                }
+                
                 closeMenu();
             });
             document.getElementById('profile_home').addEventListener('click', async function () {
                 device_feedback();
-                await include("js/modules/index/profile_module.js", "profile_script");
-                console.log("Active now");
-                console.log(active_nav);
-                load_profile_page(active_nav);
+                if(active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
+                {
+                    await include("js/modules/index/profile_module.js", "profile_script");
+                    load_profile_page(active_nav);
+                }
+                
                 closeMenu();
             });
             //Create My Tutorials page (If user is Tutor)
@@ -505,38 +456,77 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
 
     });
-    document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        console.log("??")
-        console.log(event)
 
-        if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home" || event.target.innerText == "Notifications" || event.target.parentNode.innerText == "Notifications" || event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
-            console.log("test")
-            nav.popToRoot();
-            if (event.target.innerText == "Home") {
-                if (typeof nav !== 'undefined') {
-                    active_nav = nav;
-                }
-            } else if (event.target.innerText == "Notifications") {
+    document.querySelector("ion-tabs").addEventListener('click', function (event) {
+        console.log("Which tab clicked?")
+        console.log(event)
+        if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
+            device_feedback();
+
+            if (typeof nav !== 'undefined') {
+                active_nav = nav;
+
+                nav.popToRoot();
+
                 if (typeof nav_notifications !== 'undefined') {
-                    active_nav = nav_notifications;
+                    nav_notifications.popToRoot();
                 }
-            } else if (event.target.innerText == "Settings") {
+
                 if (typeof nav_settings !== 'undefined') {
-                    active_nav = nav_settings;
+                    nav_settings.popToRoot();
                 }
             }
+        } else if (event.target.innerText == "Notifications" || event.target.parentNode.innerText.includes("Notifications") || event.target.parentNode.innerText == "Notifications" || event.target.innerText.includes("Notifications")) {
+            device_feedback();
 
             if (typeof nav_notifications !== 'undefined') {
+                active_nav = nav_notifications;
+
                 nav_notifications.popToRoot();
+
+                if (typeof nav !== 'undefined') {
+                    nav.popToRoot();
+                }
+
+                if (typeof nav_settings !== 'undefined') {
+                    nav_settings.popToRoot();
+                }
+            }
+        } else if (event.target.innerText == "Settings" || event.target.parentNode.innerText == "Settings") {
+            device_feedback();
+
+            if (typeof nav_settings !== 'undefined') {
+                active_nav = nav_settings;
+
+                nav_settings.popToRoot();
+
+                if (typeof nav !== 'undefined') {
+                    nav.popToRoot();
+                }
+
+                if (typeof nav_notifications !== 'undefined') {
+                    nav_notifications.popToRoot();
+                }
             }
         }
     });
+
     //Lazy loading - once user clicks on tab, only then do we launch JavaScript
     document.querySelector("ion-tabs").addEventListener('ionTabsWillChange', async function (event) {
         previous_tab = current_tab;
         current_tab = await tab_controller.getSelected();
-        console.log("previous tab " + previous_tab);
-        console.log('current tab ' + current_tab)
+        
+        if(current_tab === 'home') {
+            active_nav = nav;
+        } else if(current_tab === 'notifications') {
+            if(typeof nav_notifications !== 'undefined') {
+                active_nav = nav_notifications;
+            } 
+        } else {
+            if(typeof nav_settings !== 'undefined') {
+                active_nav = nav_settings;
+            }
+        }
 
         if (event.detail.tab === "notifications") {
             await include("js/modules/index/notifications_module.js", "notifications_script");
@@ -544,4 +534,25 @@ document.addEventListener("DOMContentLoaded", async function () {
             await include("js/modules/index/settings_module.js", "settings_script");
         }
     });
+    
+    //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
+    document.addEventListener("backbutton", async function () {
+        let selected_tab = await tab_controller.getSelected(); 
+        let can_go_back = await active_nav.canGoBack(); 
+
+        if (can_go_back) {
+            active_nav.pop();
+        }
+
+        if (!can_go_back && selected_tab === "home") {
+            navigator.app.exitApp();
+        }
+
+        if (!can_go_back && selected_tab !== "home") {
+            if (current_tab !== previous_tab) {
+                tab_controller.select(previous_tab);
+            }
+        } 
+
+    }, false);
 });
