@@ -416,18 +416,23 @@ document.addEventListener("DOMContentLoaded", async function () {
             //Create My Profile page
             document.getElementById('profile').addEventListener('click', async function () {
                 device_feedback();
-
-                await include("js/modules/index/profile_module.js", "profile_script");
-                load_profile_page(active_nav);
-
+                
+                if(active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
+                {
+                    await include("js/modules/index/profile_module.js", "profile_script");
+                    load_profile_page(active_nav);
+                }
                 closeMenu();
             });
             document.getElementById('profile_home').addEventListener('click', async function () {
                 device_feedback();
 
-                await include("js/modules/index/profile_module.js", "profile_script");
-                load_profile_page(active_nav);
-
+                if(active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
+                {
+                    await include("js/modules/index/profile_module.js", "profile_script");
+                    load_profile_page(active_nav);
+                }
+                
                 closeMenu();
             });
             //Create My Tutorials page (If user is Tutor)
@@ -535,14 +540,15 @@ document.addEventListener("DOMContentLoaded", async function () {
         previous_tab = current_tab;
         current_tab = await tab_controller.getSelected();
 
-        if (current_tab === 'home') {
+        
+        if(current_tab === 'home') {
             active_nav = nav;
-        } else if (current_tab === 'notifications') {
-            if (typeof nav_notifications !== 'undefined') {
+        } else if(current_tab === 'notifications') {
+            if(typeof nav_notifications !== 'undefined') {
                 active_nav = nav_notifications;
-            }
+            } 
         } else {
-            if (typeof nav_settings !== 'undefined') {
+            if(typeof nav_settings !== 'undefined') {
                 active_nav = nav_settings;
             }
         }
@@ -554,10 +560,12 @@ document.addEventListener("DOMContentLoaded", async function () {
         }
     });
 
+    
     //Controler for enabling the back button for Ionic Router, needs to be updated with all new components added
     document.addEventListener("backbutton", async function () {
-        let selected_tab = await tab_controller.getSelected();
-        let can_go_back = await active_nav.canGoBack();
+        let selected_tab = await tab_controller.getSelected(); 
+        let can_go_back = await active_nav.canGoBack(); 
+
 
         if (can_go_back) {
             active_nav.pop();
@@ -571,7 +579,6 @@ document.addEventListener("DOMContentLoaded", async function () {
             if (current_tab !== previous_tab) {
                 tab_controller.select(previous_tab);
             }
-        }
-
+        } 
     }, false);
 });
