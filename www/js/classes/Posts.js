@@ -1,6 +1,6 @@
 class Posts extends User {
-    constructor(posts, name, email, status, modules, socket) {
-        super(name, email, status, modules, socket);
+    constructor(posts, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
+        super(name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
 
         this.all_posts = posts.response;
 
@@ -47,7 +47,7 @@ class Posts extends User {
                 <ion-card class="test post" post_id="${posts[i + originalLength]._id}" post_modules="${posts[i + originalLength].post_modules.join(', ')}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${posts[i + originalLength].std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${posts[i + originalLength].post_title}</p>
@@ -144,7 +144,7 @@ class Posts extends User {
                 <ion-card class="test post" post_id="${post._id}" post_modules="${post.post_modules.join(', ')}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${post.std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${post.post_title}</p>

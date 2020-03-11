@@ -516,7 +516,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
                     let tutorial_status = this_post.post_status;
                     let tutorial_tag = this_post.post_modules.join(', ');
-                    load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                    load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                 };
             } else {
                 open_accepted_tutorial_post_button = document.getElementById('open_tutorial');
@@ -860,10 +860,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
         let new_tutorial_agreement_reject_event_handler = function () {
             device_feedback();
 
+
             if (user.getStatus() === "Student" && this_post.std_name.replace(/\s+$/, '') !== user.getName()) {
-                load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
             } else if (user.getStatus() === "Student" && this_post.std_name.replace(/\s+$/, '') === user.getName()) {
-                load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
             } else if (user.getStatus() === "Tutor" && this_post.std_name.replace(/\s+$/, '') !== user.getName()) {
                 load_pending_tutorial_component_not_signed(nav_notifications, this_post);
             } else {
@@ -879,6 +880,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
                 open_tutorial_post_button.addEventListener('click', new_tutorial_agreement_reject_event_handler, false);
             }
+
 
             let notifications_active_component = await nav_notifications.getActive();
 

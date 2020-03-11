@@ -1,9 +1,20 @@
 class User {
-    constructor(name = "", email = "", status = "", modules = ["none"], socket = "") {
+    constructor(name = "", email = "", status = "", modules = ["none"], avatar = "", open_tutorials = 0, pending_tutorials = 0, ongoing_tutorials = 0, done_tutorials = 0, tutored_pending_tutorials = 0, tutored_ongoing_tutorials = 0, tutored_done_tutorials = 0, socket = "") {
         this.name = name;
         this.email = email;
         this.status = status;
         this.modules = modules;
+        this.avatar = avatar;
+
+        this.open_tutorials = open_tutorials;
+        this.pending_tutorials = pending_tutorials;
+        this.ongoing_tutorials = ongoing_tutorials;
+        this.done_tutorials = done_tutorials;
+
+        this.tutored_pending_tutorials = tutored_pending_tutorials;
+        this.tutored_ongoing_tutorials = tutored_ongoing_tutorials;
+        this.tutored_done_tutorials = tutored_done_tutorials;
+
         this.socket = socket;
     }
 
@@ -39,6 +50,72 @@ class User {
         return this.modules;
     }
 
+    getAvatar() {
+        return this.avatar;
+    }
+
+    setAvatar(avatar) {
+        this.avatar = avatar;
+    }
+
+    //My tutorials
+    getOpenTutorials() {
+        return this.open_tutorials;
+    }
+
+    setOpenTutorials(open_tutorials) {
+        this.open_tutorials = open_tutorials;
+    }
+
+    getPendingTutorials() {
+        return this.pending_tutorials;
+    }
+
+    setPendingTutorials(pending_tutorials) {
+        this.pending_tutorials = pending_tutorials;
+    }
+
+    getOngoingTutorials() {
+        return this.ongoing_tutorials;
+    }
+
+    setOngoingTutorials(ongoing_tutorials) {
+        this.ongoing_tutorials = ongoing_tutorials;
+    }
+
+    getDoneTutorials() {
+        return this.done_tutorials;
+    }
+
+    setDoneTutorials(done_tutorials) {
+        this.done_tutorials = done_tutorials;
+    }
+
+    //My tutored tutorials
+    getPendingTutoredTutorials() {
+        return this.tutored_pending_tutorials;
+    }
+
+    setPendingTutoredTutorials(tutored_pending_tutorials) {
+        this.tutored_pending_tutorials = tutored_pending_tutorials;
+    }
+
+    getOngoingTutoredTutorials() {
+        return this.tutored_ongoing_tutorials;
+    }
+
+    setOngoingTutoredTutorials(tutored_ongoing_tutorials) {
+        this.tutored_ongoing_tutorials = tutored_ongoing_tutorials;
+    }
+
+    getDoneTutoredTutorials() {
+        return this.tutored_done_tutorials;
+    }
+
+    setDoneTutoredTutorials(tutored_done_tutorials) {
+        this.tutored_done_tutorials = tutored_done_tutorials;
+    }
+
     setSocket(socket) {
         this.socket = socket;
     }
@@ -47,10 +124,11 @@ class User {
         return this.socket;
     }
 
-    async check_session() {
+    async check_session(email) {
         try {
             let data = {
-                token: await get_secure_storage("jwt_session")
+                token: await get_secure_storage("jwt_session"),
+                email: email
             };
 
             const rawResponse = await fetch('http://serviceloopserver.ga/verify_token', {
@@ -64,19 +142,62 @@ class User {
 
             const content = await rawResponse.json();
 
-            if (content !== "Session valid") {
+            if (content.session_response !== "Session valid") {
                 //alert("Session NOT valid")
                 await remove_secure_storage("jwt_session");
                 window.location.href = "login.html";
                 return;
             } else {
-                //alert("Session valid.") 
+                this.avatar = content.user.user_avatar;
+
+                this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
+                this.pending_tutorials = content.tutorials_count.my_tutorials.pending_count;
+                this.ongoing_tutorials = content.tutorials_count.my_tutorials.ongoing_count;
+                this.done_tutorials = content.tutorials_count.my_tutorials.done_count;
+
+                this.tutored_pending_tutorials = content.tutorials_count.my_tutored_tutorials.pending_count;
+                this.tutored_ongoing_tutorials = content.tutorials_count.my_tutored_tutorials.ongoing_count;
+                this.tutored_done_tutorials = content.tutorials_count.my_tutored_tutorials.done_count;
+
                 return "Proceed";
             }
 
         } catch (ex) {
             console.log(ex);
             window.location.href = "login.html";
+            return;
+        }
+    }
+
+    async check_session_local(email) {
+        try {
+            let data = {
+                token: "dsfdf",
+                email: email
+            };
+
+            const rawResponse = await fetch('http://localhost:3001/localhost', {
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            const content = await rawResponse.json();
+            this.avatar = content.user.user_avatar;
+
+            this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
+            this.pending_tutorials = content.tutorials_count.my_tutorials.pending_count;
+            this.ongoing_tutorials = content.tutorials_count.my_tutorials.ongoing_count;
+            this.done_tutorials = content.tutorials_count.my_tutorials.done_count;
+
+            this.tutored_pending_tutorials = content.tutorials_count.my_tutored_tutorials.pending_count;
+            this.tutored_ongoing_tutorials = content.tutorials_count.my_tutored_tutorials.ongoing_count;
+            this.tutored_done_tutorials = content.tutorials_count.my_tutored_tutorials.done_count;
+        } catch (ex) {
+            console.log(ex);
             return;
         }
     }
@@ -119,7 +240,7 @@ class User {
 
         //Delete the current notifications so that we can add the new ones IF we have initialized the notifications module
         if (typeof document.getElementById('notifications_script') == null) {
-            document.getElementById('list').innerHTML = "";
+            document.getElementById('list').innerHTML = ""; 
             if (user_notifications.getAllNotifications().length <= 7) {
                 user_notifications.appendNotifications(user_notifications.getAllNotifications().length, document.getElementById('list'));
             } else {
