@@ -1,4 +1,4 @@
-function load_request_tutorial() {
+function load_request_tutorial(nav_controller) {
     customElements.get('nav-post-tutorial') || customElements.define('nav-post-tutorial', class RequestTutorial extends HTMLElement {
         constructor() {
             super();
@@ -75,6 +75,7 @@ function load_request_tutorial() {
                 request_tutorial_button.disabled = true;
                 //Data to pass to the server
                 let data = {
+                    user_avatar: user.getAvatar(),
                     request_title: document.getElementById("tutorial_title").value,
                     request_description: document.getElementById("tutorial_description").value,
                     request_modules: [document.getElementById("tutorial_modules").value],
@@ -93,9 +94,9 @@ function load_request_tutorial() {
 
                 //If no error occured, we add a new notification to the users current notfifications that his request was successful
                 if (!tutorial_request_response.error) {
-                    user_notifications.addToNotifications({notification_opened: false, _id: tutorial_request_response.response[1]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: "https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png", notification_title: "Tutorial request sent", notification_desc: tutorial_request_response.response[1].notification_desc, notification_desc_trunc: tutorial_request_response.response[1].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[1].notification_posted_on, notification_modules: tutorial_request_response.response[1].notification_modules, notification_tags: tutorial_request_response.response[1].notification_tags});
+                    user_notifications.addToNotifications({notification_opened: false, _id: tutorial_request_response.response[1]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: user.getAvatar(), notification_title: "Tutorial request sent", notification_desc: tutorial_request_response.response[1].notification_desc, notification_desc_trunc: tutorial_request_response.response[1].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[1].notification_posted_on, notification_modules: tutorial_request_response.response[1].notification_modules, notification_tags: tutorial_request_response.response[1].notification_tags});
                     //Send a new notification to all tutors
-                    user_notifications.sendNewNotification({notification_opened: false, _id: tutorial_request_response.response[2]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: "https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png", notification_title: "New tutorial request", notification_desc: tutorial_request_response.response[2].notification_desc, notification_desc_trunc: tutorial_request_response.response[2].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[2].notification_posted_on, notification_modules: tutorial_request_response.response[2].notification_modules, notification_tags: tutorial_request_response.response[2].notification_tags})
+                    user_notifications.sendNewNotification({notification_opened: false, _id: tutorial_request_response.response[2]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: user.getAvatar(), notification_title: "New tutorial request", notification_desc: tutorial_request_response.response[2].notification_desc, notification_desc_trunc: tutorial_request_response.response[2].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[2].notification_posted_on, notification_modules: tutorial_request_response.response[2].notification_modules, notification_tags: tutorial_request_response.response[2].notification_tags})
 
                     //Send a tutorial to all available and eligible tutors
                     posts.sendNewTutorial(tutorial_request_response);
@@ -160,7 +161,7 @@ console.log("Notification posts 2")
                     ];
 
                     create_toast("You have successfully requested a tutorial.", "dark", 2000, toast_buttons);
-                    nav.pop();
+                    nav_controller.pop();
                     //document.querySelector("ion-back-button").click();
                 } else {
                     //If an error occured, display an error and make the button clickable again
@@ -183,6 +184,6 @@ console.log("Notification posts 2")
         }
     });
 
-    nav.push('nav-post-tutorial');
+    nav_controller.push('nav-post-tutorial');
 }
 

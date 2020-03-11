@@ -1,6 +1,6 @@
 class Tutor_Tutorials extends User {
-    constructor(tutor_tutorials, name, email, status, modules, socket) {
-        super(name, email, status, modules, socket);
+    constructor(tutor_tutorials, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
+        super(name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
 
         this.all_tutor_tutorials = tutor_tutorials.response;
 
@@ -106,7 +106,7 @@ class Tutor_Tutorials extends User {
                 <ion-card class="test post" post_id="${tutorial._id}" post_modules="${tutorial.post_modules.join(', ')}" post_status="${tutorial.post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${tutorial.std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${tutorial.post_title}</p>
@@ -156,7 +156,7 @@ class Tutor_Tutorials extends User {
                 <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${tutorials[i + originalLength].std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${tutorials[i + originalLength].post_title}</p>
@@ -313,7 +313,7 @@ class Tutor_Tutorials extends User {
                 <ion-card class="test post" post_id="${this_tutorial._id}" post_modules="${this_tutorial.post_modules.join(', ')}" post_status="${this_tutorial.post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${this_tutorial.std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${this_tutorial.post_title}</p>
