@@ -335,7 +335,8 @@ function load_profile_page(nav_controller) {
                         console.log(skills_array);
                         
                         access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
-
+                        set_secure_storage("user_modules", skills_array); 
+                        
                         create_toast("Skills saved successfully.", "dark", 2000, toast_buttons); 
                         
                         dismissModal(currentModal);
