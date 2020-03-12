@@ -37,11 +37,14 @@ document.addEventListener("deviceready", async function () {
     current_tab = 'home';
     previous_tab = 'home';
 
-    //Once we are sure that the users session is valid, we populate the User class
-    let name = await get_secure_storage("user_name")
-    user.setName(name.replace(/\s+$/, ''));
-    user.setEmail(await get_secure_storage("users_email"));
-    user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    //Once we are sure that the users session is valid, we populate the User class 
+    let name = await get_secure_storage("user_name"); 
+    user.setName(name.replace(/\s+$/, '')); 
+    user.setEmail(await get_secure_storage("users_email")); 
+    
+    if(IsJsonString(await get_secure_storage("user_status"))) {
+        user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+    }
 
     //Set status of user to tutor
     //user.setName("Nichita Postolachi".replace(/\s+$/, ''));

@@ -184,7 +184,7 @@ function set_secure_storage(key, value) {
         cordova.plugins.SecureKeyStore.set(function (res) {
             resolve("Successfully stored string!")
         }, function (error) {
-            reject(error)
+            resolve(error)
         }, key, value);
     });
 }
@@ -202,7 +202,7 @@ function get_secure_storage(key) {
         cordova.plugins.SecureKeyStore.get(function (email) {
             resolve(email);
         }, function (error) {
-            reject(error);
+            resolve(error);
         }, key);
     });
 }
@@ -219,7 +219,7 @@ function remove_secure_storage(key) {
         cordova.plugins.SecureKeyStore.remove(function (res) {
             resolve("Successfully removed from secure storage!");
         }, function (error) {
-            reject(error);
+            resolve(error);
         }, key);
     });
 }
@@ -1916,4 +1916,13 @@ function conver_to_time(date) {
     }
 
     return hours + ":" + minutes;
+}
+
+function IsJsonString(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
 }
