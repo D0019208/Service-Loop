@@ -96,6 +96,14 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
       "clobbers": [
         "CameraPopoverHandle"
       ]
+    },
+    {
+      "id": "onesignal-cordova-plugin.OneSignal",
+      "file": "plugins/onesignal-cordova-plugin/www/OneSignal.js",
+      "pluginId": "onesignal-cordova-plugin",
+      "clobbers": [
+        "OneSignal"
+      ]
     }
   ];
   module.exports.metadata = {
@@ -107,6 +115,7 @@ cordova.define('cordova/plugin_list', function(require, exports, module) {
     "cordova-plugin-velda-devicefeedback": "0.0.2",
     "cordova-plugin-android-fingerprint-auth": "1.5.0",
     "cordova-plugin-qr-barcode-scanner": "8.0.3",
-    "cordova-plugin-camera": "4.1.0"
+    "cordova-plugin-camera": "4.1.0",
+    "onesignal-cordova-plugin": "2.8.4"
   };
 });

@@ -29,7 +29,7 @@ function all_tutor_tutorials() {
 
                 tutor_tutorials_loaded = true;
 
-                tutor_tutorials = new Tutor_Tutorials(tutor_tutorials_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), tutor_tutorials_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
             }
 
             let html;
