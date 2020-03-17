@@ -10,6 +10,7 @@ let tutor_tutorials_pending_loaded = false;
 let tutor_tutorials_ongoing_loaded = false;
 let tutor_tutorials_done_loaded = false;
 
+
 function all_tutor_tutorials() {
     customElements.get('nav-my-tutorials') || customElements.define('nav-my-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
@@ -66,6 +67,7 @@ function all_tutor_tutorials() {
                     <ion-list-header id="pending_tutor_tutorials_header">
                         NO PENDING TUTORIALS
                     </ion-list-header> 
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -76,6 +78,7 @@ function all_tutor_tutorials() {
                     <ion-list-header id="ongoing_tutor_tutorials_header">
                         NO ONGOING TUTORIALS  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -86,6 +89,7 @@ function all_tutor_tutorials() {
                     <ion-list-header id="done_tutorials_header">
                         NO DONE TUTORIALS  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -128,6 +132,7 @@ function all_tutor_tutorials() {
                     <ion-list-header id="pending_tutor_tutorials_header">
                         ${tutor_tutorials.pending_tutor_tutorials.length ? "PENDING TUTORIALS" : "NO PENDING TUTORIALS"} 
                     </ion-list-header> 
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -138,6 +143,7 @@ function all_tutor_tutorials() {
                     <ion-list-header id="ongoing_tutor_tutorials_header">
                         ${tutor_tutorials.ongoing_tutor_tutorials.length ? "ONGOING TUTORIALS" : "NO ONGOING TUTORIALS"}  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -148,6 +154,7 @@ function all_tutor_tutorials() {
                     <ion-list-header id="done_tutor_tutorials_header">
                         ${tutor_tutorials.done_tutor_tutorials.length ? "DONE TUTORIALS" : "NO DONE TUTORIALS"}  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -196,7 +203,46 @@ function all_tutor_tutorials() {
 //
 //            // Insert the new node before the reference node
 //            doneReferenceNode.parentNode.insertBefore(append_done_tutorials_infinite_scroll, doneReferenceNode.nextSibling);
+            
+            let popover_title = "";
+            let popover_content = "";
+            //Ionic popover 
+            let currentPopover = null;
+            var popover;
+            const buttons = document.querySelectorAll('.info');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', handleButtonClick);
+            }
 
+            async function handleButtonClick(ev) {
+                popover = await popoverController.create({
+                    component: 'popover-example-page',
+                    event: ev,
+                    translucent: true,
+                    mode: "ios"
+                });
+                currentPopover = popover;
+                return popover.present();
+            }
+
+            function dismissPopover() {
+                if (currentPopover) {
+                    currentPopover.dismiss().then(() => {
+                        currentPopover = null;
+                    });
+                }
+            }
+
+            customElements.get('popover-example-page') || customElements.define('popover-example-page', class ModalContent extends HTMLElement {
+                connectedCallback() {
+                    this.innerHTML = `
+                  <ion-list>
+                    <ion-list-header id="info_title" style="font-weight: bold; font-size: x-large;">${popover_title}</ion-list-header>
+                    <p style="margin-left: 15px; margin-right: 15px;">${popover_content}</p>
+                  </ion-list>
+                `;
+                }
+            });
 
             //We set the tutorials length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value 
             tutor_tutorials.pending_tutor_tutorials_length = 0;
@@ -252,10 +298,16 @@ function all_tutor_tutorials() {
             for (let i = 0; i < segments.length; i++) {
                 segments[i].addEventListener('ionChange', (ev) => {
                     if (ev.detail.value === "tutor_tutorials_pending_segment") {
+                        popover_title = "Pending";
+                        popover_content = "All tutorials that need to be confirmed by tutor and student";
+                        
                         segment_elements.ongoing.classList.add("hide");
                         segment_elements.pending.classList.remove("hide");
                         segment_elements.done.classList.add("hide");
                     } else if (ev.detail.value === "tutor_tutorials_ongoing_segment") {
+                        popover_title = "Ongoing";
+                        popover_content = "All tutorials that are in progress";
+                        
                         segment_elements.ongoing.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
                         segment_elements.done.classList.add("hide");
@@ -293,6 +345,9 @@ function all_tutor_tutorials() {
                             tutor_tutorials_ongoing_loaded = true;
                         }
                     } else if (ev.detail.value === "tutor_tutorials_done_segment") {
+                        popover_title = "Done";
+                        popover_content = "All tutorials that have being completed";
+                        
                         segment_elements.done.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
                         segment_elements.ongoing.classList.add("hide");
@@ -549,9 +604,42 @@ function done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {
                                                               <span>Tutorial has been compeleted.</span>
                                                               </li>
                                                             </ul>
-                                                        </div><br><br>
+                                                        </div>
+                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <ion-item-divider class="divider"></ion-item-divider>
+                                                            <ion-list-header class="collapsible">
+                                                                <strong>TUTORIAL LINKS</strong>
+                                                            </ion-list-header>
+                                                        <ion-list class="content">
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                                            </ion-item>
+                                                        </ion-list>   
+                                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
 
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
+    
+    //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+        
     nav.push(tutor_tutorial_element);
 }

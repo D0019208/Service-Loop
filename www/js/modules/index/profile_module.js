@@ -95,7 +95,7 @@ function load_profile_page(nav_controller) {
                   <strong>SKILLS</strong>
                 </ion-list-header>
                 <ion-button id="edit_skills" class='edit_skills' fill="outline" slot="end">Edit</ion-button>
-                <ion-list id="profile_skills" style='margin-left:10px;'>
+                <ion-list id="profile_skills" style='margin-left:10px;margin-top: 1px;'>
                 </ion-list>
             </ion-list>
         </ion-content>
@@ -336,10 +336,16 @@ function load_profile_page(nav_controller) {
                         
                         access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
                         set_secure_storage("user_modules", skills_array); 
-                        
+                        user.setModules(skills_array);
+
                         create_toast("Skills saved successfully.", "dark", 2000, toast_buttons); 
                         
                         dismissModal(currentModal);
+                        
+                        document.getElementById("profile_skills").innerHTML = "";  //update skills
+                        for (var i = 0; i < user.modules.length; i++) {
+                            document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
+                        }
                     });
 
                     document.getElementById("modal_close").addEventListener('click', () => {
@@ -365,4 +371,3 @@ function load_profile_page(nav_controller) {
 
     nav_controller.push('nav-profile');
 }
-

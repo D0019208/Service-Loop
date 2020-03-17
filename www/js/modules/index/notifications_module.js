@@ -1048,10 +1048,42 @@ function load_post_agreement_signed_component(this_post) {
                                                               <span>Tutorial has been compeleted.</span>
                                                               </li>
                                                             </ul>
-                                                        </div><br><br>
+                                                        </div>
+                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <ion-item-divider class="divider"></ion-item-divider>
+                                                            <ion-list-header class="collapsible">
+                                                                <strong>TUTORIAL LINKS</strong>
+                                                            </ion-list-header>
+                                                        <ion-list class="content">
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                                            </ion-item>
+                                                        </ion-list>    
+                                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
+    //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+    
     active_nav.push(tutorial_accepted_component);
 }

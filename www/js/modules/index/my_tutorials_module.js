@@ -12,6 +12,7 @@ let my_requested_posts_pending_loaded = false;
 let my_requested_posts_ongoing_loaded = false;
 let my_requested_posts_done_loaded = false;
 
+
 function load_my_requested_tutorials(nav_controller) {
     customElements.get('nav-my-requested-tutorials') || customElements.define('nav-my-requested-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
@@ -75,6 +76,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="open_tutorials_header">
                         NO OPEN TUTORIALS
                     </ion-list-header> 
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="open-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -86,6 +88,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="pending_tutorials_header">
                         NO PENDING TUTORIALS
                     </ion-list-header> 
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -96,6 +99,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="ongoing_tutorials_header">
                         NO ONGOING TUTORIALS  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -106,6 +110,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="done_tutorials_header">
                         NO DONE TUTORIALS  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -154,6 +159,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="open_tutorials_header">
                         ${tutorials.open_tutorials.length ? "OPEN TUTORIALS" : "NO OPEN TUTORIALS"}
                     </ion-list-header> 
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="open-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -165,6 +171,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="pending_tutorials_header">
                         ${tutorials.pending_tutorials.length ? "PENDING TUTORIALS" : "NO PENDING TUTORIALS"} 
                     </ion-list-header> 
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -175,6 +182,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="ongoing_tutorials_header">
                         ${tutorials.ongoing_tutorials.length ? "ONGOING TUTORIALS" : "NO ONGOING TUTORIALS"}  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -185,6 +193,7 @@ function load_my_requested_tutorials(nav_controller) {
                     <ion-list-header id="done_tutorials_header">
                         ${tutorials.done_tutorials.length ? "DONE TUTORIALS" : "NO DONE TUTORIALS"}  
                     </ion-list-header>  
+                    <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
                 
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -233,7 +242,47 @@ function load_my_requested_tutorials(nav_controller) {
 //
 //            // Insert the new node before the reference node
 //            doneReferenceNode.parentNode.insertBefore(append_done_tutorials_infinite_scroll, doneReferenceNode.nextSibling);
+            
+            
+            let popover_title = "";
+            let popover_content = "";
+            //Ionic popover 
+            let currentPopover = null;
+            var popover;
+            const buttons = document.querySelectorAll('.info');
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].addEventListener('click', handleButtonClick);
+            }
 
+            async function handleButtonClick(ev) {
+                popover = await popoverController.create({
+                    component: 'popover-example-page',
+                    event: ev,
+                    translucent: true,
+                    mode: "ios"
+                });
+                currentPopover = popover;
+                return popover.present();
+            }
+
+            function dismissPopover() {
+                if (currentPopover) {
+                    currentPopover.dismiss().then(() => {
+                        currentPopover = null;
+                    });
+                }
+            }
+
+            customElements.get('popover-example-page') || customElements.define('popover-example-page', class ModalContent extends HTMLElement {
+                connectedCallback() {
+                    this.innerHTML = `
+                  <ion-list>
+                    <ion-list-header id="info_title" style="font-weight: bold; font-size: x-large;">${popover_title}</ion-list-header>
+                    <p style="margin-left: 15px; margin-right: 15px;">${popover_content}</p>
+                  </ion-list>
+                `;
+                }
+            });
 
             //We set the tutorials length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value
             tutorials.open_tutorials_length = 0;
@@ -249,6 +298,8 @@ function load_my_requested_tutorials(nav_controller) {
             console.log("Tutorials")
             console.log(tutorials);
             console.log(tutorials.get_open_tutorials());
+
+
 
 
 
@@ -300,11 +351,17 @@ function load_my_requested_tutorials(nav_controller) {
             for (let i = 0; i < segments.length; i++) {
                 segments[i].addEventListener('ionChange', (ev) => { 
                     if (ev.detail.value === "open_segment") {
+                        popover_title = "Open";
+                        popover_content = "All tutorials with no assigned tutor";
+                        
                         segment_elements.open.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
                         segment_elements.ongoing.classList.add("hide");
                         segment_elements.done.classList.add("hide");
                     } else if (ev.detail.value === "pending_segment") {
+                        popover_title = "Pending";
+                        popover_content = "All tutorials that need to be confirmed by tutor and student";
+                        
                         segment_elements.pending.classList.remove("hide");
                         segment_elements.open.classList.add("hide");
                         segment_elements.ongoing.classList.add("hide");
@@ -343,6 +400,9 @@ function load_my_requested_tutorials(nav_controller) {
                             my_requested_posts_pending_loaded = true;
                         }
                     } else if (ev.detail.value === "ongoing_segment") {
+                        popover_title = "Ongoing";
+                        popover_content = "All tutorials that are in progress";
+                        
                         segment_elements.ongoing.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
                         segment_elements.open.classList.add("hide");
@@ -381,6 +441,9 @@ function load_my_requested_tutorials(nav_controller) {
                             my_requested_posts_ongoing_loaded = true;
                         }
                     } else if (ev.detail.value === "done_segment") {
+                        popover_title = "Done";
+                        popover_content = "All tutorials that have being completed";
+                        
                         segment_elements.done.classList.remove("hide");
                         segment_elements.pending.classList.add("hide");
                         segment_elements.ongoing.classList.add("hide");

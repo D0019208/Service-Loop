@@ -575,7 +575,21 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                   <span>Tutorial has been compeleted.</span>
                   </li>
                 </ul>
-            </div><br><br>
+            </div>
+            <br><br><br><br><br><br><br><br><br>
+            <ion-item-divider class="divider"></ion-item-divider>
+                <ion-list-header class="collapsible">
+                    <strong>TUTORIAL LINKS</strong>
+                </ion-list-header>
+            <ion-list class="content">
+                <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                    <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                </ion-item>
+                <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                    <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                </ion-item>
+            </ion-list>
+            <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
         </ion-content>`;
     tutorial_element.innerHTML = tutorial_element_html;
 
@@ -630,6 +644,24 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     }
 
     let ionNavDidChangeEvent = async function () {
+        //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+        
         if (document.getElementById('tutorial_log') !== null) {
             tutorial_log = document.getElementById('tutorial_log');
             tutorial_log.addEventListener('click', tutorial_log_handler, false);
@@ -920,7 +952,21 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                               <span>Tutorial has been compeleted.</span>
                                                               </li>
                                                             </ul>
-                                                        </div><br><br>
+                                                        </div>
+                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <ion-item-divider class="divider"></ion-item-divider>
+                                                            <ion-list-header class="collapsible">
+                                                                <strong>TUTORIAL LINKS</strong>
+                                                            </ion-list-header>
+                                                        <ion-list class="content">
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                                            </ion-item>
+                                                        </ion-list> 
+                                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
 
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
@@ -946,6 +992,24 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     }
 
     let ionNavDidChangeEvent = async function () {
+        //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+        
         if (document.getElementById('view_agreement') !== null) {
             openPdf = document.getElementById("view_agreement");
             openPdf.addEventListener('click', openPdfHandler, false);
@@ -1063,7 +1127,21 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                                               <span>Tutorial has been compeleted.</span>
                                                               </li>
                                                             </ul>
-                                                        </div><br><br>
+                                                        </div>
+                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <ion-item-divider class="divider"></ion-item-divider>
+                                                            <ion-list-header class="collapsible">
+                                                                <strong>TUTORIAL LINKS</strong>
+                                                            </ion-list-header>
+                                                        <ion-list class="content">
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                                            </ion-item>
+                                                        </ion-list>  
+                                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
@@ -1076,6 +1154,24 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     };
 
     let ionNavDidChangeEvent = async function () {
+        //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+        
         if (document.getElementById('tutorial_log') !== null) {
             tutorial_log = document.getElementById('tutorial_log');
             tutorial_log.addEventListener('click', tutorial_log_handler, false);
@@ -1129,13 +1225,14 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
                                     </ion-item>
 
                                     <br><br>
+                                    <ion-item lines="none" style="text-align:center;"><ion-label>Your signature <ion-text color="danger">*</ion-text></ion-label></ion-item>
                                     <div class="wrapper">
                                         <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
                                     </div>
                                     <div style="text-align:center">
                                         
-                                        <button id="undo">Undo</button>
-                                        <button id="clear">Clear</button>
+                                        <ion-button style="height: 25px;" fill="outline" id="undo">Undo</ion-button>
+                                        <ion-button style="height: 25px;" fill="outline" id="clear">Clear</ion-button>
                                     </div>
 
                                     <div class="ion-padding-top fields">
@@ -1155,6 +1252,24 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
     };
 
     let ionNavDidChangeEvent = async function () {
+        //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+        
         if (document.getElementById('signature-pad') !== null) {
             await include("js/signature_pad.min.js", "signature_pad");
             drawing_pad();
@@ -1388,8 +1503,8 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
                                         <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
                                     </div>
                                     <div style="text-align:center"> 
-                                        <button id="undo">Undo</button>
-                                        <button id="clear">Clear</button>
+                                        <ion-button style="height: 25px;" fill="outline" id="undo">Undo</ion-button>
+                                        <ion-button style="height: 25px;" fill="outline" id="clear">Clear</ion-button>
                                     </div>
 
                                     <div class="ion-padding-top fields">
@@ -1608,6 +1723,8 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 </ion-chip>
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="begin_tutorial">Begin Tutorial</ion-button>
+                                    <ion-button style="display:none" expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
@@ -1634,12 +1751,33 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                       <span>Tutorial has been compeleted.</span>
                                       </li>
                                     </ul>
-                                </div><br><br>
+                                </div>
+                                    <br><br><br><br><br><br><br><br><br>
+                                    <ion-item-divider class="divider"></ion-item-divider>
+                                        <ion-list-header class="collapsible">
+                                            <strong>TUTORIAL LINKS</strong>
+                                        </ion-list-header>
+                                    <ion-list class="content">
+                                        <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                            <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                        </ion-item>
+                                        <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                            <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                        </ion-item>
+                                    </ion-list>
+                                     
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                             </ion-content>`;
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_controller.push(tutorial_accepted_component);
+    
+    
+    let begin_tutorial;
+    let begin_tutorial_handler = async function () {
+        activate_bar_code_scanner();
+    };
 
     let tutorial_log;
     let tutorial_log_handler = async function () {
@@ -1661,6 +1799,24 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     }
 
     let ionNavDidChangeEvent = async function () {
+        //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+        
         if (document.getElementById('view_agreement') !== null) {
             openPdf = document.getElementById("view_agreement");
             openPdf.addEventListener('click', openPdfHandler, false);
@@ -1675,6 +1831,11 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
             validate_agreement = document.getElementById("verify_agreement");
             validate_agreement.addEventListener('click', validate_agreement_handler, false);
         }
+        
+        if (document.getElementById('begin_tutorial') !== null) {
+            begin_tutorial = document.getElementById('begin_tutorial');
+            begin_tutorial.addEventListener('click', begin_tutorial_handler, false);
+        }
 
         let notifications_active_component = await nav_controller.getActive();
 
@@ -1682,6 +1843,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
             openPdf.removeEventListener("click", openPdfHandler, false);
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             validate_agreement.removeEventListener('click', validate_agreement_handler, false);
+            begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
@@ -1777,9 +1939,29 @@ function load_open_tutorial_component(nav_controller, this_post) {
                                                               <span>Tutorial has been compeleted.</span>
                                                               </li>
                                                             </ul>
-                                                        </div><br><br>
+                                                        </div>
+                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <ion-item-divider class="divider"></ion-item-divider>
+                                                            <ion-list-header class="collapsible">
+                                                                <strong>TUTORIAL LINKS</strong>
+                                                            </ion-list-header>
+                                                        <ion-list class="content">
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                                            </ion-item>
+                                                        </ion-list>  
+                                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
     nav_controller.push(tutorial_requested_component);
+}
+
+function change_to_finish_tutorial()
+{
+    document.getElementById("begin_tutorial").style.display = "none";
+    document.getElementById("finish_tutorial").style.display = "block";
 }
 
 function activate_bar_code_scanner() {
@@ -1816,7 +1998,7 @@ function activate_bar_code_scanner() {
                     ];
 
                     create_toast("Student email is: " + result.text + "@student.dkit.ie", "dark", 2000, toast_buttons);
-
+                    change_to_finish_tutorial();
                     return result.text;
                 }
             },

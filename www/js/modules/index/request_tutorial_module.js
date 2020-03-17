@@ -19,24 +19,15 @@ function load_request_tutorial(nav_controller) {
           <ion-content>
               <ion-list style="text-align:center;">
             <p><strong>Post a tutorial request</strong></p>
-            <p>Please fill out the fields below to request a tutorial. Our tutors will assign you a date and time for a tutorial once they are available.</p>
+            <p style="padding-left:10px;padding-right:10px;">Please fill out the fields below to request a tutorial. Our tutors will assign you a date and time for a tutorial once they are available.</p>
             
               </ion-list>      
                 <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
                     <p></p>
-                    <ion-item>
-                        <ion-label class="tut_req_title" align="center" position="stacked">Request Title <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input align="center" placeholder="Brief request description" id="tutorial_title" required type="text"></ion-input>
-                    </ion-item>
-
-                    <ion-item>
-                        <ion-label class="tut_req_title" align="center" position="stacked">Request Description <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-textarea rows="6" align="center" placeholder="Tell us your request in detail" id="tutorial_description" required type="text"></ion-textarea>
-                    </ion-item>
-
-                    <ion-item lines="none">
-                        <ion-label class="tut_req_title" style="margin-top:-40px;" align="center" position="stacked">Request Specific Skill<ion-text color="danger">*</ion-text></ion-label> 
-                    </ion-item>
+                    <br><br>
+                    <div style="display:flex;position: absolute;width: 80%;z-index: 999;top: 3px;">
+                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Request Specific Skill <ion-text color="danger">*</ion-text></ion-text>
+                    </div>
 
                     <ion-item style="margin-top:-30px;">
 
@@ -50,6 +41,23 @@ function load_request_tutorial(nav_controller) {
                             <ion-select-option value="Maths">Maths</ion-select-option>
                         </ion-select>
                     </ion-item>
+                         <br>
+                    <div style="display:flex;position: absolute;width: 80%;z-index: 999;">
+                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Request Title <ion-text color="danger">*</ion-text></ion-text>
+                    </div>
+                    <ion-item>
+                        <ion-input style="margin-bottom: -15px;" align="center" placeholder="Brief request description" id="tutorial_title" required type="text"></ion-input>
+                    </ion-item>
+                    
+                    <br>
+                    <div style="display:flex;position: absolute;width: 80%;z-index: 999;">
+                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Request Description <ion-text color="danger">*</ion-text></ion-text>
+                    </div>
+                    <ion-item>
+                        <ion-textarea rows="6" style="margin-top: 5px;" align="center" placeholder="Tell us your request in detail" id="tutorial_description" required type="text"></ion-textarea>
+                    </ion-item>
+
+                    
 
                     <div class="ion-padding-top">
                         <ion-button expand="block" type="submit" class="ion-no-margin" id="request_tutorial">Request tutorial</ion-button>

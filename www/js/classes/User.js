@@ -158,7 +158,6 @@ class User {
                 return;
             } else {
                 this.id = content.user._id;
-                
                 this.avatar = content.user.user_avatar;
 
                 this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
@@ -197,7 +196,6 @@ class User {
             });
 
             const content = await rawResponse.json();
-            
             this.id = content.user._id;
             this.avatar = content.user.user_avatar;
 

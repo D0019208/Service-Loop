@@ -4,6 +4,7 @@ class Tutorials extends User {
 console.log(tutorials.response)
 console.log(tutorials)
 console.log("debug")
+
         this.all_tutorials = tutorials.response;
 
         //Check to see if there are any posts (If empty, there will be a string)

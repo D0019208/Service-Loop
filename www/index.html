@@ -9,6 +9,10 @@
         <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>
         <link href="css/style.css" rel="stylesheet" type="text/css"/>
+        <script type="module">
+            import { popoverController } from 'https://cdn.jsdelivr.net/npm/@ionic/core@next/dist/ionic/index.esm.js';
+            window.popoverController = popoverController;
+        </script>
         <style>
             :root {
                 --ion-safe-area-top: 0px;
@@ -197,7 +201,15 @@
             
             .tut_req_title
             {
-                padding-left: 35%;
+                /*padding-left: 35%;
+                margin: auto;
+                font-size: 19px !important;
+                max-width: 200% !important;
+                align-self: center !important;*/
+            }
+            .native-textarea
+            {
+                margin-top: 8px !important;
             }
 
             /*forum*/
@@ -383,7 +395,11 @@
                 padding-left: 20%;
                 padding-right: 20%;
             }
-            
+            .native-input
+            {
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+            }
 
 
             
@@ -591,6 +607,14 @@
             .swiper-slide
             {
                 margin-top: -35px;
+            }
+            
+            /*Info box*/
+            .info
+            {
+                position: absolute;
+                right: 5px;
+                top: 12px;
             }
         </style>
     </head>
