@@ -13,6 +13,8 @@ var current_tab;
 var previous_tab;
 var signaturePad;
 var active_nav;
+var push;
+
 var new_message_ping = new Audio('sounds/new_message.mp3');
 
 Element.prototype.appendAfter = function (element) {
@@ -52,7 +54,7 @@ document.addEventListener("deviceready", async function () {
     //user.setEmail("nikito888@gmail.com");
 
     //Check to make sure that the users session has not expired
-    await user.check_session_local(user.getEmail());
+    await user.check_session(user.getEmail());
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -381,14 +383,14 @@ document.addEventListener("deviceready", async function () {
 
             user.createWebSocketConnection();
             if (user.getStatus() === "Tutor") {
-                posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                posts = new Posts(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
                 posts.waitForNewTutorials();
             } else {
-                posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                posts = new Posts(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             }
 
             blockchain = new Blockchain();
@@ -397,10 +399,16 @@ document.addEventListener("deviceready", async function () {
             //Create a Notifications class to store all the details and functions relating to the notifications
             //Extends User class
             if (typeof notifications_response === "string") {
-                user_notifications = new Notifications(notifications_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                user_notifications = new Notifications(user.getId(), notifications_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             } else {
-                user_notifications = new Notifications(notifications_response.response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                user_notifications = new Notifications(user.getId(), notifications_response.response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             }
+            
+            //Setup push notifications
+            push = new Push_Notifications("c08fd8bd-bfbf-4dd3-bc07-61d214842ccd");
+            push.initialize();
+            push.set_user_id(user.getEmail());
+            //push.send_notification("Test title", "Test body", user.getEmail(), "test", {foo: "bar"});
 
             //Now that we have notifications, we need to add a badge to show all unread notifications
             user_notifications.addUnreadNotificationsToDOM();

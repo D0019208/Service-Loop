@@ -28,7 +28,7 @@ function load_my_requested_tutorials(nav_controller) {
                 my_requested_posts_response = await access_route(data, "get_my_requested_posts");
                 my_requested_posts_loaded = true;
 
-                tutorials = new Tutorials(my_requested_posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), my_requested_posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
 
                 console.log(tutorials.open_tutorials);
                 console.log(tutorials.pending_tutorials);

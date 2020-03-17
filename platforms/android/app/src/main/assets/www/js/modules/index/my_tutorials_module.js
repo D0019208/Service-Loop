@@ -12,7 +12,7 @@ let my_requested_posts_pending_loaded = false;
 let my_requested_posts_ongoing_loaded = false;
 let my_requested_posts_done_loaded = false;
 
-function load_my_requested_tutorials() {
+function load_my_requested_tutorials(nav_controller) {
     customElements.get('nav-my-requested-tutorials') || customElements.define('nav-my-requested-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
             super();
@@ -27,7 +27,7 @@ function load_my_requested_tutorials() {
                 my_requested_posts_response = await access_route(data, "get_my_requested_posts");
                 my_requested_posts_loaded = true;
 
-                tutorials = new Tutorials(my_requested_posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), my_requested_posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
 
                 console.log(tutorials.open_tutorials);
                 console.log(tutorials.pending_tutorials);
@@ -441,19 +441,19 @@ function load_my_requested_tutorials() {
                         } 
 
                         if (tutorial_status == "Open") {
-                            load_open_tutorial_component(nav, this_tutorial);
+                            load_open_tutorial_component(nav_controller, this_tutorial);
                         } else if (tutorial_status == "Pending") {
                             if (this_tutorial.post_agreement_offered) {
-                                load_post_agreement_offered_component(nav, this_tutorial, tutorial_tag, tutorial_status);
+                                load_post_agreement_offered_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                             } else if (this_tutorial.post_agreement_signed) {
-                                load_pending_tutorial_component_agreement_signed(nav, this_tutorial, tutorial_tag, tutorial_status)
+                                load_pending_tutorial_component_agreement_signed(nav_controller, this_tutorial, tutorial_tag, tutorial_status)
                             } else {
-                                load_pending_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
+                                load_pending_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                             }
                         } else if (tutorial_status == "Ongoing") {
-                            load_ongoing_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
+                            load_ongoing_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         } else {
-                            load_done_tutorial_component(nav, this_tutorial, tutorial_tag, tutorial_status);
+                            load_done_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         }
                     }
                 });
@@ -475,5 +475,5 @@ function load_my_requested_tutorials() {
         }
     });
 
-    nav.push('nav-my-requested-tutorials');
+    nav_controller.push('nav-my-requested-tutorials');
 } 
