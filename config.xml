@@ -22,6 +22,7 @@ xmlns:cdv="http://cordova.apache.org/ns/1.0"
   <plugin name="cordova-plugin-velda-devicefeedback" spec="*" /> 
   <plugin name="cordova-plugin-android-fingerprint-auth" spec="*" />
   <plugin name="cordova-plugin-qr-barcode-scanner" spec="*" />
+  <plugin name="onesignal-cordova-plugin" spec="*" />
   
   <platform name="android">
    <edit-config file="app/src/main/AndroidManifest.xml" mode="merge" target="/manifest/application">
