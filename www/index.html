@@ -9,6 +9,10 @@
         <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>
         <link href="css/style.css" rel="stylesheet" type="text/css"/>
+        <script type="module">
+            import { popoverController } from 'https://cdn.jsdelivr.net/npm/@ionic/core@next/dist/ionic/index.esm.js';
+            window.popoverController = popoverController;
+        </script>
         <style>
             :root {
                 --ion-safe-area-top: 0px;
@@ -197,7 +201,15 @@
             
             .tut_req_title
             {
-                padding-left: 35%;
+                /*padding-left: 35%;
+                margin: auto;
+                font-size: 19px !important;
+                max-width: 200% !important;
+                align-self: center !important;*/
+            }
+            .native-textarea
+            {
+                margin-top: 8px !important;
             }
 
             /*forum*/
@@ -383,7 +395,11 @@
                 padding-left: 20%;
                 padding-right: 20%;
             }
-            
+            .native-input
+            {
+                padding-top: 0px !important;
+                padding-bottom: 0px !important;
+            }
 
 
             
@@ -592,6 +608,14 @@
             {
                 margin-top: -35px;
             }
+            
+            /*Info box*/
+            .info
+            {
+                position: absolute;
+                right: 5px;
+                top: 12px;
+            }
         </style>
     </head>
     <body>
@@ -602,7 +626,7 @@
         <ion-menu side="start" menu-id="menu">
             <ion-header class="menu_header">
                 <ion-avatar style="width: 55px;height: 55px;" class="menu_avatar">
-                   <img src="images/avatar.jpg">
+                   <img id="menu_avatar" src="">
                 </ion-avatar>
                 <h4 class="menu_name"><strong id="user_name_menu">German Luter</strong></h4>
                 <p class="menu_email" id="user_email_menu">info@student.dkit.ie</p>
@@ -611,33 +635,30 @@
                 </ion-toolbar>-->
             </ion-header>
             <ion-content>
-                <ion-list>
+                <ion-list id="menu_content">
                     <a href="#" style="text-decoration: none;">
                         <ion-item id="profile" style="margin-left:-16px; margin-bottom: 10px;" class="ion-activatable ripple">
                             <ion-item lines="none">
                                 <ion-icon name="person" slot="start"></ion-icon>
-                                <ion-label>Profile</ion-label>
-                                
+                                <ion-label>Profile</ion-label> 
                             </ion-item>
                             <ion-ripple-effect></ion-ripple-effect>
                         </ion-item>
                     </a>
                     <a href="#" style="text-decoration: none;">
-                        <ion-item id="testtest" style="margin-left:-16px;margin-bottom: 10px;" class="ion-activatable ripple">
+                        <ion-item id="request_tutorial_menu" style="margin-left:-16px;margin-bottom: 10px;" class="ion-activatable ripple">
                             <ion-item lines="none">
                                 <ion-icon name="add" slot="start"></ion-icon>
-                                <ion-label>Request a tutorial</ion-label>
-                                
+                                <ion-label>Request a tutorial</ion-label> 
                             </ion-item>
                             <ion-ripple-effect></ion-ripple-effect>
                         </ion-item>
                     </a>
                     <a href="#" style="text-decoration: none;">
-                        <ion-item style="margin-left:-16px;" class="ion-activatable ripple">
+                        <ion-item id="my_tutorials_menu" style="margin-left:-16px;" class="ion-activatable ripple">
                             <ion-item lines="none">
                                 <ion-icon name="book" slot="start"></ion-icon>
-                                <ion-label>My tutorials</ion-label>
-                                
+                                <ion-label>My tutorials</ion-label> 
                             </ion-item>
                             <ion-ripple-effect></ion-ripple-effect>
                         </ion-item>

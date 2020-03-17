@@ -528,16 +528,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
                     let tutorial_tag = this_post.post_modules.join(', ');
                     load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                 };
-            } else {
-                open_accepted_tutorial_post_button = document.getElementById('open_tutorial');
-
-                accepted_tutorial_request_event_handler = function () {
-                    device_feedback();
-
-                    let tutorial_status = this_post.post_status;
-                    let tutorial_tag = this_post.post_modules.join(', ');
-                    load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
-                };
             }
 
             if (typeof open_accepted_tutorial_post_button !== 'undefined' && open_accepted_tutorial_post_button !== null) {
@@ -1058,10 +1048,42 @@ function load_post_agreement_signed_component(this_post) {
                                                               <span>Tutorial has been compeleted.</span>
                                                               </li>
                                                             </ul>
-                                                        </div><br><br>
+                                                        </div>
+                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <ion-item-divider class="divider"></ion-item-divider>
+                                                            <ion-list-header class="collapsible">
+                                                                <strong>TUTORIAL LINKS</strong>
+                                                            </ion-list-header>
+                                                        <ion-list class="content">
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
+                                                            </ion-item>
+                                                        </ion-list>    
+                                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
+    //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+              coll[i].addEventListener("click", function() {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.maxHeight){
+                  content.style.maxHeight = null;
+                } else {
+                  content.style.maxHeight = content.scrollHeight + "px";
+                } 
+              });
+            }
+        }
+    
     nav_notifications.push(tutorial_accepted_component);
 }

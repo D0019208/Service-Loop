@@ -5,9 +5,9 @@ function load_profile_page(nav_controller) {
         }
         connectedCallback() {
             var currentModal;
-        //Displays correct profile page based on user's status
-        if (user.getStatus() === "Tutor") {
-            this.innerHTML = `
+            //Displays correct profile page based on user's status
+            if (user.getStatus() === "Tutor") { 
+                this.innerHTML = `
             <ion-header translucent>
             <ion-toolbar>
             <ion-buttons slot="start">
@@ -23,7 +23,7 @@ function load_profile_page(nav_controller) {
         <ion-content fullscreen>
         <ion-item style="margin-top:15px;" lines="none">
           <ion-avatar class="profile_avatar">
-            <img id="user_avatar" src="images/avatar.jpg">
+            <img id="user_avatar" src="${user.getAvatar() + "?" + performance.now()}">
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
@@ -51,21 +51,22 @@ function load_profile_page(nav_controller) {
             <ion-list class="content">
                 <ion-item>
                   <ion-label>Open Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">1</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getOpenTutorials()}</ion-note>
                 </ion-item>
-                <ion-item>
-                  <ion-label>Ongoing Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">2</ion-note>
-                </ion-item>
-
+                
                 <ion-item>
                   <ion-label>Pending Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">1</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getPendingTutorials()}</ion-note>
+                </ion-item>
+                
+                <ion-item>
+                  <ion-label>Ongoing Tutorials</ion-label>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getOngoingTutorials()}</ion-note>
                 </ion-item>
                 
                 <ion-item>
                   <ion-label>Finished Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">35</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getDoneTutorials()}</ion-note>
                 </ion-item>
             </ion-list>
             
@@ -74,18 +75,18 @@ function load_profile_page(nav_controller) {
                 </ion-list-header>
             <ion-list class="content">
                 <ion-item>
-                  <ion-label>Ongoing Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">2</ion-note>
-                </ion-item>
-
-                <ion-item>
                   <ion-label>Pending Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">1</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getPendingTutoredTutorials()}</ion-note>
                 </ion-item>
                 
                 <ion-item>
+                  <ion-label>Ongoing Tutorials</ion-label>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getOngoingTutoredTutorials()}</ion-note>
+                </ion-item>
+
+                <ion-item>
                   <ion-label>Finished Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">35</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getDoneTutoredTutorials()}</ion-note>
                 </ion-item>
             </ion-list>
             
@@ -94,7 +95,7 @@ function load_profile_page(nav_controller) {
                   <strong>SKILLS</strong>
                 </ion-list-header>
                 <ion-button id="edit_skills" class='edit_skills' fill="outline" slot="end">Edit</ion-button>
-                <ion-list id="profile_skills" style='margin-left:10px;'>
+                <ion-list id="profile_skills" style='margin-left:10px;margin-top: 1px;'>
                 </ion-list>
             </ion-list>
         </ion-content>
@@ -102,8 +103,7 @@ function load_profile_page(nav_controller) {
 
 <ion-alert-controller></ion-alert-controller>
         `;
-            }
-            else{
+            } else {
                 this.innerHTML = `
             <ion-header translucent>
             <ion-toolbar>
@@ -120,7 +120,7 @@ function load_profile_page(nav_controller) {
         <ion-content fullscreen>
         <ion-item style="margin-top:15px;" lines="none">
           <ion-avatar class="profile_avatar">
-            <img id="user_avatar" src="images/avatar.jpg">
+            <img id="user_avatar" src="${user.getAvatar() + "?" + performance.now()}">
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
@@ -148,21 +148,22 @@ function load_profile_page(nav_controller) {
             <ion-list>
                 <ion-item>
                   <ion-label>Open Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">1</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getOpenTutorials()}</ion-note>
                 </ion-item>
-                <ion-item>
-                  <ion-label>Ongoing Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">2</ion-note>
-                </ion-item>
-
+                
                 <ion-item>
                   <ion-label>Pending Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">1</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getPendingTutorials()}</ion-note>
+                </ion-item>
+                
+                <ion-item>
+                  <ion-label>Ongoing Tutorials</ion-label>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getOngoingTutorials()}</ion-note>
                 </ion-item>
                 
                 <ion-item>
                   <ion-label>Finished Tutorials</ion-label>
-                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">35</ion-note>
+                  <ion-note style='font-size: 0.9em;' slot="end" color="primary">${user.getDoneTutorials()}</ion-note>
                 </ion-item>
             </ion-list>
         </ion-content>
@@ -178,17 +179,15 @@ function load_profile_page(nav_controller) {
             //Change user's skills
             if (user.getStatus() === "Tutor") {
                 for (var i = 0; i < user.modules.length; i++) {
-                    document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>'+user.modules[i]+'</ion-label></ion-chip>');
-
+                    document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
                 }
             }
             if (user.getStatus() === "Tutor") {
                 document.getElementById('user_status_profile').innerText = "TUTOR";
             } else {
                 document.getElementById('user_status_profile').innerText = "STUDENT";
-            }
-            console.log(user.getModules());
-            
+            } 
+
             //var button = document.activeElement.tagName;
             //button.onclick = addItem;
 
@@ -215,25 +214,34 @@ function load_profile_page(nav_controller) {
                     }
                 });
             }
-            
+
             //Displays gallery(for the user to select new avatar) when user clicks on the avatar
-            document.getElementById("cameraTakePicture").addEventListener("click", cameraTakePicture); 
-            function cameraTakePicture() { 
-                     navigator.camera.getPicture(onSuccess, onFail, {  
-                        quality: 50, 
-                        destinationType: Camera.DestinationType.DATA_URL,
-                        sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
-                     });  
+            document.getElementById("cameraTakePicture").addEventListener("click", cameraTakePicture);
+            function cameraTakePicture() {
+                navigator.camera.getPicture(onSuccess, onFail, {
+                    quality: 50,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    sourceType: Camera.PictureSourceType.SAVEDPHOTOALBUM
+                });
 
-                     function onSuccess(imageData) { 
-                        var image = document.getElementById('user_avatar'); 
-                        image.src = "data:image/jpeg;base64," + imageData; 
-                     }  
+                function onSuccess(imageData) {
+                    var profile_avatar = document.getElementById('user_avatar');
+                    profile_avatar.src = "data:image/jpeg;base64," + imageData;
+                    
+                    var home_avatar = document.getElementById("user_avatar_home");
+                    home_avatar.src = "data:image/jpeg;base64," + imageData;
+                    
+                    (async () => {
+                        let response = await access_route({email: user.getEmail(), image: imageData}, "update_avatar"); 
+                        user.setAvatar(response); 
+                    })();
 
-                     function onFail(message) { 
-                        alert('Failed because: ' + message); 
-                     } 
                 }
+
+                function onFail(message) {
+                    alert('Failed because: ' + message);
+                }
+            }
 
             //Displays edit skill page
             document.getElementById("edit_skills").addEventListener("click", async function () {
@@ -275,10 +283,9 @@ function load_profile_page(nav_controller) {
 
                 modal_created.present().then(() => {
                     currentModal = modal_created;
-                    
-                    //Function that adds skill to the page
-                    function addItem() {
 
+                    //Function that adds skill to the page
+                    function addItem() { 
                         device_feedback();
                         var textInput = document.getElementById("profile_tutorial_modules");  //getting text input
                         var skill = textInput.value;   //getting value of text input element
@@ -291,16 +298,16 @@ function load_profile_page(nav_controller) {
                     }
                     //Moves select icon to the side
                     setTimeout(function () {
-                if (document.querySelector('.my-select') !== null) {
-                    document.querySelector('.my-select').shadowRoot.querySelector('.select-icon').setAttribute('style', 'position:absolute; right:10px; bottom:15px');
-                }
-            }, 100);
-            //Runs addItem() function when user clicks save button in the select menu
-            const ion_select = document.querySelector('ion-select');
-            ion_select.addEventListener('ionChange', function(){
-                addItem();
-            });
-            ion_select.value = user.getModules();
+                        if (document.querySelector('.my-select') !== null) {
+                            document.querySelector('.my-select').shadowRoot.querySelector('.select-icon').setAttribute('style', 'position:absolute; right:10px; bottom:15px');
+                        }
+                    }, 100);
+                    //Runs addItem() function when user clicks save button in the select menu
+                    const ion_select = document.querySelector('ion-select');
+                    ion_select.addEventListener('ionChange', function () {
+                        addItem();
+                    });
+                    ion_select.value = user.getModules(); 
 
                     document.getElementById('save_button').addEventListener('click', () => {
                         device_feedback();
@@ -314,12 +321,34 @@ function load_profile_page(nav_controller) {
                                 }
                             }
                         ];
+                        //USE THIS TO REMOVE ELEMENT FROM MAIN PROFILE PAGE ON SAVE
+                        //console.log(document.getElementById('profile_skills').children);
+                        
+                        console.log(document.getElementById('p').children);
+                        let skills_array = [];
+                        let skills_list = document.getElementById('p').children;
+                        
+                        for(let i = 0; i < skills_list.length; i++) {
+                            skills_array.push(skills_list[i].innerText);
+                        } 
+                        
+                        console.log(skills_array);
+                        
+                        access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
+                        set_secure_storage("user_modules", skills_array); 
+                        user.setModules(skills_array);
 
-                        create_toast("Skills saved successfully.", "dark", 2000, toast_buttons);
+                        create_toast("Skills saved successfully.", "dark", 2000, toast_buttons); 
+                        
                         dismissModal(currentModal);
+                        
+                        document.getElementById("profile_skills").innerHTML = "";  //update skills
+                        for (var i = 0; i < user.modules.length; i++) {
+                            document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
+                        }
                     });
 
-                    document.getElementById("modal_close").addEventListener('click', () => { 
+                    document.getElementById("modal_close").addEventListener('click', () => {
                         dismissModal(currentModal);
                     });
                 });
