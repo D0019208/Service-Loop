@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     create_ionic_alert("Fingerprint authentication failed", "Please setup fingerprint authentication in the Settings page first.", ["OK"]);
                 }
             } else {
-                create_ionic_alert("Fingerprint authentication failed", "Unfortunetly your device does not support fingerprint authentication, please \n\
+                create_ionic_alert("Fingerprint authentication failed", "Unfortunately your device does not support fingerprint authentication, please \n\
             use your email and password instead.", ["OK"]);
             }
             

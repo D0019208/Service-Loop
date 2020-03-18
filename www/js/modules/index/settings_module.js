@@ -67,7 +67,6 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                                 </ion-avatar>
                                 <ion-label>
                                     <h2>Change Password</h2>
-                                    <p>It's a good idea to use strong password</p>
                                 </ion-label>
                             </ion-item>
                             <ion-ripple-effect></ion-ripple-effect>
@@ -79,7 +78,7 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                                 </ion-avatar>
                                 <ion-label>
                                     <h2>Fingerprint</h2>
-                                    <p id="fingerprint_message">Turn on fingerprint login</p>
+                                    <p id="fingerprint_message">Toggle fingerprint login</p>
                                 </ion-label>
                                 <ion-toggle slot="end" name="fingerprint_toggle"></ion-toggle>
                             </ion-item>

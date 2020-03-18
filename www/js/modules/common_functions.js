@@ -561,21 +561,21 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 </ion-label>
             </ion-item>
             <div class="wrapper">
-                <ul class="StepProgress">
-                  <li class="StepProgress-item is-done"><strong>Open</strong>
-                  <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                  </li>
-                  <li class="StepProgress-item current"><strong>Pending</strong>
-                  <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                  </li>
-                  <li class="StepProgress-item"><strong>Ongoing</strong>
-                  <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                  </li>
-                  <li class="StepProgress-item"><strong>Done</strong>
-                  <span>Tutorial has been compeleted.</span>
-                  </li>
-                </ul>
-            </div>
+            <ul class="StepProgress">
+              <li class="StepProgress-item current"><strong>Open</strong>
+              <span>Tutorial requested. No tutor assigned.</span>
+              </li>
+              <li class="StepProgress-item"><strong>Pending</strong>
+              <span>Tutor has been assigned.</span>
+              </li>
+              <li class="StepProgress-item"><strong>Ongoing</strong>
+              <span>Agreement generated and signed. </span>
+              </li>
+              <li class="StepProgress-item"><strong>Done</strong>
+              <span>Tutorial completed.</span>
+              </li>
+            </ul>
+        </div>
             <br><br><br><br><br><br><br><br><br>
             <ion-item-divider class="divider"></ion-item-divider>
                 <ion-list-header class="collapsible">
@@ -920,8 +920,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                             </ion-item>      
                                                              <ion-item style="margin-top:-15px;" lines="none">
                                                                 <h6>
-                                                                    You have successfully created an agreement for this tutorial, please wait for ${this_tutorial.std_name} to accept or reject the agreement. You can contact the
-                                                                    student using his college email '${this_tutorial.post_tutor_email}'. 
+                                                                An agreement is created. Please wait for ${this_tutorial.std_name} to accept or reject the agreement.
                                                                 </h6>
 
                                                             </ion-item> 
@@ -940,16 +939,16 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                             <div class="wrapper">
                                                             <ul class="StepProgress">
                                                               <li class="StepProgress-item is-done"><strong>Open</strong>
-                                                              <span>Tutorial has been requested by a student, tutor not assigned.</span>
+                                                              <span>Tutorial requested. No tutor assigned.</span>
                                                               </li>
                                                               <li class="StepProgress-item current"><strong>Pending</strong>
-                                                              <span>You have been assigned to a tutorial, contact student via email to generate an agreement.</span>
+                                                              <span>Tutor has been assigned.</span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Ongoing</strong>
-                                                              <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                                              <span>Agreement generated and signed.</span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Done</strong>
-                                                              <span>Tutorial has been compeleted.</span>
+                                                              <span>Tutorial completed.</span>
                                                               </li>
                                                             </ul>
                                                         </div>
@@ -1097,9 +1096,8 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                 </ion-item>      
                                  <ion-item style="margin-top:-15px;" lines="none">
                                     <h6>
-                                        ${this_post.post_tutor_name} has agreed to be your tutor, please get in contact with him
-                                        through his college email '${this_post.post_tutor_email}' to discuss the details of your tutorial
-                                        and create an agreement.
+                                        ${this_post.post_tutor_name} has assigned to be your tutor and will contact with you shorty via college email
+                                        '${this_post.post_tutor_email}'.
                                     </h6>
                                 </ion-item>    
                                 <ion-item-divider class="divider2"></ion-item-divider>   
@@ -1115,16 +1113,16 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                                             <div class="wrapper">
                                                             <ul class="StepProgress">
                                                               <li class="StepProgress-item is-done"><strong>Open</strong>
-                                                              <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                                              <span>Tutorial requested. No tutor assigned.</span>
                                                               </li>
                                                               <li class="StepProgress-item current"><strong>Pending</strong>
-                                                              <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                                              <span>Tutor has been assigned.</span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Ongoing</strong>
-                                                              <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                                              <span>Agreement generated and signed.</span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Done</strong>
-                                                              <span>Tutorial has been compeleted.</span>
+                                                              <span>Tutorial completed.</span>
                                                               </li>
                                                             </ul>
                                                         </div>
@@ -1220,7 +1218,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
                                     </ion-item>
 
                                     <ion-item>
-                                        <ion-label position="stacked">Location <ion-text color="danger">*</ion-text></ion-label>
+                                        <ion-label position="stacked">Room number<ion-text color="danger">*</ion-text></ion-label>
                                         <ion-input id="tutorial_room" placeholder="P1119" required type="text"></ion-input>
                                     </ion-item>
 
@@ -1510,7 +1508,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
                                     <div class="ion-padding-top fields">
                                         <ion-button expand="block" id="accept_agreement_button" type="submit" class="ion-no-margin">Accept agreement</ion-button>
                                     </div>
-                                    <p class="success_text3">Please note, once accepted, you cannot cancel the agreement or not turn up. Failure to turn up will result in penalties being imposed.</p> 
+                                    <p class="success_text3">Please note, once accepted you cannot cancel the agreement. Failure to attend will result in penalties being imposed.</p> 
                             </ion-content>`;
 
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
@@ -1736,22 +1734,22 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                         <h2><strong>Tutorial stage</strong></h2>
                                     </ion-label>
                                 </ion-item>
-                                    <div class="wrapper">
-                                    <ul class="StepProgress">
-                                      <li class="StepProgress-item is-done"><strong>Open</strong>
-                                      <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
-                                      </li>
-                                      <li class="StepProgress-item is-done"><strong>Pending</strong>
-                                      <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
-                                      </li>
-                                      <li class="StepProgress-item current"><strong>Ongoing</strong>
-                                      <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
-                                      </li>
-                                      <li class="StepProgress-item"><strong>Done</strong>
-                                      <span>Tutorial has been compeleted.</span>
-                                      </li>
-                                    </ul>
-                                </div>
+                                <div class="wrapper">
+                                <ul class="StepProgress">
+                                  <li class="StepProgress-item current"><strong>Open</strong>
+                                  <span>Tutorial requested. No tutor assigned.</span>
+                                  </li>
+                                  <li class="StepProgress-item"><strong>Pending</strong>
+                                  <span>Tutor has been assigned.</span>
+                                  </li>
+                                  <li class="StepProgress-item"><strong>Ongoing</strong>
+                                  <span>Agreement generated and signed. </span>
+                                  </li>
+                                  <li class="StepProgress-item"><strong>Done</strong>
+                                  <span>Tutorial completed.</span>
+                                  </li>
+                                </ul>
+                            </div>
                                     <br><br><br><br><br><br><br><br><br>
                                     <ion-item-divider class="divider"></ion-item-divider>
                                         <ion-list-header class="collapsible">
@@ -1927,16 +1925,16 @@ function load_open_tutorial_component(nav_controller, this_post) {
                                                             <div class="wrapper">
                                                             <ul class="StepProgress">
                                                               <li class="StepProgress-item current"><strong>Open</strong>
-                                                              <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+                                                              <span>Tutorial requested. No tutor assigned.</span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Pending</strong>
-                                                              <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+                                                              <span>Tutor has been assigned.</span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Ongoing</strong>
-                                                              <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+                                                              <span>Agreement generated and signed. </span>
                                                               </li>
                                                               <li class="StepProgress-item"><strong>Done</strong>
-                                                              <span>Tutorial has been compeleted.</span>
+                                                              <span>Tutorial completed.</span>
                                                               </li>
                                                             </ul>
                                                         </div>
@@ -2255,10 +2253,9 @@ function IsJsonString(str) {
 //                                                        </ion-item>      
 //                                                         <ion-item style="margin-top:-15px;" lines="none">
 //                                                            <h6>
-//                                                                Your tutor, ${this_post.post_tutor_name} has sent you an agreement regarding your tutorial request, please
-//                                                                review it before accepting or rejecting it. If you have any questions, contact him through his college email at 
-//                                                                '${this_post.post_tutor_email}' 
-//                                                            </h6>
+//                                                                ${this_post.post_tutor_name} has sent you an agreement, please
+//                                                                review it before accepting or rejecting it.
+//                                                           </h6>
 //
 //                                                        </ion-item> 
 //                                                            <ion-item-divider class="divider2"></ion-item-divider> 
@@ -2277,16 +2274,16 @@ function IsJsonString(str) {
 //                                                            <div class="wrapper">
 //                                                            <ul class="StepProgress">
 //                                                              <li class="StepProgress-item is-done"><strong>Open</strong>
-//                                                              <span>Your tutorial has been requested successfully, it has currently not been assigned to a tutor.</span>
+//                                                              <span>Tutorial requested. No tutor assigned.</span>
 //                                                              </li>
 //                                                              <li class="StepProgress-item current"><strong>Pending</strong>
-//                                                              <span>A tutor has been assigned, the tutor will contact you via email to generate an agreement.</span>
+//                                                              <span>Tutor has been assigned.</span>
 //                                                              </li>
 //                                                              <li class="StepProgress-item"><strong>Ongoing</strong>
-//                                                              <span>Agreement has been generated and signed by both tutor & student, tutorial will take place on agreed time and date.</span>
+//                                                              <span>Agreement generated and signed.</span>
 //                                                              </li>
 //                                                              <li class="StepProgress-item"><strong>Done</strong>
-//                                                              <span>Tutorial has been compeleted.</span>
+//                                                              <span>Tutorial completed.</span>
 //                                                              </li>
 //                                                            </ul>
 //                                                        </div><br><br>
