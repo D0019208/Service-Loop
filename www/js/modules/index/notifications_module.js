@@ -40,7 +40,7 @@ let notification_posts_loaded = false;
 const nav_notifications = document.getElementById('nav-notifications');
 let active_component;
 
-customElements.define('nav-notifications', class NavNotifications extends HTMLElement {
+customElements.get('nav-notifications') || customElements.define('nav-notifications', class NavNotifications extends HTMLElement {
     constructor() {
         super();
     }
@@ -949,11 +949,11 @@ function load_tutorial_accepted_component(this_post, notification_tags) {
 //    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 
     if (this_post.post_agreement_offered) {
-        load_post_agreement_offered_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
+        load_post_agreement_offered_component(active_nav, this_post, tutorial_tag, tutorial_status);
     } else if (this_post.post_agreement_signed) {
         load_post_agreement_signed_component(this_post);
     } else if (notification_tags.includes("Tutorial request accepted")) {
-        load_pending_tutorial_component_not_signed(nav_notifications, this_post);
+        load_pending_tutorial_component_not_signed(active_nav, this_post);
     } else {
         load_pending_tutorial_component(this_post);
     }
@@ -1049,7 +1049,7 @@ function load_post_agreement_signed_component(this_post) {
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>
@@ -1085,5 +1085,5 @@ function load_post_agreement_signed_component(this_post) {
             }
         }
     
-    nav_notifications.push(tutorial_accepted_component);
+    active_nav.push(tutorial_accepted_component);
 }

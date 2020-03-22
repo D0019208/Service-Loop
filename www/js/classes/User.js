@@ -1,5 +1,6 @@
 class User {
-    constructor(name = "", email = "", status = "", modules = ["none"], avatar = "", open_tutorials = 0, pending_tutorials = 0, ongoing_tutorials = 0, done_tutorials = 0, tutored_pending_tutorials = 0, tutored_ongoing_tutorials = 0, tutored_done_tutorials = 0, socket = "") {
+    constructor(id = "", name = "", email = "", status = "", modules = ["none"], avatar = "", open_tutorials = 0, pending_tutorials = 0, ongoing_tutorials = 0, done_tutorials = 0, tutored_pending_tutorials = 0, tutored_ongoing_tutorials = 0, tutored_done_tutorials = 0, socket = "") {
+        this.id = id;
         this.name = name;
         this.email = email;
         this.status = status;
@@ -16,6 +17,14 @@ class User {
         this.tutored_done_tutorials = tutored_done_tutorials;
 
         this.socket = socket;
+    }
+    
+    setId(id) {
+        this.id = id;
+    }
+    
+    getId() {
+        return this.id;
     }
 
     setName(name) {
@@ -148,6 +157,7 @@ class User {
                 window.location.href = "login.html";
                 return;
             } else {
+                this.id = content.user._id;
                 this.avatar = content.user.user_avatar;
 
                 this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
@@ -186,6 +196,7 @@ class User {
             });
 
             const content = await rawResponse.json();
+            this.id = content.user._id;
             this.avatar = content.user.user_avatar;
 
             this.open_tutorials = content.tutorials_count.my_tutorials.open_count;

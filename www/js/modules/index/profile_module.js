@@ -371,4 +371,3 @@ function load_profile_page(nav_controller) {
 
     nav_controller.push('nav-profile');
 }
-

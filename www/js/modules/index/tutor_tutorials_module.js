@@ -30,7 +30,7 @@ function all_tutor_tutorials() {
 
                 tutor_tutorials_loaded = true;
 
-                tutor_tutorials = new Tutor_Tutorials(tutor_tutorials_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), tutor_tutorials_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
             }
 
             let html;
@@ -605,7 +605,7 @@ function done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br><br><br><br><br><br><br><br>
+                                                        <br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>

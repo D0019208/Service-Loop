@@ -240,7 +240,7 @@ async function sms_verification_setup() {
           <ion-content>
               <ion-list class="fields" style="text-align:center;">
             <p><strong>Verify your identity with SMS</strong></p>
-            <p>Please input your 4 digit code sent by SMS. If you did not recieve one then please request a new one or request a resend.</p>
+            <p>Please input your 4 digit code sent by SMS. If you did not receive one then please request a new code or request a resend.</p>
             
               </ion-list>
     

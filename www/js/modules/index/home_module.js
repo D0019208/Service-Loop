@@ -13,6 +13,8 @@ var current_tab;
 var previous_tab;
 var signaturePad;
 var active_nav;
+var push;
+
 var new_message_ping = new Audio('sounds/new_message.mp3');
 
 Element.prototype.appendAfter = function (element) {
@@ -38,11 +40,11 @@ document.addEventListener("deviceready", async function () {
     previous_tab = 'home';
 
     //Once we are sure that the users session is valid, we populate the User class 
-    let name = await get_secure_storage("user_name"); 
-    user.setName(name.replace(/\s+$/, '')); 
-    user.setEmail(await get_secure_storage("users_email")); 
-    
-    if(IsJsonString(await get_secure_storage("user_status"))) {
+    let name = await get_secure_storage("user_name");
+    user.setName(name.replace(/\s+$/, ''));
+    user.setEmail(await get_secure_storage("users_email"));
+
+    if (IsJsonString(await get_secure_storage("user_status"))) {
         user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
     }
 
@@ -52,7 +54,7 @@ document.addEventListener("deviceready", async function () {
     //user.setEmail("nikito888@gmail.com");
 
     //Check to make sure that the users session has not expired
-    await user.check_session_local(user.getEmail());
+    await user.check_session(user.getEmail());
 
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
@@ -99,8 +101,7 @@ document.addEventListener("deviceready", async function () {
 
 
 
-    if (tutorial_slides_status !== "false")
-    {
+    if (tutorial_slides_status !== "false") {
         //Shows tutorial slides
         let tab_bar = document.querySelector('ion-tab-bar');
         tab_bar.style.display = 'none';
@@ -211,6 +212,10 @@ document.addEventListener("deviceready", async function () {
                             <ion-label style="text-align:center;">
                                 <h1 style="color:white;"><strong id="user_name">John</strong></h1>
                                 <p style="color:white;" id="user_email">D00194503@student.dkit.ie</p>
+
+
+
+
                                 <br>
                                 <h2 style="color:white; margin-top:-5px;"><strong id="user_status">Student</strong></h2>
                                 <br>
@@ -225,7 +230,7 @@ document.addEventListener("deviceready", async function () {
 
                                 <ion-list class='home_buttons ion-activatable ripple' id="post_tutorial">
                                     <h6>Request a tutorial</h6>
-                                    <p>Request our tutors for a tutorial for a particular module</p>
+                                    <p>Request a tutorial from one of our available tutors</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_post' src="images/i_post.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -234,7 +239,7 @@ document.addEventListener("deviceready", async function () {
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple' id="all_tutorials">
                                     <h6>All tutorial requests</h6>
-                                    <p>View all the requested tutorials on the forum</p>
+                                    <p>View all available requests</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_search' src="images/i_search.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -243,7 +248,7 @@ document.addEventListener("deviceready", async function () {
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple' id='my_tutorials'>
                                     <h6>My tutorials</h6>
-                                    <p>View all tutorials that are tutored by you</p>
+                                    <p>View tutorials accepted by me</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_post' src="images/i_posts.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -251,7 +256,7 @@ document.addEventListener("deviceready", async function () {
                                 <hr><hr> 
                                 <ion-list class='home_buttons ion-activatable ripple' id='my_requested_tutorials'>
                                     <h6>My requested tutorials</h6>
-                                    <p>View all the tutorials requested by you</p>
+                                    <p>View my requests</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -261,7 +266,7 @@ document.addEventListener("deviceready", async function () {
                 
                                  <ion-list class='home_buttons ion-activatable ripple' id='barcode_scanner'>
                                     <h6>Barcode scanner</h6>
-                                    <p>View all the tutorials requested by you</p>
+                                   
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -273,7 +278,7 @@ document.addEventListener("deviceready", async function () {
                     
                         </ion-content>`;
                 //We get all the users notifications based off his email and modules
-                notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: true, user_modules: user.getModules()}}, "get_all_notifications");
+                notifications_response = await access_route({ users_email: user.getEmail(), user_tutor: { is_tutor: true, user_modules: user.getModules() } }, "get_all_notifications");
             } else {
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
@@ -313,7 +318,7 @@ document.addEventListener("deviceready", async function () {
 
                                 <ion-list class='home_buttons ion-activatable ripple' id="post_tutorial">
                                     <h6>Request a tutorial</h6>
-                                    <p>Request our tutors for a tutorial for a particular module</p>
+                                    <p>Request a tutorial from one of our available tutors</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_post' src="images/i_post.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -322,7 +327,6 @@ document.addEventListener("deviceready", async function () {
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple' id="home_tutor_application">
                                     <h6>Apply to be a tutor</h6>
-                                    <p>Apply to be a tutor here</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_search' src="images/i_search.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -331,7 +335,7 @@ document.addEventListener("deviceready", async function () {
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple' id="my_requested_tutorials">
                                     <h6>My requested tutorials</h6>
-                                    <p>View all the tutorials requested by you</p>
+                                    <p>View my requests</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_exchange' src="images/i_exchange.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -339,7 +343,7 @@ document.addEventListener("deviceready", async function () {
                             </div>
                         </ion-content>`;
                 //We get all the users notificatios based only on his email as the user is not a tutor
-                notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications");
+                notifications_response = await access_route({ users_email: user.getEmail(), user_tutor: { is_tutor: false, user_modules: user.getModules() } }, "get_all_notifications");
             }
 
             this.innerHTML = home_component;
@@ -381,14 +385,14 @@ document.addEventListener("deviceready", async function () {
 
             user.createWebSocketConnection();
             if (user.getStatus() === "Tutor") {
-                posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                posts = new Posts(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
                 posts.waitForNewTutorials();
             } else {
-                posts = new Posts({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutorials = new Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutor_tutorials = new Tutor_Tutorials({response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                posts = new Posts(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             }
 
             blockchain = new Blockchain();
@@ -397,10 +401,16 @@ document.addEventListener("deviceready", async function () {
             //Create a Notifications class to store all the details and functions relating to the notifications
             //Extends User class
             if (typeof notifications_response === "string") {
-                user_notifications = new Notifications(notifications_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                user_notifications = new Notifications(user.getId(), notifications_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             } else {
-                user_notifications = new Notifications(notifications_response.response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                user_notifications = new Notifications(user.getId(), notifications_response.response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             }
+
+            //Setup push notifications
+            push = new Push_Notifications("c08fd8bd-bfbf-4dd3-bc07-61d214842ccd");
+            push.initialize();
+            push.set_user_id(user.getEmail());
+            //push.send_notification("Test title", "Test body", user.getEmail(), "test", {foo: "bar"});
 
             //Now that we have notifications, we need to add a badge to show all unread notifications
             user_notifications.addUnreadNotificationsToDOM();
@@ -421,8 +431,7 @@ document.addEventListener("deviceready", async function () {
             document.getElementById('profile').addEventListener('click', async function () {
                 device_feedback();
 
-                if (active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
-                {
+                if (active_nav.getElementsByTagName("NAV-PROFILE").length === 0) {
                     await include("js/modules/index/profile_module.js", "profile_script");
                     load_profile_page(active_nav);
                 }
@@ -431,8 +440,7 @@ document.addEventListener("deviceready", async function () {
             document.getElementById('request_tutorial_menu').addEventListener('click', async function () {
                 device_feedback();
 
-                if (active_nav.getElementsByTagName("NAV-POST-TUTORIAL").length === 0)
-                {
+                if (active_nav.getElementsByTagName("NAV-POST-TUTORIAL").length === 0) {
                     await include("js/modules/index/request_tutorial_module.js", "request_tutorial_script");
                     load_request_tutorial(active_nav);
                 }
@@ -441,8 +449,7 @@ document.addEventListener("deviceready", async function () {
             document.getElementById('my_tutorials_menu').addEventListener('click', async function () {
                 device_feedback();
 
-                if (active_nav.getElementsByTagName("NAV-MY-REQUESTED-TUTORIALS").length === 0)
-                {
+                if (active_nav.getElementsByTagName("NAV-MY-REQUESTED-TUTORIALS").length === 0) {
                     await include("js/modules/index/my_tutorials_module.js", "my_requested_tutorials_script");
                     load_my_requested_tutorials(active_nav);
                 }
@@ -451,8 +458,7 @@ document.addEventListener("deviceready", async function () {
             document.getElementById('profile_home').addEventListener('click', async function () {
                 device_feedback();
 
-                if (active_nav.getElementsByTagName("NAV-PROFILE").length === 0)
-                {
+                if (active_nav.getElementsByTagName("NAV-PROFILE").length === 0) {
                     await include("js/modules/index/profile_module.js", "profile_script");
                     load_profile_page(active_nav);
                 }
@@ -492,14 +498,14 @@ document.addEventListener("deviceready", async function () {
         }
 
         attributeChangedCallback(name, oldValue, newValue) {
-//        switch (name) {
-//            case 'value':
-//                console.log(`Value changed from ${oldValue} to ${newValue}`);
-//                break;
-//            case 'max':
-//                console.log(`You won't max-out any time soon, with ${newValue}!`);
-//                break;
-//        }
+            //        switch (name) {
+            //            case 'value':
+            //                console.log(`Value changed from ${oldValue} to ${newValue}`);
+            //                break;
+            //            case 'max':
+            //                console.log(`You won't max-out any time soon, with ${newValue}!`);
+            //                break;
+            //        }
             console.log("Attribute changed?")
         }
 
