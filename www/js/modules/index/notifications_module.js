@@ -1049,7 +1049,6 @@ function load_post_agreement_signed_component(this_post) {
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br><br><br><br><br><br><br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>

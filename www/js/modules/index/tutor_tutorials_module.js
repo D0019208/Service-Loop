@@ -605,7 +605,6 @@ function done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br><br><br><br><br><br><br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>

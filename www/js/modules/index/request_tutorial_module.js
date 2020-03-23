@@ -42,7 +42,7 @@ function load_request_tutorial(nav_controller) {
                     </ion-item>
                          <br>
                     <div style="display:flex;position: absolute;width: 80%;z-index: 999;">
-                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Request Title <ion-text color="danger">*</ion-text></ion-text>
+                        <ion-text style="margin:auto;margin-top: -2px;font-size: 15px;" class="tut_req_title" position="stacked">Request Title <ion-text color="danger">*</ion-text></ion-text>
                     </div>
                     <ion-item>
                         <ion-input style="margin-bottom: -15px;" align="center" placeholder="e.g. Need help with Java" id="tutorial_title" required type="text"></ion-input>
@@ -50,7 +50,7 @@ function load_request_tutorial(nav_controller) {
                     
                     <br>
                     <div style="display:flex;position: absolute;width: 80%;z-index: 999;">
-                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Request Description <ion-text color="danger">*</ion-text></ion-text>
+                        <ion-text style="margin:auto;margin-top: -2px;font-size: 15px;" class="tut_req_title" position="stacked">Request Description <ion-text color="danger">*</ion-text></ion-text>
                     </div>
                     <ion-item>
                         <ion-textarea rows="6" style="margin-top: 5px;" align="center" placeholder="e.g. For loops and classes" id="tutorial_description" required type="text"></ion-textarea>
