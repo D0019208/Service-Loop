@@ -40,7 +40,7 @@ let notification_posts_loaded = false;
 const nav_notifications = document.getElementById('nav-notifications');
 let active_component;
 
-customElements.define('nav-notifications', class NavNotifications extends HTMLElement {
+customElements.get('nav-notifications') || customElements.define('nav-notifications', class NavNotifications extends HTMLElement {
     constructor() {
         super();
     }
@@ -516,7 +516,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
                     let tutorial_status = this_post.post_status;
                     let tutorial_tag = this_post.post_modules.join(', ');
-                    load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                    load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                 };
             } else {
                 open_accepted_tutorial_post_button = document.getElementById('open_tutorial');
@@ -860,10 +860,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
         let new_tutorial_agreement_reject_event_handler = function () {
             device_feedback();
 
+
             if (user.getStatus() === "Student" && this_post.std_name.replace(/\s+$/, '') !== user.getName()) {
-                load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
             } else if (user.getStatus() === "Student" && this_post.std_name.replace(/\s+$/, '') === user.getName()) {
-                load_pending_tutorial_component(this_post, tutorial_tag, tutorial_status);
+                load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
             } else if (user.getStatus() === "Tutor" && this_post.std_name.replace(/\s+$/, '') !== user.getName()) {
                 load_pending_tutorial_component_not_signed(nav_notifications, this_post);
             } else {
@@ -879,6 +880,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
                 open_tutorial_post_button.addEventListener('click', new_tutorial_agreement_reject_event_handler, false);
             }
+
 
             let notifications_active_component = await nav_notifications.getActive();
 
@@ -947,11 +949,11 @@ function load_tutorial_accepted_component(this_post, notification_tags) {
 //    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 
     if (this_post.post_agreement_offered) {
-        load_post_agreement_offered_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
+        load_post_agreement_offered_component(active_nav, this_post, tutorial_tag, tutorial_status);
     } else if (this_post.post_agreement_signed) {
         load_post_agreement_signed_component(this_post);
     } else if (notification_tags.includes("Tutorial request accepted")) {
-        load_pending_tutorial_component_not_signed(nav_notifications, this_post);
+        load_pending_tutorial_component_not_signed(active_nav, this_post);
     } else {
         load_pending_tutorial_component(this_post);
     }
@@ -1051,5 +1053,5 @@ function load_post_agreement_signed_component(this_post) {
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
-    nav_notifications.push(tutorial_accepted_component);
+    active_nav.push(tutorial_accepted_component);
 }

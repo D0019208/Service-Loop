@@ -1,6 +1,6 @@
 class Notifications extends User {
-    constructor(notifications, name, email, status, modules, socket) {
-        super(name, email, status, modules, socket);
+    constructor(id, notifications, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
+        super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
 
         this.all_notifications = notifications;
 
@@ -157,7 +157,7 @@ class Notifications extends User {
     }
 
     addUnreadNotificationsToDOM() {
-        if (!this.unread_notifications == 0) {
+        if (!this.unread_notifications == 0 && !document.getElementById("new_notifications")) {
 
             let notifications_icon = document.querySelector("[name='notifications']");
 
@@ -174,7 +174,7 @@ class Notifications extends User {
     }
 
     addUnreadNotificationsToBadge(unread_notifications) {
-        if (!document.getElementById("new_notifications").length) {
+        if (document.getElementById("new_notifications")) {
             document.getElementById("new_notifications").innerText = unread_notifications;
         }
     }

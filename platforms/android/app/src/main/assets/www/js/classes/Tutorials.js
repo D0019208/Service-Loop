@@ -1,7 +1,9 @@
 class Tutorials extends User {
-    constructor(tutorials, name, email, status, modules, socket) {
-        super(name, email, status, modules, socket);
-
+    constructor(id, tutorials, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
+        super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
+console.log(tutorials.response)
+console.log(tutorials)
+console.log("debug")
         this.all_tutorials = tutorials.response;
 
         //Check to see if there are any posts (If empty, there will be a string)
@@ -105,7 +107,7 @@ class Tutorials extends User {
                 <ion-card class="test post" post_id="${tutorial._id}" post_modules="${tutorial.post_modules.join(', ')}" post_status="${tutorial.post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${tutorial.std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${tutorial.post_title}</p>
@@ -181,7 +183,7 @@ class Tutorials extends User {
                 <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
-                                <img src="https://d00192082.alwaysdata.net/ServiceLoopServer/resources/images/base_user.png">
+                                <img src="${tutorials[i + originalLength].std_avatar}">
                             </ion-avatar>
                             <ion-label>
                                 <p style="font-size:1em; color: black;">${tutorials[i + originalLength].post_title}</p>
