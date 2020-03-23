@@ -3,13 +3,14 @@
   width: 330px;
   font-family: 'Helvetica';
   font-size: 17px;
+  height: auto !important;
   
 }
 .StepProgress {
   position: relative;
   padding-left: 45px;
   list-style: none;
-  margin-bottom: 100px;
+  margin-bottom: 0px;
   padding-right: 5px;
 }
 .StepProgress span

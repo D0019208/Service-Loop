@@ -576,7 +576,6 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
               </li>
             </ul>
         </div>
-            <br><br>
             <ion-item-divider class="divider"></ion-item-divider>
                 <ion-list-header class="collapsible">
                     <strong>TUTORIAL LINKS</strong>
@@ -590,6 +589,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 </ion-item>
             </ion-list>
             <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
+            <br><br>
         </ion-content>`;
     tutorial_element.innerHTML = tutorial_element_html;
 
@@ -952,7 +952,6 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>
@@ -1126,7 +1125,6 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>
@@ -1667,7 +1665,6 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
 
 
 
-
 function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_accepted_component = document.createElement('tutorial_agreement_accepted');
     let tutorial_accepted_component_html;
@@ -1750,7 +1747,6 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                   </li>
                                 </ul>
                             </div>
-                                    <br><br>
                                     <ion-item-divider class="divider"></ion-item-divider>
                                         <ion-list-header class="collapsible">
                                             <strong>TUTORIAL LINKS</strong>
@@ -1797,6 +1793,12 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     }
 
     let ionNavDidChangeEvent = async function () {
+        var testbtn = 1;
+        if(testbtn === 1){
+            document.getElementById("begin_tutorial").style.display = "none";
+            document.getElementById("finish_tutorial").style.display = "block";
+        }
+        
         //TUTORIAL LINKS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
@@ -1938,7 +1940,6 @@ function load_open_tutorial_component(nav_controller, this_post) {
                                                               </li>
                                                             </ul>
                                                         </div>
-                                                        <br><br>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
                                                                 <strong>TUTORIAL LINKS</strong>
