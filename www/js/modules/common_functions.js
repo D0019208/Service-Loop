@@ -88,10 +88,8 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        //const rawResponse = await fetch("http://localhost:3001/" + route, {
-
-        const rawResponse = await fetch("http://serviceloopserver.ga/" + route, {
-
+        let path = localhost ? "http://localhost:3001/" : "http://serviceloopserver.ga/";
+        const rawResponse = await fetch(path + route, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -353,16 +351,18 @@ function insert_to_array_by_index(array, index, value) {
 }
 
 function device_feedback() {
-    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-        if (feedback.haptic && feedback.acoustic) {
-            window.plugins.deviceFeedback.haptic();
-            window.plugins.deviceFeedback.acoustic();
-        } else if (feedback.haptic) {
-            window.plugins.deviceFeedback.haptic();
-        } else if (feedback.acoustic) {
-            window.plugins.deviceFeedback.acoustic();
-        }
-    });
+    if (!localhost) {
+        window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
+            if (feedback.haptic && feedback.acoustic) {
+                window.plugins.deviceFeedback.haptic();
+                window.plugins.deviceFeedback.acoustic();
+            } else if (feedback.haptic) {
+                window.plugins.deviceFeedback.haptic();
+            } else if (feedback.acoustic) {
+                window.plugins.deviceFeedback.acoustic();
+            }
+        });
+    }
 }
 
 /*
@@ -484,6 +484,8 @@ function isCanvasBlank(canvas) {
 }
 
 function load_post_agreement_offered_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
             <ion-toolbar>
@@ -581,12 +583,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                     <strong>TUTORIAL LINKS</strong>
                 </ion-list-header>
             <ion-list class="content">
-                <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
-                    <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
-                </ion-item>
-                <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
-                    <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
-                </ion-item>
+                ${tutorial_links}
             </ion-list>
             <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
             <br><br>
@@ -594,6 +591,13 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     tutorial_element.innerHTML = tutorial_element_html;
 
     nav_controller.push(tutorial_element);
+
+    let cancel_tutorial;
+    let cancel_tutorial_handler = async function () {
+        device_feedback();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+    };
 
     let tutorial_log;
     let tutorial_log_handler = async function () {
@@ -650,18 +654,18 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             var i;
 
             for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                  content.style.maxHeight = null;
-                } else {
-                  content.style.maxHeight = content.scrollHeight + "px";
-                } 
-              });
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             }
         }
-        
+
         if (document.getElementById('tutorial_log') !== null) {
             tutorial_log = document.getElementById('tutorial_log');
             tutorial_log.addEventListener('click', tutorial_log_handler, false);
@@ -687,6 +691,11 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             validate_agreement.addEventListener('click', validate_agreement_handler, false);
         }
 
+        if (document.getElementById('cancel_tutorial') !== null) {
+            cancel_tutorial = document.getElementById('cancel_tutorial');
+            cancel_tutorial.addEventListener('click', cancel_tutorial_handler, false);
+        }
+
         let notifications_active_component = await nav_controller.getActive();
 
         if (notifications_active_component.component.tagName !== "TUTORIAL" && notifications_active_component.component.tagName !== "SIGN-TUTORIAL-AGREEMENT" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
@@ -695,6 +704,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             reject_agreement.removeEventListener("click", reject_agreement_handler, false);
             validate_agreement.removeEventListener("click", validate_agreement_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
         }
     };
 
@@ -716,7 +726,7 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
             }
         ];
 
-        create_toast("You have successfully accepted a tutorial.", "dark", 2000, toast_buttons);
+        create_toast("You have accepted a tutorial.", "dark", 2000, toast_buttons);
     });
 
     if (!post_acceptated_response.error) {
@@ -724,7 +734,9 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
         user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification, post_acceptated_response.response.post);
 
         //Send push notification
-        push.send_notification("Tutor assigned", "A tutor has been assigned for the tutorial '" + post_acceptated_response.response.post.post_title + "'. Click on this notification to open it.", post_acceptated_response.response.post.std_email, "Tutorial accepted", post_acceptated_response.response.post, post_acceptated_response.response.student_notification);
+        if (!localhost) {
+            push.send_notification("Tutor assigned", "A tutor has been assigned for the tutorial '" + post_acceptated_response.response.post.post_title + "'. Click on this notification to open it.", post_acceptated_response.response.post.std_email, "Tutorial accepted", post_acceptated_response.response.post, post_acceptated_response.response.student_notification);
+        }
 
         tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
 
@@ -863,6 +875,8 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
 
 
 function load_pending_tutorial_component_signed(nav_controller, this_tutorial, tutorial_status, tutorial_tag) {
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+
     let tutor_tutorial_element = document.createElement('tutorial');
     let tutor_tutorial_element_html = `
                             <ion-header translucent>
@@ -957,18 +971,20 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                                 <strong>TUTORIAL LINKS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
-                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
-                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
-                                                            </ion-item>
-                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
-                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
-                                                            </ion-item>
+                                                            ${tutorial_links}
                                                         </ion-list> 
                                                         <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
 
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
     nav_controller.push(tutor_tutorial_element);
+
+    let cancel_tutorial;
+    let cancel_tutorial_handler = async function () {
+        device_feedback();
+
+        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, tutorial_status);
+    };
 
     let tutorial_log;
     let tutorial_log_handler = async function () {
@@ -996,18 +1012,23 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
             var i;
 
             for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                  content.style.maxHeight = null;
-                } else {
-                  content.style.maxHeight = content.scrollHeight + "px";
-                } 
-              });
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             }
         }
-        
+
+        if (document.getElementById('cancel_tutorial') !== null) {
+            cancel_tutorial = document.getElementById('cancel_tutorial');
+            cancel_tutorial.addEventListener('click', cancel_tutorial_handler, false);
+        }
+
         if (document.getElementById('view_agreement') !== null) {
             openPdf = document.getElementById("view_agreement");
             openPdf.addEventListener('click', openPdfHandler, false);
@@ -1030,6 +1051,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
             validate_agreement.removeEventListener('click', validate_agreement_handler, false);
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
         }
     };
 
@@ -1037,6 +1059,8 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 }
 
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+
     let tutorial_accepted_component = document.createElement('tutorial_requested');
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `
@@ -1130,12 +1154,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                                                 <strong>TUTORIAL LINKS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
-                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
-                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
-                                                            </ion-item>
-                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
-                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
-                                                            </ion-item>
+                                                            ${tutorial_links}
                                                         </ion-list>  
                                                         <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
@@ -1143,6 +1162,13 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_controller.push(tutorial_accepted_component);
+
+    let cancel_tutorial;
+    let cancel_tutorial_handler = async function () {
+        device_feedback();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+    };
 
     let tutorial_log;
     let tutorial_log_handler = async function () {
@@ -1156,18 +1182,23 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
             var i;
 
             for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                  content.style.maxHeight = null;
-                } else {
-                  content.style.maxHeight = content.scrollHeight + "px";
-                } 
-              });
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             }
         }
-        
+
+        if (document.getElementById('cancel_tutorial') !== null) {
+            cancel_tutorial = document.getElementById('cancel_tutorial');
+            cancel_tutorial.addEventListener('click', cancel_tutorial_handler, false);
+        }
+
         if (document.getElementById('tutorial_log') !== null) {
             tutorial_log = document.getElementById('tutorial_log');
             tutorial_log.addEventListener('click', tutorial_log_handler, false);
@@ -1177,6 +1208,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
 
         if (notifications_active_component.component.tagName !== "TUTORIAL_REQUESTED" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
+            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
@@ -1184,7 +1216,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
+function load_pending_tutorial_component_not_signed(nav_controller, this_tutorial) {
     let tutor_tutorial_element = document.createElement('tutorial');
     let date = new Date();
     let year = date.getFullYear();
@@ -1211,18 +1243,13 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
                                         <ion-datetime id="tutorial_date" value="${current_date}" min="${year}" max="${year}" placeholder="Select Date"></ion-datetime>
                                     </ion-item>
                                     <ion-item>
-                                        <ion-label>Duration <ion-text color="danger">*</ion-text></ion-label>
+                                        <ion-label>Time <ion-text color="danger">*</ion-text></ion-label>
                                         <ion-datetime id="tutorial_time" display-format="HH:mm" value="00:00"></ion-datetime>
-                                    </ion-item>
-
-                                    <ion-item>
-                                        <ion-label position="stacked">Room number<ion-text color="danger">*</ion-text></ion-label>
-                                        <ion-input id="tutorial_room" placeholder="P1119" required type="text"></ion-input>
                                     </ion-item>
 
                                     <br><br>
                                     <ion-item lines="none" style="text-align:center;"><ion-label>Your signature <ion-text color="danger">*</ion-text></ion-label></ion-item>
-                                    <div class="wrapper">
+                                    <div class="wrapper2">
                                         <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
                                     </div>
                                     <div style="text-align:center">
@@ -1235,16 +1262,31 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
                                         <ion-button expand="block" id="generate_agreement" type="submit" class="ion-no-margin">Create agreement</ion-button>
                                     </div>
                                     <p class="success_text3">Please note, the student has to agree to the agreement before a tutorial can take place.</p> 
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                 </ion-content>`;
 
     tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
     nav_controller.push(tutor_tutorial_element);
 
+    let cancel_tutorial;
+    let cancel_tutorial_handler = async function () {
+        device_feedback();
+
+        console.log("Eeeeey")
+        console.log(this_tutorial)
+
+        if (this_tutorial.post_status = "In negotiation") {
+            this_tutorial.post_status = "Pending"
+        }
+
+        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, this_tutorial.post_status);
+    };
+
     let generate_agreement_button;
     let generate_agreement_handler = async function () {
         device_feedback();
 
-        generate_agreement(nav_controller, tutorial);
+        generate_agreement(nav_controller, this_tutorial);
     };
 
     let ionNavDidChangeEvent = async function () {
@@ -1254,18 +1296,18 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
             var i;
 
             for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                  content.style.maxHeight = null;
-                } else {
-                  content.style.maxHeight = content.scrollHeight + "px";
-                } 
-              });
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             }
         }
-        
+
         if (document.getElementById('signature-pad') !== null) {
             await include("js/signature_pad.min.js", "signature_pad");
             drawing_pad();
@@ -1273,9 +1315,15 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
             generate_agreement_button.addEventListener('click', generate_agreement_handler, false);
         }
 
+        if (document.getElementById('cancel_tutorial') !== null) {
+            cancel_tutorial = document.getElementById('cancel_tutorial');
+            cancel_tutorial.addEventListener('click', cancel_tutorial_handler, false);
+        }
+
         let notifications_active_component = await nav_controller.getActive();
 
         if (notifications_active_component.component.tagName !== "TUTORIAL") {
+            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
             generate_agreement_button.removeEventListener("click", generate_agreement_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
@@ -1297,21 +1345,24 @@ function load_pending_tutorial_component_not_signed(nav_controller, tutorial) {
 
 
 async function generate_agreement(nav_controller, tutorial) {
-    if (isCanvasBlank(document.getElementById('signature-pad')) || document.getElementById('tutorial_room').value == "") {
+    if (isCanvasBlank(document.getElementById('signature-pad'))) {
         create_ionic_alert("Agreement creation failed", "Please fill in all fields before proceeding.", ["OK"]);
     } else {
         let agreement_generated_response;
 
         if (typeof tutorial._id == 'undefined') {
-            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
         } else {
-            agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutorial_room: document.getElementById('tutorial_room').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
         }
 
         console.log(agreement_generated_response);
         if (!agreement_generated_response.error) {
             //Send push notification
-            push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Tutorial accepted", {}, {});
+            if (!localhost) {
+                push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Tutorial accepted", {}, {});
+            }
+
             //push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Agreement offer accepted", agreement_generated_response.updated_tutorial, agreement_generated_response.student_notification.response);
 
             user_notifications.addToNotifications(agreement_generated_response.tutor_notification.response);
@@ -1321,7 +1372,7 @@ async function generate_agreement(nav_controller, tutorial) {
             tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
             posts.replace_notification_posts(agreement_generated_response.updated_tutorial);
             //tutor_tutorials.add_tutorial_to_DOM("Ongoing", agreement_generated_response.updated_tutorial)
- 
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -1359,8 +1410,8 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
     //Get the current post notification
     let this_post = posts.getNotificationPostDetailsById(this_notification.post_id);
     console.log("Test - " + this_notification.post_id)
-console.log("This post");
-console.log(this_post)
+    console.log("This post");
+    console.log(this_post)
     if (typeof this_post == 'undefined') {
         this_post = posts.getNotificationById(this_notification.post_id);
     }
@@ -1417,7 +1468,7 @@ console.log(this_post)
     let handler = function () {
         device_feedback();
 
-        create_ionic_alert("Accept tutorial", "Are you sure you want to accept this tutorial? You cannot unasign yourself (yet) after you have accepted a tutorial.", [
+        create_ionic_alert("Accept tutorial", "Are you sure you want to accept this tutorial?", [
             {
                 text: 'Accept',
                 handler: async () => {
@@ -1495,7 +1546,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
                                     <ion-item-divider class="divider">
                                     </ion-item-divider>
                                     <br><br>
-                                    <div class="wrapper">
+                                    <div class="wrapper2">
                                         <canvas id="signature-pad" class="signature-pad" width=300 height=200></canvas>
                                     </div>
                                     <div style="text-align:center"> 
@@ -1574,7 +1625,9 @@ async function accept_agreement(nav_controller, this_tutorial) {
 
         if (!agreement_accepted_response.error) {
             //Send push notification
-            push.send_notification("Agreement accepted", "The student has accepted your agreement for the '" + agreement_accepted_response.updated_tutorial.post_title + "' tutorial. Click on this notification to view it.", agreement_accepted_response.updated_tutorial.post_tutor_email, "Agreement accepted", {}, {});
+            if (!localhost) {
+                push.send_notification("Agreement accepted", "The student has accepted your agreement for the '" + agreement_accepted_response.updated_tutorial.post_title + "' tutorial. Click on this notification to view it.", agreement_accepted_response.updated_tutorial.post_tutor_email, "Agreement accepted", {}, {});
+            }
 
             let toast_buttons = [
                 {
@@ -1622,7 +1675,10 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
 
     if (!agreement_rejected_response.error) {
         //Send push notification
-        push.send_notification("Agreement rejected", "The student has rejected your agreement for the '" + agreement_rejected_response.updated_tutorial.post_title + "' tutorial. Click on this notification to create a new one.", agreement_rejected_response.updated_tutorial.post_tutor_email, "Agreement rejected", {}, {});
+        if (!localhost) {
+            push.send_notification("Agreement rejected", "The student has rejected your agreement for the '" + agreement_rejected_response.updated_tutorial.post_title + "' tutorial. Click on this notification to create a new one.", agreement_rejected_response.updated_tutorial.post_tutor_email, "Agreement rejected", {}, {});
+        }
+
         console.log(agreement_rejected_response)
         console.log("Before");
         console.log(tutorials.open_tutorials);
@@ -1666,6 +1722,19 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
 
 
 function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+    let cancel_button = "";
+
+    //Check to see if tutorial in progress, add another line of code to check if to add the "Begin tutorial" or "Finish tutorial" button. Use same method for creating method as u can see below.
+    if (!this_post.tutorial_started) {
+        cancel_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>';
+    }
+    
+    //Checking to see if user is student or tutor, if student, we DO NOT display Begin tutorial, if tutor, we display it
+    if(this_post.std_email !== user.getEmail()) {
+        
+    }
+
     let tutorial_accepted_component = document.createElement('tutorial_agreement_accepted');
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `
@@ -1719,7 +1788,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="begin_tutorial">Begin Tutorial</ion-button>
-                                    <ion-button style="display:none" expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
@@ -1752,25 +1821,35 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                             <strong>TUTORIAL LINKS</strong>
                                         </ion-list-header>
                                     <ion-list class="content">
-                                        <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
-                                            <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
-                                        </ion-item>
-                                        <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
-                                            <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
-                                        </ion-item>
+                                        ${tutorial_links}
                                     </ion-list>
-                                     
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
+                                     ${cancel_button}
                             </ion-content>`;
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_controller.push(tutorial_accepted_component);
-    
-    
+
+    let cancel_tutorial;
+    let cancel_tutorial_handler = async function () {
+        device_feedback();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+    };
+
     let begin_tutorial;
     let begin_tutorial_handler = async function () {
-        activate_bar_code_scanner();
+        //let student_number = await activate_bar_code_scanner();
+        let student_number = "await activate_bar_code_scanner()";
+
+        if (student_number !== "Canceled") {
+            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler);
+        }
+    };
+
+    let finish_tutorial;
+    let finish_tutorial_handler = async function () {
+        end_tutorial(nav_controller, this_post, this_post._id, tutorial_status, finish_tutorial, finish_tutorial_handler);
     };
 
     let tutorial_log;
@@ -1793,30 +1872,29 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     }
 
     let ionNavDidChangeEvent = async function () {
-        var testbtn = 1;
-        if(testbtn === 1){
-            document.getElementById("begin_tutorial").style.display = "none";
-            document.getElementById("finish_tutorial").style.display = "block";
-        }
-        
         //TUTORIAL LINKS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
 
             for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                  content.style.maxHeight = null;
-                } else {
-                  content.style.maxHeight = content.scrollHeight + "px";
-                } 
-              });
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             }
         }
-        
+
+        if (document.getElementById('cancel_tutorial') !== null) {
+            cancel_tutorial = document.getElementById('cancel_tutorial');
+            cancel_tutorial.addEventListener('click', cancel_tutorial_handler, false);
+        }
+
         if (document.getElementById('view_agreement') !== null) {
             openPdf = document.getElementById("view_agreement");
             openPdf.addEventListener('click', openPdfHandler, false);
@@ -1831,20 +1909,26 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
             validate_agreement = document.getElementById("verify_agreement");
             validate_agreement.addEventListener('click', validate_agreement_handler, false);
         }
-        
+
         if (document.getElementById('begin_tutorial') !== null) {
             begin_tutorial = document.getElementById('begin_tutorial');
             begin_tutorial.addEventListener('click', begin_tutorial_handler, false);
         }
 
-        let notifications_active_component = await nav_controller.getActive();
+        if (document.getElementById('finish_tutorial') !== null) {
+            finish_tutorial = document.getElementById('finish_tutorial');
+            finish_tutorial.addEventListener('click', finish_tutorial_handler, false);
+        }
 
+        let notifications_active_component = await nav_controller.getActive();
         if (notifications_active_component.component.tagName !== "TUTORIAL_AGREEMENT_ACCEPTED" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
             openPdf.removeEventListener("click", openPdfHandler, false);
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             validate_agreement.removeEventListener('click', validate_agreement_handler, false);
+            finish_tutorial.removeEventListener("click", finish_tutorial_handler, false);
             begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
         }
     };
 
@@ -1852,12 +1936,16 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 }
 
 
-function load_open_tutorial_component(nav_controller, this_post) {
+async function load_open_tutorial_component(nav_controller, this_post) {
     let tutorial_status = this_post.post_status;
+    let module = this_post.post_modules.join(', ');
 
     if (tutorial_status == "In Negotiation") {
         tutorial_status = "Pending";
     }
+
+    //Links for tutrial info
+    let tutorial_links = get_tutorial_links(module);
 
     let tutorial_requested_component = document.createElement('tutorial_requested');
     tutorial_requested_component.innerHTML = `<ion-header translucent>
@@ -1896,7 +1984,7 @@ function load_open_tutorial_component(nav_controller, this_post) {
 
                         <ion-chip class="module" color="primary">
                             <ion-icon name="star"></ion-icon>
-                            <ion-label>${this_post.post_modules.join(', ')}</ion-label>
+                            <ion-label>${module}</ion-label>
                         </ion-chip>
                         <!--<ion-chip class="module2" color="danger">
                           <ion-icon name="close"></ion-icon>
@@ -1945,17 +2033,19 @@ function load_open_tutorial_component(nav_controller, this_post) {
                                                                 <strong>TUTORIAL LINKS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
-                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/', '_system', 'location=yes');">
-                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript tutorial</ion-label>
-                                                            </ion-item>
-                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/', '_system', 'location=yes');">
-                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML tutorial</ion-label>
-                                                            </ion-item>
+                                                            ${tutorial_links}
                                                         </ion-list>  
                                                         <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>
                                                     </ion-content>`;
     nav_controller.push(tutorial_requested_component);
-    
+
+    let cancel_tutorial;
+    let cancel_tutorial_handler = async function () {
+        device_feedback();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+    };
+
     let ionNavDidChangeEvent = async function () {
         //TUTORIAL LINKS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
@@ -1963,68 +2053,275 @@ function load_open_tutorial_component(nav_controller, this_post) {
             var i;
 
             for (i = 0; i < coll.length; i++) {
-              coll[i].addEventListener("click", function() {
-                this.classList.toggle("active");
-                var content = this.nextElementSibling;
-                if (content.style.maxHeight){
-                  content.style.maxHeight = null;
-                } else {
-                  content.style.maxHeight = content.scrollHeight + "px";
-                } 
-              });
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
             }
+        }
+
+        if (document.getElementById('cancel_tutorial') !== null) {
+            cancel_tutorial = document.getElementById('cancel_tutorial');
+            cancel_tutorial.addEventListener('click', cancel_tutorial_handler, false);
+        }
+
+        let notifications_active_component = await nav_controller.getActive();
+
+        if (notifications_active_component.component.tagName !== "TUTORIAL_REQUESTED") {
+            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
+            nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-function change_to_finish_tutorial()
-{
-    document.getElementById("begin_tutorial").style.display = "none";
-    document.getElementById("finish_tutorial").style.display = "block";
+async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+
+    let tutorial_accepted_component = document.createElement('tutorial_complete');
+    let tutorial_accepted_component_html;
+    tutorial_accepted_component_html = `
+                            <ion-header translucent>
+                                <ion-toolbar>
+                                    <ion-buttons onclick="device_feedback()" slot="start">
+                                        <ion-back-button defaultHref="/"></ion-back-button>
+                                    </ion-buttons>
+                                    <ion-buttons onclick="device_feedback()" slot="end">
+                                        <ion-menu-button></ion-menu-button>
+                                    </ion-buttons>
+                                    <ion-title><h1 style="margin-left: 0px; margin-top: 12px;">My Tutorials</h1></ion-title>
+                                </ion-toolbar>
+                            </ion-header>
+
+                            <ion-content fullscreen>
+                                <ion-item style="margin-top:10px;" lines="none">
+                                    <ion-avatar style="width: 100px;height: 100px;" slot="start">
+                                        <img src="${this_post.std_avatar}">
+                                    </ion-avatar>
+                                    <ion-label>
+                                        <h2><strong>${this_post.std_name}</strong></h2>
+                                        <p>${this_post.std_email}</p>
+                                    </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
+                                </ion-item>
+
+
+                                <ion-item-divider class="divider"></ion-item-divider>
+                                <ion-item lines="none">
+                                    
+                                        <h6><strong>${this_post.post_title}</strong></h6>
+                                    
+                                </ion-item>
+                                <ion-item style="margin-top:-10px;" lines="none">
+                                    <p>
+                                        ${this_post.post_desc}
+                                    </p>
+                                </ion-item>
+                                        <ion-chip class="module" color="primary">
+                                    <ion-icon name="star"></ion-icon>
+                                    <ion-label>${tutorial_tag}</ion-label>
+                                </ion-chip>
+                                <!--<ion-chip class="module2" color="danger">
+                                  <ion-icon name="close"></ion-icon>
+                                  <ion-label>Closed</ion-label>
+                                </ion-chip>-->
+                                <ion-chip color="success">
+                                    <ion-icon name="swap"></ion-icon>
+                                    <ion-label>${tutorial_status}</ion-label>
+                                </ion-chip>
+                                <ion-item-divider class="divider2"></ion-item-divider>   
+                                <div class="ion-padding-top">
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                </div> 
+                                 <ion-item-divider class="divider2"></ion-item-divider>   
+                                
+                            <ion-item lines="none">
+                                    <ion-label>
+                                        <h2><strong>Tutorial stage</strong></h2>
+                                    </ion-label>
+                                </ion-item>
+                                <div class="wrapper">
+                                <ul class="StepProgress">
+                                  <li class="StepProgress-item"><strong>Open</strong>
+                                  <span>Tutorial requested. No tutor assigned.</span>
+                                  </li>
+                                  <li class="StepProgress-item"><strong>Pending</strong>
+                                  <span>Tutor has been assigned.</span>
+                                  </li>
+                                  <li class="StepProgress-item"><strong>Ongoing</strong>
+                                  <span>Agreement generated and signed. </span>
+                                  </li>
+                                  <li class="StepProgress-item current"><strong>Done</strong>
+                                  <span>Tutorial completed.</span>
+                                  </li>
+                                </ul>
+                            </div>
+                                    <ion-item-divider class="divider"></ion-item-divider>
+                                        <ion-list-header class="collapsible">
+                                            <strong>TUTORIAL LINKS</strong>
+                                        </ion-list-header>
+                                    <ion-list class="content">
+                                        ${tutorial_links}
+                                    </ion-list>
+                            </ion-content>`;
+
+    tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
+
+    nav_controller.push(tutorial_accepted_component);
+
+    let tutorial_log;
+    let tutorial_log_handler = async function () {
+        load_blockchain_component(nav_controller, this_post._id);
+    };
+
+    let validate_agreement;
+    let validate_agreement_handler = async function () {
+        device_feedback();
+
+        validate_digital_signatures({tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
+    };
+
+    let openPdf;
+    let openPdfHandler = async function () {
+        device_feedback();
+        openPDF(this_post.post_agreement_url);
+        //console.log(this_tutorial);
+    }
+
+    let ionNavDidChangeEvent = async function () {
+        //TUTORIAL LINKS ACCORDION
+        if (document.getElementsByClassName("collapsible") !== null) {
+            var coll = document.getElementsByClassName("collapsible");
+            var i;
+
+            for (i = 0; i < coll.length; i++) {
+                coll[i].addEventListener("click", function () {
+                    this.classList.toggle("active");
+                    var content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            }
+        }
+
+        if (document.getElementById('view_agreement') !== null) {
+            openPdf = document.getElementById("view_agreement");
+            openPdf.addEventListener('click', openPdfHandler, false);
+        }
+
+        if (document.getElementById('tutorial_log') !== null) {
+            tutorial_log = document.getElementById('tutorial_log');
+            tutorial_log.addEventListener('click', tutorial_log_handler, false);
+        }
+
+        if (document.getElementById('verify_agreement') !== null) {
+            validate_agreement = document.getElementById("verify_agreement");
+            validate_agreement.addEventListener('click', validate_agreement_handler, false);
+        }
+
+        let notifications_active_component = await nav_controller.getActive();
+        if (notifications_active_component.component.tagName !== "TUTORIAL_COMPLETE" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
+            openPdf.removeEventListener("click", openPdfHandler, false);
+            tutorial_log.removeEventListener("click", tutorial_log_handler, false);
+            validate_agreement.removeEventListener('click', validate_agreement_handler, false);
+            nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+        }
+    };
+
+    nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-function activate_bar_code_scanner() {
-    cordova.plugins.barcodeScanner.scan(
-            function (result) {
-//                alert("We got a barcode\n" +
-//                        "Result: " + result.text + "\n" +
-//                        "Format: " + result.format + "\n" +
-//                        "Cancelled: " + result.cancelled);
+async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status) {
+    create_ionic_alert("Cancel tutorial?", "Are you sure you want to cancel this tutorial? You cannot undo this action!", [
+        {
+            text: 'Yes',
+            handler: async () => {
+                device_feedback();
 
-                if (result.cancelled) {
-                    let toast_buttons = [
-                        {
-                            side: 'end',
-                            text: 'Close',
-                            role: 'cancel',
-                            handler: () => {
-                                console.log('Cancel clicked');
-                            }
+                console.log("Tutorial to be removed");
+                console.log(tutorial);
+
+                //Check what page we on, my tutorials or my requested tutorials
+                if (document.getElementById('my_posts_content') !== null) {
+                    tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+                } else {
+                    let total_tutorials;
+
+                    if (status === "Open") {
+                        total_tutorials = tutorials.total_open_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutorials.total_open_tutorials--;
+                            tutorials.open_tutorials = tutorials.open_tutorials.filter(e => e._id !== tutorial._id);
                         }
-                    ];
+                    } else if (status === "Pending" || status === "In negotiation") {
+                        total_tutorials = tutorials.total_pending_tutorials;
 
-                    create_toast("Barcode scanning cancelled.", "dark", 2000, toast_buttons);
-                } else if (result.format === "CODE_39" && result.text !== "") {
-                    let toast_buttons = [
-                        {
-                            side: 'end',
-                            text: 'Close',
-                            role: 'cancel',
-                            handler: () => {
-                                console.log('Cancel clicked');
-                            }
+                        if (total_tutorials > 0) {
+                            tutorials.total_pending_tutorials--;
+                            tutorials.pending_tutorials = tutorials.pending_tutorials.filter(e => e._id !== tutorial._id);
                         }
-                    ];
+                    } else if (status === "Ongoing") {
+                        total_tutorials = tutorials.total_ongoing_tutorials;
 
-                    create_toast("Student email is: " + result.text + "@student.dkit.ie", "dark", 2000, toast_buttons);
-                    change_to_finish_tutorial();
-                    return result.text;
+                        if (total_tutorials > 0) {
+                            tutorials.total_ongoing_tutorials--;
+                            tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    } else if (status === "Done") {
+                        total_tutorials = tutorials.total_done_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutorials.total_done_tutorials--;
+                            tutorials.done_tutorials = tutorials.done_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    }
                 }
-            },
-            function (error) {
-                let toast_buttons = [
+
+                if (document.getElementById('my_tutored_posts_content') !== null) {
+                    tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial)
+                } else if (user.getStatus() == "Tutor") {
+                    let total_tutorials;
+
+                    if (status === "Pending" || status === "In negotiation") {
+                        total_tutorials = tutor_tutorials.total_tutor_pending_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutor_tutorials.total_tutor_pending_tutorials--;
+                            tutor_tutorials.pending_tutor_tutorials = tutor_tutorials.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    } else if (status === "Ongoing") {
+                        total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutor_tutorials.total_tutor_ongoing_tutorials--;
+                            tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    } else if (status === "Done") {
+                        total_tutorials = tutor_tutorials.total_tutor_done_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutor_tutorials.total_tutor_done_tutorials--;
+                            tutor_tutorials.done_tutor_tutorials = tutor_tutorials.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    }
+                }
+
+                console.log("Tutorial removed?");
+                console.log(tutor_tutorials.pending_tutor_tutorials);
+
+                let cancel_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
+                let cancel_buttons = [
                     {
                         side: 'end',
                         text: 'Close',
@@ -2035,22 +2332,112 @@ function activate_bar_code_scanner() {
                     }
                 ];
 
-                create_toast("Scanning failed: " + error, "dark", 2000, toast_buttons);
-            },
-            {
-                preferFrontCamera: false, // iOS and Android
-                showFlipCameraButton: true, // iOS and Android
-                showTorchButton: true, // iOS and Android
-                torchOn: false, // Android, launch with the torch switched on (if available)
-                saveHistory: true, // Android, save scan history (default false)
-                prompt: "Place a barcode inside the scan area", // Android
-                resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
-                formats: "BAR_CODE", // default: all but PDF_417 and RSS_EXPANDED
-                orientation: "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
-                disableAnimations: true, // iOS
-                disableSuccessBeep: false // iOS and Android
+                create_toast("Tutorial canceled!", "dark", 2000, cancel_buttons);
+
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(cancel_response.student_notification.response);
+
+                posts.removeNotificationPostByPostId(tutorial_id)
+
+                if (typeof notification_posts !== 'undefined') {
+                    notification_posts = notification_posts.filter(function (obj) {
+                        return obj._id !== tutorial_id;
+                    });
+                }
+
+                console.log("Notification Posts");
+                console.log(notification_posts);
+
+                console.log("Notification Posts Remove")
+                console.log(posts.notification_posts)
+
+                //Send notification to tutor if he exists
+                if (cancel_response.tutor_exists) {
+                    user_notifications.sendNewNotification(cancel_response.tutor_notification.response);
+                }
+
+                nav_controller.pop();
             }
-    );
+        },
+        {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+                device_feedback();
+                console.log('Cancel')
+            }
+        }
+    ]);
+}
+
+async function activate_bar_code_scanner() {
+    return new Promise((resolve, reject) => {
+        cordova.plugins.barcodeScanner.scan(
+                function (result) {
+//                alert("We got a barcode\n" +
+//                        "Result: " + result.text + "\n" +
+//                        "Format: " + result.format + "\n" +
+//                        "Cancelled: " + result.cancelled);
+
+                    if (result.cancelled) {
+                        let toast_buttons = [
+                            {
+                                side: 'end',
+                                text: 'Close',
+                                role: 'cancel',
+                                handler: () => {
+                                    console.log('Cancel clicked');
+                                }
+                            }
+                        ];
+
+                        create_toast("Barcode scanning cancelled.", "dark", 2000, toast_buttons);
+                        resolve("Canceled");
+                    } else if (result.format === "CODE_39" && result.text !== "") {
+                        let toast_buttons = [
+                            {
+                                side: 'end',
+                                text: 'Close',
+                                role: 'cancel',
+                                handler: () => {
+                                    console.log('Cancel clicked');
+                                }
+                            }
+                        ];
+
+                        resolve(result.text);
+                    }
+                },
+                function (error) {
+                    let toast_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Scanning failed: " + error, "dark", 2000, toast_buttons);
+                    resolve("Canceled");
+                },
+                {
+                    preferFrontCamera: false, // iOS and Android
+                    showFlipCameraButton: true, // iOS and Android
+                    showTorchButton: true, // iOS and Android
+                    torchOn: false, // Android, launch with the torch switched on (if available)
+                    saveHistory: true, // Android, save scan history (default false)
+                    prompt: "Place a barcode inside the scan area", // Android
+                    resultDisplayDuration: 0, // Android, display scanned text for X ms. 0 suppresses it entirely, default 1500
+                    formats: "BAR_CODE", // default: all but PDF_417 and RSS_EXPANDED
+                    orientation: "landscape", // Android only (portrait|landscape), default unset so it rotates with the device
+                    disableAnimations: true, // iOS
+                    disableSuccessBeep: false // iOS and Android
+                }
+        );
+    });
 }
 
 async function validate_digital_signatures(data_object) {
@@ -2113,6 +2500,300 @@ function load_blockchain_component(nav_controller, this_post_id) {
     blockchain.load_blockchain_content(this_post_id);
 }
 
+function get_tutorial_links(tutorial_tag) {
+    let tutorial_links;
+
+    if (tutorial_tag == "Java") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/java/java_classes.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Java Classes</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/java/java_conditions.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Java Conditions</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/java/java_arrays.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Java Arrays</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "Visual Basic") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/objects-and-classes/', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Visual Basic Classes</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://docs.microsoft.com/en-us/dotnet/visual-basic/language-reference/statements/if-then-else-statement', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Visual Basic Conditions</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://docs.microsoft.com/en-us/dotnet/visual-basic/programming-guide/language-features/arrays/', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Visual Basic Arrays</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "HTML") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/whatis/whatis_htmldom.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML DOM</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/html_elements.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML Elements</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/html/html_attributes.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">HTML Attributes</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "CSS") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://blog.logrocket.com/how-css-works-understanding-the-cascade-d181cd89a4d8/', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">CSS Cascade</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/cssref/default.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">CSS Properties</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/cssref/css_selectors.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">CSS Selectors</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "JavaScript") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/js_scope.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript Scope</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/js_classes.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">JavaScript Classes</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/js/js_es6.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">ECMAScript 6</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "ASP.NET") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/asp/webpages_classes.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">ASP.NET Classes</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/asp/webpages_objects.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">ASP.NET Objects</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.com/asp/webpages_files.asp', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">ASP.NET Files</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "Networking") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://docs.oracle.com/javase/tutorial/networking/overview/networking.html', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Networking Basics</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.w3schools.in/types-of-network-protocols-and-their-uses/', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Network Protocols</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://docs.oracle.com/javase/tutorial/networking/sockets/definition.html', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Sockets</ion-label>
+                                                            </ion-item>
+    `;
+    } else if (tutorial_tag == "Databases") {
+        tutorial_links = `<ion-item onclick="cordova.InAppBrowser.open('https://www.tutorialspoint.com/Types-of-databases', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Types of Databases</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.essentialsql.com/what-is-a-database-trigger/', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Database Triggers</ion-label>
+                                                            </ion-item>
+                                                            <ion-item onclick="cordova.InAppBrowser.open('https://www.techopedia.com/definition/16455/transaction', '_blank', 'location=yes');">
+                                                                <ion-label style="font-style: italic; text-decoration: underline;" color="primary">Database Transactions</ion-label>
+                                                            </ion-item>
+    `;
+    }
+
+    return tutorial_links;
+}
+
+function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler) {
+    console.log("Start");
+    console.log(begin_tutorial);
+    console.log(begin_tutorial_handler)
+    create_ionic_alert("Begin tutorial?", "Are you sure you want to begin this tutorial? Once a tutorial is started, it cannot be canceled or paused!", [
+        {
+            text: 'Yes',
+            handler: async () => {
+                device_feedback();
+
+                //Update the tutorial 
+                let begin_response = await access_route({tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
+                let begin_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                //Update our tutorials
+                if (tutorial_status === "Ongoing") {
+                    tutorials.total_ongoing_tutorials--;
+                    tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== this_post._id);
+
+                    tutorials.ongoing_tutorials.push(begin_response.updated_tutorial);
+                }
+
+                if (user.getStatus() == "Tutor") {
+                    if (tutorial_status === "Ongoing") {
+                        tutor_tutorials.total_tutor_ongoing_tutorials--;
+                        tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== this_post._id);
+
+                        tutor_tutorials.ongoing_tutor_tutorials.push(begin_response.updated_tutorial);
+                    }
+                }
+
+                create_toast("Tutorial started!", "dark", 2000, begin_buttons);
+
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(begin_response.student_notification.response);
+
+                //Remove notification post and add new one (The post object we are using to get the information for notifications)
+                posts.removeNotificationPostByPostId(post_id);
+                posts.notification_posts.push(begin_response.updated_tutorial);
+
+                //Do same for the notification_posts variable
+                if (typeof notification_posts !== 'undefined') {
+                    notification_posts = notification_posts.filter(function (obj) {
+                        return obj._id !== post_id;
+                    });
+
+                    notification_posts.push(begin_response.updated_tutorial);
+                }
+
+
+                console.log("Notification Posts");
+                console.log(notification_posts);
+
+                console.log("Notification Posts Remove")
+                console.log(posts.notification_posts)
+
+                //REMOVE BEGIN TUTORIAL EVENT LISTENER
+                begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
+
+                //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
+
+
+                user_notifications.sendNewNotification(begin_response.tutor_notification.response);
+            }
+        },
+        {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+                device_feedback();
+                console.log('Cancel')
+            }
+        }
+    ]);
+}
+
+function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tutorial, finish_tutorial_handler) {
+    create_ionic_alert("Finish tutorial?", "Are you sure you want to finish this tutorial? The tutorial will be moved to done and be considered completed.", [
+        {
+            text: 'Yes',
+            handler: async () => {
+                device_feedback();
+
+                console.log("Tutorial to be removed");
+                console.log(tutorial);
+
+                let end_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "finish_tutorial");
+
+                //Check what page we on, my tutorials or my requested tutorials
+                if (document.getElementById('my_posts_content') !== null) {
+                    tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+                    tutorials.total_done_tutorials++;
+                    tutorials.add_post_to_segment("Done", document.getElementById('done_tutorials_header'), end_response.updated_tutorial);
+
+                    console.log(tutorials.done_tutorials);
+                } else {
+                    let total_tutorials;
+
+                    if (status === "Ongoing") {
+                        total_tutorials = tutorials.total_ongoing_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutorials.total_ongoing_tutorials--;
+                            tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    }
+
+                    //ADD A TUTORIAL TO DONE ARRAY
+                    tutorials.total_done_tutorials++;
+                    tutorials.done_tutorials.push(end_response.updated_tutorial);
+                }
+
+                if (document.getElementById('my_tutored_posts_content') !== null) {
+                    tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, end_response.updated_tutorial);
+
+                    //Add tutorial to Done segment
+                    tutor_tutorials.add_tutorial_to_DOM("Done", end_response.updated_tutorial);
+                } else if (user.getStatus() == "Tutor") {
+                    let total_tutorials;
+
+                    if (status === "Ongoing") {
+                        total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
+
+                        if (total_tutorials > 0) {
+                            tutor_tutorials.total_tutor_ongoing_tutorials--;
+                            tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                        }
+                    }
+
+                    //ADD A TUTORIAL TO DONE ARRAY
+                    tutor_tutorials.total_tutor_done_tutorials++;
+                    tutor_tutorials.done_tutor_tutorials.push(end_response.updated_tutorial);
+                }
+
+                console.log("Tutorial removed?");
+                console.log(tutor_tutorials.pending_tutor_tutorials);
+
+                let cancel_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Tutorial canceled!", "dark", 2000, cancel_buttons);
+
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(end_response.tutor_notification.response);
+
+                posts.removeNotificationPostByPostId(tutorial_id)
+
+                if (typeof notification_posts !== 'undefined') {
+                    notification_posts = notification_posts.filter(function (obj) {
+                        return obj._id !== tutorial_id;
+                    });
+
+                    notification_posts.push(end_response.updated_tutorial);
+                }
+
+                console.log("Notification Posts");
+                console.log(notification_posts);
+
+                console.log("Notification Posts Remove")
+                console.log(posts.notification_posts)
+
+                //REMOVE BEGIN TUTORIAL EVENT LISTENER
+                finish_tutorial.removeEventListener("click", finish_tutorial_handler, false);
+
+                user_notifications.sendNewNotification(end_response.student_notification.response);
+
+
+                nav_controller.pop();
+            }
+        },
+        {
+            text: 'No',
+            role: 'cancel',
+            handler: () => {
+                device_feedback();
+                console.log('Cancel')
+            }
+        }
+    ]);
+}
+
 function convertDate(inputFormat) {
     function pad(s) {
         return (s < 10) ? '0' + s : s;
@@ -2144,175 +2825,3 @@ function IsJsonString(str) {
     }
     return true;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-//function load_tutorial_accepted_component(this_post, notification_tags) {
-//    console.log("Accepted post")
-//    console.log(this_post);
-//
-//    let tutorial_status = this_post.post_status;
-//    let tutorial_tag = this_post.post_modules.join(', ');
-//
-//    if (tutorial_status == "In Negotiation") {
-//        tutorial_status = "Pending";
-//    }
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-////    tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
-////    nav.push(tutor_tutorial_element);
-////
-////    let generate_agreement_button;
-////    let generate_agreement_handler = async function () {
-////        device_feedback();
-////
-////        generate_agreement(tutorial);
-////    }
-////
-////    let ionNavDidChangeEvent = async function () {
-////        if (document.getElementById('signature-pad') !== null) {
-////            await include("js/signature_pad.min.js", "signature_pad");
-////            drawing_pad();
-////            generate_agreement_button = document.getElementById("generate_agreement");
-////            generate_agreement_button.addEventListener('click', generate_agreement_handler, false);
-////        }
-////
-////        let notifications_active_component = await nav.getActive();
-////
-////        if (notifications_active_component.component === "nav-my-tutorials") {
-////            generate_agreement_button.removeEventListener("click", generate_agreement_handler, false);
-////            nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-////        }
-////    };
-////
-////    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-//
-//    if (this_post.post_agreement_offered) {
-//        load_post_agreement_offered_component(active_nav, this_post, tutorial_tag, tutorial_status);
-//    } else if (this_post.post_agreement_signed) {
-//        load_post_agreement_signed_component(this_post);
-//    } else if (notification_tags.includes("Tutorial request accepted")) {
-//        load_pending_tutorial_component_not_signed(active_nav, this_post);
-//    } else {
-//        load_pending_tutorial_component(active_nav, this_post, tutorial_tag, tutorial_status);
-//    }
-//}
-//
-//function load_post_agreement_signed_component(this_post) {
-//    let tutorial_accepted_component = document.createElement('tutorial_requested');
-//    let tutorial_accepted_component_html;
-//    tutorial_accepted_component_html = `<ion-header translucent>
-//                                                        <ion-toolbar>
-//                                                                <ion-buttons onclick="device_feedback()" slot="start">
-//                                                            <ion-back-button defaultHref="/"></ion-back-button>
-//                                                          </ion-buttons>
-//                                                            <ion-title><h1>Tutorial</h1></ion-title>
-//                                                        </ion-toolbar>
-//                                                    </ion-header>
-//
-//                                                    <ion-content fullscreen>
-//                                                        <ion-item style="margin-top:10px;" lines="none">
-//                                                            <ion-avatar style="width: 100px;height: 100px;" slot="start">
-//                                                                <img src="${this_post.std_avatar}">
-//                                                            </ion-avatar>
-//                                                            <ion-label>
-//                                                                <h2><strong>${this_post.std_name}</strong></h2>
-//                                                                <p>${this_post.std_email}</p>
-//                                                            </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
-//                                                        </ion-item>
-//
-//
-//                                                        <ion-item-divider class="divider"></ion-item-divider>
-//                                                        <ion-item lines="none">
-//                                                            
-//                                                                <h6><strong>${this_post.post_title}</strong></h6>
-//                                                            
-//                                                        </ion-item>
-//                                                        <ion-item style="margin-top:-10px;" lines="none">
-//                                                            <p>
-//                                                                ${this_post.post_desc}
-//                                                            </p>
-//                                                        </ion-item>
-//                                                                <ion-chip class="module" color="primary">
-//                                                            <ion-icon name="star"></ion-icon>
-//                                                            <ion-label>${tutorial_tag}</ion-label>
-//                                                        </ion-chip>
-//                                                        <!--<ion-chip class="module2" color="danger">
-//                                                          <ion-icon name="close"></ion-icon>
-//                                                          <ion-label>Closed</ion-label>
-//                                                        </ion-chip>-->
-//                                                        <ion-chip color="success">
-//                                                            <ion-icon name="swap"></ion-icon>
-//                                                            <ion-label>${tutorial_status}</ion-label>
-//                                                        </ion-chip>
-//                                                         <ion-item-divider class="divider2"></ion-item-divider>  
-//                                                          <ion-item lines="none">
-//                                                            <ion-label>
-//                                                                <h2><strong>Extra information</strong></h2>
-//                                                            </ion-label>
-//                                                        </ion-item>      
-//                                                         <ion-item style="margin-top:-15px;" lines="none">
-//                                                            <h6>
-//                                                                ${this_post.post_tutor_name} has sent you an agreement, please
-//                                                                review it before accepting or rejecting it.
-//                                                           </h6>
-//
-//                                                        </ion-item> 
-//                                                            <ion-item-divider class="divider2"></ion-item-divider> 
-//                                                            <div class="ion-padding-top">
-//                                                                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-//                                                                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-//                                                                <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="accept_agreement">Accept<br/>agreement</ion-button>
-//                                                                <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="reject_agreement">Reject<br/>agreement</ion-button>
-//                                                            </div>             
-//                                                        <ion-item-divider class="divider2"></ion-item-divider> 
-//                                                    <ion-item lines="none">
-//                                                            <ion-label>
-//                                                                <h2><strong>Tutorial stage</strong></h2>
-//                                                            </ion-label>
-//                                                        </ion-item>
-//                                                            <div class="wrapper">
-//                                                            <ul class="StepProgress">
-//                                                              <li class="StepProgress-item is-done"><strong>Open</strong>
-//                                                              <span>Tutorial requested. No tutor assigned.</span>
-//                                                              </li>
-//                                                              <li class="StepProgress-item current"><strong>Pending</strong>
-//                                                              <span>Tutor has been assigned.</span>
-//                                                              </li>
-//                                                              <li class="StepProgress-item"><strong>Ongoing</strong>
-//                                                              <span>Agreement generated and signed.</span>
-//                                                              </li>
-//                                                              <li class="StepProgress-item"><strong>Done</strong>
-//                                                              <span>Tutorial completed.</span>
-//                                                              </li>
-//                                                            </ul>
-//                                                        </div><br><br>
-//                                                    </ion-content>`;
-//
-//    tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
-//
-//    active_nav.push(tutorial_accepted_component);
-//}

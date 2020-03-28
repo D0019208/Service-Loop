@@ -1,5 +1,5 @@
 "use strict"
-
+var localhost = false;
 /*
  ******************************************************************************************************************
  ******************************************************************************************************************
@@ -9,7 +9,9 @@
  */
 document.addEventListener("deviceready", function () {
     //Hide splashscreen
-    navigator.splashscreen.hide();
+    if (!localhost) {
+        navigator.splashscreen.hide();
+    }
 });
 
 document.addEventListener("DOMContentLoaded", function () { 

@@ -11,7 +11,7 @@ let tutor_tutorials_ongoing_loaded = false;
 let tutor_tutorials_done_loaded = false;
 
 
-function all_tutor_tutorials() {
+function all_tutor_tutorials(nav_controller) {
     customElements.get('nav-my-tutorials') || customElements.define('nav-my-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
             super();
@@ -48,21 +48,21 @@ function all_tutor_tutorials() {
                 <ion-segment>  
                     <ion-segment-button value="tutor_tutorials_pending_segment" checked onclick="device_feedback();">
                         <ion-label>Pending</ion-label>
-                        <IonBadge color="primary" id="pending_tutorials_badge">0</IonBadge>
+                        <IonBadge color="primary" id="pending_tutorials_badge">${tutor_tutorials.total_tutor_pending_tutorials}</IonBadge>
                     </ion-segment-button>
                     <ion-segment-button value="tutor_tutorials_ongoing_segment" onclick="device_feedback();">
                         <ion-label>Ongoing</ion-label>
-                        <IonBadge color="primary" id="ongoing_tutorials_badge">0</IonBadge>
+                        <IonBadge color="primary" id="ongoing_tutorials_badge">${tutor_tutorials.total_tutor_ongoing_tutorials}</IonBadge>
                     </ion-segment-button>
                     <ion-segment-button value="tutor_tutorials_done_segment" onclick="device_feedback();">
                         <ion-label>Done</ion-label>
-                        <IonBadge color="primary" id="done_tutorials_badge">0</IonBadge>
+                        <IonBadge color="primary" id="done_tutorials_badge">${tutor_tutorials.total_tutor_done_tutorials}</IonBadge>
                     </ion-segment-button>
                 </ion-segment>
             </ion-toolbar> 
         </ion-header> 
         <ion-content fullscreen  class="ion-padding"> 
-            <segment-content id="my_posts_content">  
+            <segment-content id="my_tutored_posts_content">  
                 <ion-list id="tutor_tutorials_pending" class="hide">
                     <ion-list-header id="pending_tutor_tutorials_header">
                         NO PENDING TUTORIALS
@@ -127,7 +127,7 @@ function all_tutor_tutorials() {
             </ion-toolbar> 
         </ion-header> 
         <ion-content fullscreen  class="ion-padding"> 
-            <segment-content id="my_posts_content">  
+            <segment-content id="my_tutored_posts_content">  
                 <ion-list id="tutor_tutorials_pending" class="hide">
                     <ion-list-header id="pending_tutor_tutorials_header">
                         ${tutor_tutorials.pending_tutor_tutorials.length ? "PENDING TUTORIALS" : "NO PENDING TUTORIALS"} 
@@ -247,8 +247,11 @@ function all_tutor_tutorials() {
             //We set the tutorials length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value 
             tutor_tutorials.pending_tutor_tutorials_length = 0;
             tutor_tutorials.ongoing_tutor_tutorials_length = 0;
-            tutor_tutorials.closed_tutor_tutorials_length = 0;
-
+            tutor_tutorials.done_tutor_tutorials_length = 0;
+            
+            console.log("?W?W?W?W?W?W?");
+            console.log(tutor_tutorials.pending_tutor_tutorials);
+            
             //List element we are appending our tutorials to  
             const pendingInfiniteScroll = document.getElementById('pending-tutorials-infinite-scroll');
             //If we have less than 3 tutorials we display all of them otherwise we display only 7
@@ -407,20 +410,23 @@ function all_tutor_tutorials() {
                         if (tutorial_status == "In negotiation") {
                             tutorial_status = "Pending";
                         }
-
+                        let active_component = await nav_controller.getActive();
+                        
                         console.log(tutorial_status);
+                        console.log("Active thign") 
+                        console.log(active_component);
 
-                        if (tutorial_status == "Pending") {
+                        if (tutorial_status == "Pending" && active_component.component == "nav-my-tutorials") {
                             if (!this_tutorial.post_agreement_offered) {
-                                load_pending_tutorial_component_not_signed(nav, tutorial);
+                                load_pending_tutorial_component_not_signed(nav_controller, this_tutorial);
                             } else {
-                                load_pending_tutorial_component_signed(nav, this_tutorial, tutorial_status, tutorial_tag)
+                                load_pending_tutorial_component_signed(nav_controller, this_tutorial, tutorial_status, tutorial_tag)
                             }
-                        } else if (tutorial_status == "Ongoing") {
+                        } else if (tutorial_status == "Ongoing" && active_component.component == "nav-my-tutorials") {
                             console.log(this_tutorial)
-                            load_ongoing_tutorial_component(nav, this_tutorial, tutorial_status, tutorial_tag);
-                        } else {
-                            load_done_tutorial_component(nav, this_tutorial, tutorial_status, tutorial_tag);
+                            load_ongoing_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
+                        } else if(tutorial_status == "Done" && active_component.component == "nav-my-tutorials") {
+                            load_done_tutorial_component(nav_controller, this_tutorial, tutorial_status, tutorial_tag);
                         }
                     }
                 });
@@ -430,6 +436,9 @@ function all_tutor_tutorials() {
         }
 
         disconnectedCallback() {
+            tutor_tutorials_ongoing_loaded = false;
+            tutor_tutorials_done_loaded = false;
+            
             console.log('Custom square element removed from page.');
         }
 
@@ -442,7 +451,7 @@ function all_tutor_tutorials() {
         }
     });
 
-    nav.push('nav-my-tutorials');
+    nav_controller.push('nav-my-tutorials');
 }  
 
 //function load_ongoing_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {

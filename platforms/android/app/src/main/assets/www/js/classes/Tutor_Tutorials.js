@@ -234,12 +234,12 @@ class Tutor_Tutorials extends User {
 
                     document.getElementById("pending_tutorials_badge").innerText = this.total_tutor_pending_tutorials;
 
-                    this.pending_tutor_tutorials = this.pending_tutor_tutorials.filter(e => e !== this_tutorial);
+                    this.pending_tutor_tutorials = this.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
                 }
             } else {
                 if (total_tutorials > 0) {
                     this.total_tutor_pending_tutorials--;
-                    this.pending_tutor_tutorials = this.pending_tutor_tutorials.filter(e => e !== this_tutorial);
+                    this.pending_tutor_tutorials = this.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
                 }
             }
         } else if (segment == "Ongoing") {
@@ -260,12 +260,12 @@ class Tutor_Tutorials extends User {
 
                     document.getElementById("ongoing_tutorials_badge").innerText = this.total_tutor_ongoing_tutorials;
 
-                    this.ongoing_tutor_tutorials = this.ongoing_tutor_tutorials.filter(e => e !== this_tutorial);
+                    this.ongoing_tutor_tutorials = this.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
                 }
             } else {
                 if (total_tutorials > 0) {
                     this.total_tutor_ongoing_tutorials--;
-                    this.ongoing_tutor_tutorials = this.ongoing_tutor_tutorials.filter(e => e !== this_tutorial);
+                    this.ongoing_tutor_tutorials = this.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
                 }
             }
         } else {
@@ -286,12 +286,12 @@ class Tutor_Tutorials extends User {
 
                     document.getElementById("done_tutorials_badge").innerText = this.total_tutor_done_tutorials;
 
-                    this.done_tutor_tutorials = this.done_tutor_tutorials.filter(e => e !== this_tutorial);
+                    this.done_tutor_tutorials = this.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
                 }
             } else {
                 if (total_tutorials > 0) {
                     this.total_tutor_done_tutorials--;
-                    this.done_tutor_tutorials = this.done_tutor_tutorials.filter(e => e !== this_tutorial);
+                    this.done_tutor_tutorials = this.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
                 }
             }
         }
@@ -438,5 +438,14 @@ class Tutor_Tutorials extends User {
         }
         
         console.log(this.pending_tutor_tutorials)
+    }
+    
+    remove_tutorial(segment, tutorial) {
+        console.log("Removing")
+        if(segment === "Pending") {
+            this.pending_tutor_tutorials.filter(function(e) {
+                return e !== 'seven' 
+            });
+        }
     }
 }

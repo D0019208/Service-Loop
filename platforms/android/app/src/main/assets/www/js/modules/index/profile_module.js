@@ -92,10 +92,10 @@ function load_profile_page(nav_controller) {
             
             <ion-list>
                 <ion-list-header>
-                  <strong>SKILLS</strong>
+                  <strong>SUBJECTS</strong>
                 </ion-list-header>
                 <ion-button id="edit_skills" class='edit_skills' fill="outline" slot="end">Edit</ion-button>
-                <ion-list id="profile_skills" style='margin-left:10px;'>
+                <ion-list id="profile_skills" style='margin-left:10px;margin-top: 1px;'>
                 </ion-list>
             </ion-list>
         </ion-content>
@@ -251,7 +251,7 @@ function load_profile_page(nav_controller) {
                 let modal_content = `
                 <ion-header translucent>
                   <ion-toolbar>
-                    <ion-title>Edit Skills</ion-title>
+                    <ion-title>Edit subjects</ion-title>
                     <ion-buttons onclick="device_feedback()" slot="end">
                       <ion-button id="modal_close">Close</ion-button>
                     </ion-buttons>
@@ -260,7 +260,7 @@ function load_profile_page(nav_controller) {
                 <ion-content fullscreen> 
                       <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                     <ion-item>
-                        <ion-select class="my-select" multiple="true" selected-text="Click to edit skills" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
+                        <ion-select class="my-select" multiple="true" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
                             <ion-select-option value="HTML5">HTML5</ion-select-option>
                             <ion-select-option value="CSS3">CSS3</ion-select-option>    
                             <ion-select-option value="JavaScript">JavaScript</ion-select-option>
@@ -336,10 +336,16 @@ function load_profile_page(nav_controller) {
                         
                         access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
                         set_secure_storage("user_modules", skills_array); 
-                        
-                        create_toast("Skills saved successfully.", "dark", 2000, toast_buttons); 
+                        user.setModules(skills_array);
+
+                        create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons); 
                         
                         dismissModal(currentModal);
+                        
+                        document.getElementById("profile_skills").innerHTML = "";  //update skills
+                        for (var i = 0; i < user.modules.length; i++) {
+                            document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
+                        }
                     });
 
                     document.getElementById("modal_close").addEventListener('click', () => {
@@ -365,4 +371,3 @@ function load_profile_page(nav_controller) {
 
     nav_controller.push('nav-profile');
 }
-
