@@ -311,7 +311,7 @@ class Tutorials extends User {
                 }
             }
         } else if (segment == "Ongoing") {
-            container = this.total_ongoing_tutorials;
+            container = document.getElementById('ongoing');
 
             if (container) {
                 total_tutorials = container.querySelectorAll('.test').length;
@@ -326,7 +326,7 @@ class Tutorials extends User {
 
                     this.total_ongoing_tutorials--;
 
-                    document.getElementById("ongoing_tutorials_badge").innerText = this.total_ongoing_tutorials;
+                    document.getElementById("ongoing_badge").innerText = this.total_ongoing_tutorials;
 
                     this.ongoing_tutorials = this.ongoing_tutorials.filter(e => e._id !== tutorial._id);
                 }
@@ -352,7 +352,7 @@ class Tutorials extends User {
 
                     this.total_done_tutorials--;
 
-                    document.getElementById("done_tutorials_badge").innerText = this.total_done_tutorials;
+                    document.getElementById("done_badge").innerText = this.total_done_tutorials;
 
                     this.done_tutorials = this.done_tutorials.filter(e => e._id !== tutorial._id);
                 }

@@ -860,6 +860,24 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
             nav_notifications.push(nav_notification_tutorial_agreement_accepted);
+        } else if (this_post.post_status !== "Ongoing") {
+            nav_notification_tutorial_agreement_accepted.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+            nav_notifications.push(nav_notification_tutorial_agreement_accepted);
         } else {
             nav_notification_tutorial_agreement_accepted.innerHTML = `
           <ion-header translucent>
@@ -1019,6 +1037,100 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notifications.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
         }
     } else if (notification_tags.includes("Tutorial cancelled") && notification_tags.length !== 0) {
+        device_feedback();
+        console.log("Notification <>")
+        console.log(notification);
+
+        //Find a notification from notifications object that matches the ID of the clicked element.
+        let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
+        let this_post;
+
+        //We get the post that this notifiaction relates to by comparing the post id's
+        for (let i = 0; i < notification_posts.length; i++) {
+            if (this_notification.post_id === notification_posts[i]._id) {
+                this_post = notification_posts[i];
+            }
+        }
+
+        if (!this_notification.notification_opened) {
+            this_notification.notification_opened = true;
+            user_notifications.subtractUnreadNotifications();
+            notification.parentNode.classList.remove("not_read");
+            notification.parentNode.classList.add("read");
+            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+            user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
+        }
+
+        let nav_notification_tutorial_canceled = document.createElement('nav-notification-tutorial-agreement-accepted');
+
+
+        nav_notification_tutorial_canceled.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+
+        //The button to which we are applying the event listener
+        nav_notifications.push(nav_notification_tutorial_canceled);
+    } else if (notification_tags.includes("Tutorial started") && notification_tags.length !== 0) {
+        device_feedback();
+        console.log("Notification <>")
+        console.log(notification);
+
+        //Find a notification from notifications object that matches the ID of the clicked element.
+        let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
+        let this_post;
+
+        //We get the post that this notifiaction relates to by comparing the post id's
+        for (let i = 0; i < notification_posts.length; i++) {
+            if (this_notification.post_id === notification_posts[i]._id) {
+                this_post = notification_posts[i];
+            }
+        }
+
+        if (!this_notification.notification_opened) {
+            this_notification.notification_opened = true;
+            user_notifications.subtractUnreadNotifications();
+            notification.parentNode.classList.remove("not_read");
+            notification.parentNode.classList.add("read");
+            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+            user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
+        }
+
+        let nav_notification_tutorial_canceled = document.createElement('nav-notification-tutorial-agreement-accepted');
+
+
+        nav_notification_tutorial_canceled.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+
+        //The button to which we are applying the event listener
+        nav_notifications.push(nav_notification_tutorial_canceled);
+    } else if (notification_tags.includes("Tutorial finished") && notification_tags.length !== 0) {
         device_feedback();
         console.log("Notification <>")
         console.log(notification);
