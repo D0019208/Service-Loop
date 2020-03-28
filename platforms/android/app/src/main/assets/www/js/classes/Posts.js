@@ -2,6 +2,7 @@ class Posts extends User {
     constructor(id, posts, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
         super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
 
+
         this.all_posts = posts.response;
 
         //Check to see if there are any posts (If empty, there will be a string)

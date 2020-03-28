@@ -217,7 +217,7 @@ class Notifications extends User {
             this.notifications_length += 1;
         }
     }  
-
+    
     sendNewNotification(notification) {
         this.socket.emit('send_notification', notification);
     }

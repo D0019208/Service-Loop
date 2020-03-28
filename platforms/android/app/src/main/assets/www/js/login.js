@@ -1,5 +1,5 @@
 "use strict"
-
+var localhost = false;
 /*
  ******************************************************************************************************************
  ******************************************************************************************************************
@@ -16,17 +16,19 @@ if (localStorage.getItem("fingerprint_setup") !== null) {
 
 document.addEventListener("deviceready", function () {
     //Hide splashscreen
-    navigator.splashscreen.hide();
+    if (!localhost) {
+        navigator.splashscreen.hide();
+    }
 });
 
-document.addEventListener("DOMContentLoaded", function () { 
-    
+document.addEventListener("DOMContentLoaded", function () {
+
     let fingerprint_active = false;
-    
+
     document.getElementById('login').addEventListener('click', () => {
         device_feedback();
     });
-    
+
     document.querySelector('form').addEventListener('submit', (event) => {
         event.preventDefault();
         document.getElementById('login').disabled = true;
@@ -37,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //Login using fingerprint
     document.getElementById("fingerprint").addEventListener('click', async () => {
         device_feedback();
-        
+
         if (!fingerprint_active) {
             fingerprint_active = true;
             let fingerprint_available = await is_fingerprint_available();
@@ -53,11 +55,13 @@ document.addEventListener("DOMContentLoaded", function () {
                     create_ionic_alert("Fingerprint authentication failed", "Please setup fingerprint authentication in the Settings page first.", ["OK"]);
                 }
             } else {
-                create_ionic_alert("Fingerprint authentication failed", "Unfortunetly your device does not support fingerprint authentication, please \n\
+                create_ionic_alert("Fingerprint authentication failed", "Unfortunately your device does not support fingerprint authentication, please \n\
             use your email and password instead.", ["OK"]);
             }
-            
-            setTimeout(function(){ fingerprint_active = false; }, 1000);
+
+            setTimeout(function () {
+                fingerprint_active = false;
+            }, 1000);
         }
     });
 }, false);

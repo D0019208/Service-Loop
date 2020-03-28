@@ -152,7 +152,6 @@ class User {
             const content = await rawResponse.json();
 
             if (content.session_response !== "Session valid") {
-                alert("Session NOT valid")
                 await remove_secure_storage("jwt_session");
                 window.location.href = "login.html";
                 return;

@@ -16,6 +16,7 @@ var active_nav;
 var push;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
+var localhost = false;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -28,9 +29,8 @@ Element.prototype.appendAfter = function (element) {
  ******************************************************************************************************************
  ******************************************************************************************************************
  */
-//deviceready
-//DOMContentLoaded
-document.addEventListener("deviceready", async function () {
+let start = localhost ? "DOMContentLoaded" : "deviceready";
+document.addEventListener(start, async function () {
     user = new User();
     let home_component;
     let notifications_response;
@@ -38,24 +38,37 @@ document.addEventListener("deviceready", async function () {
     let tutorial_slides_status = localStorage.getItem("tutorial_slides");
     current_tab = 'home';
     previous_tab = 'home';
+    let name;
 
-    //Once we are sure that the users session is valid, we populate the User class 
-    let name = await get_secure_storage("user_name");
-    user.setName(name.replace(/\s+$/, ''));
-    user.setEmail(await get_secure_storage("users_email"));
+    if (!localhost) {
+        //Once we are sure that the users session is valid, we populate the User class 
+        name = await get_secure_storage("user_name");
+        user.setName(name.replace(/\s+$/, ''));
+        user.setEmail(await get_secure_storage("users_email"));
 
-    if (IsJsonString(await get_secure_storage("user_status"))) {
-        user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+        if (IsJsonString(await get_secure_storage("user_status"))) {
+            user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
+        }
     }
 
-    //Set status of user to tutor
-    //user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-    //user.setStatus("Tutor");
-    //user.setEmail("nikito888@gmail.com");
+    if (localhost) {
+        //Set status of user to tutor
+//        user.setName("John Doe".replace(/\s+$/, ''));
+//        user.setStatus("Student");
+//        user.setEmail("D00192082@student.dkit.ie");
 
-    //Check to make sure that the users session has not expired
-    await user.check_session(user.getEmail());
+        //Set status of user to tutor
+        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+        user.setStatus("Tutor");
+        user.setEmail("nikito888@gmail.com");
+    }
 
+    if (!localhost) {
+        //Check to make sure that the users session has not expired
+        await user.check_session(user.getEmail());
+    } else {
+        await user.check_session_local(user.getEmail())
+    }
     //If a user is a tutor, then he has modules he can offer and thus he can view the forum
     //and he cannot apply to become a tutor again
 
@@ -185,8 +198,12 @@ document.addEventListener("deviceready", async function () {
             document.getElementById('menu_avatar').src = user.getAvatar();
 
             if (user.getStatus() === "Tutor") {
-                user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-                //user.setModules(["PHP", "JavaScript", "Java"]);
+                if (!localhost) {
+                    user.setModules(JSON.parse(await get_secure_storage("user_modules")));
+                } else {
+                    user.setModules(["HTML", "JavaScript", "Java"]);
+                }
+
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -263,14 +280,6 @@ document.addEventListener("deviceready", async function () {
                                 </ion-list>
                                 
                                 <hr><hr> 
-                
-                                 <ion-list class='home_buttons ion-activatable ripple' id='barcode_scanner'>
-                                    <h6>Barcode scanner</h6>
-                                   
-                                    <img class='b_circle' src="images/circle.png" alt=""/>
-                                    <img class='i_exchange' src="images/i_exchange.png" alt=""/>
-                                    <ion-ripple-effect></ion-ripple-effect>
-                                </ion-list> 
                                 <!--<ion-item onclick="navigateForward()">
                                     Navigate Forward
                                 </ion-item>--> 
@@ -278,7 +287,7 @@ document.addEventListener("deviceready", async function () {
                     
                         </ion-content>`;
                 //We get all the users notifications based off his email and modules
-                notifications_response = await access_route({ users_email: user.getEmail(), user_tutor: { is_tutor: true, user_modules: user.getModules() } }, "get_all_notifications");
+                notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: true, user_modules: user.getModules()}}, "get_all_notifications");
             } else {
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
@@ -327,6 +336,7 @@ document.addEventListener("deviceready", async function () {
                                 <hr><hr>
                                 <ion-list class='home_buttons ion-activatable ripple' id="home_tutor_application">
                                     <h6>Apply to be a tutor</h6>
+                                    <p>Submit an application to become a tutor today!</p>
                                     <img class='b_circle' src="images/circle.png" alt=""/>
                                     <img class='i_search' src="images/i_search.png" alt=""/>
                                     <ion-ripple-effect></ion-ripple-effect>
@@ -343,13 +353,14 @@ document.addEventListener("deviceready", async function () {
                             </div>
                         </ion-content>`;
                 //We get all the users notificatios based only on his email as the user is not a tutor
-                notifications_response = await access_route({ users_email: user.getEmail(), user_tutor: { is_tutor: false, user_modules: user.getModules() } }, "get_all_notifications");
+                notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications");
             }
 
             this.innerHTML = home_component;
             //Hide splashscreen
-            navigator.splashscreen.hide();
-
+            if (!localhost) {
+                navigator.splashscreen.hide();
+            }
             //Update the users UI depending on what the user is
             document.getElementById('user_name').innerText = user.getName();
             if (user.getStatus() === "Tutor") {
@@ -385,14 +396,14 @@ document.addEventListener("deviceready", async function () {
 
             user.createWebSocketConnection();
             if (user.getStatus() === "Tutor") {
-                posts = new Posts(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutorials = new Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutor_tutorials = new Tutor_Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                posts = new Posts(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
                 posts.waitForNewTutorials();
             } else {
-                posts = new Posts(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutorials = new Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-                tutor_tutorials = new Tutor_Tutorials(user.getId(), { response: [] }, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                posts = new Posts(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutorials = new Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+                tutor_tutorials = new Tutor_Tutorials(user.getId(), {response: []}, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
             }
 
             blockchain = new Blockchain();
@@ -407,10 +418,11 @@ document.addEventListener("deviceready", async function () {
             }
 
             //Setup push notifications
-            push = new Push_Notifications("c08fd8bd-bfbf-4dd3-bc07-61d214842ccd");
-            push.initialize();
-            push.set_user_id(user.getEmail());
-            //push.send_notification("Test title", "Test body", user.getEmail(), "test", {foo: "bar"});
+            if (!localhost) {
+                push = new Push_Notifications("c08fd8bd-bfbf-4dd3-bc07-61d214842ccd");
+                push.initialize();
+                push.set_user_id(user.getEmail());
+            }
 
             //Now that we have notifications, we need to add a badge to show all unread notifications
             user_notifications.addUnreadNotificationsToDOM();
@@ -474,18 +486,6 @@ document.addEventListener("deviceready", async function () {
                     all_tutor_tutorials(active_nav);
                 });
             }
-
-
-
-
-
-
-
-            //Barcode scanner call
-            document.getElementById('barcode_scanner').addEventListener('click', () => {
-                activate_bar_code_scanner();
-            });
-
         }
 
         //Callback to call when component is removed
