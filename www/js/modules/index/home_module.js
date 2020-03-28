@@ -16,7 +16,8 @@ var active_nav;
 var push;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
-var localhost = false;
+//var localhost = false;
+var localhost = true;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
