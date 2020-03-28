@@ -247,7 +247,7 @@ function all_tutor_tutorials(nav_controller) {
             //We set the tutorials length to 0 as when you first launch the component you do not see the elements scrolled thus we need to reset the value 
             tutor_tutorials.pending_tutor_tutorials_length = 0;
             tutor_tutorials.ongoing_tutor_tutorials_length = 0;
-            tutor_tutorials.closed_tutor_tutorials_length = 0;
+            tutor_tutorials.done_tutor_tutorials_length = 0;
             
             console.log("?W?W?W?W?W?W?");
             console.log(tutor_tutorials.pending_tutor_tutorials);
@@ -424,7 +424,7 @@ function all_tutor_tutorials(nav_controller) {
                             }
                         } else if (tutorial_status == "Ongoing" && active_component.component == "nav-my-tutorials") {
                             console.log(this_tutorial)
-                            load_ongoing_tutorial_component(nav_controller, this_tutorial, tutorial_status, tutorial_tag);
+                            load_ongoing_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         } else if(tutorial_status == "Done" && active_component.component == "nav-my-tutorials") {
                             load_done_tutorial_component(nav_controller, this_tutorial, tutorial_status, tutorial_tag);
                         }
