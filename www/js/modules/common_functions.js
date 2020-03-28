@@ -2082,7 +2082,7 @@ async function load_open_tutorial_component(nav_controller, this_post) {
 }
 
 async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
-    let tutorial_links = get_tutorial_links(tutorial_tag);
+    let tutorial_links = get_tutorial_links(tutorial_status);
 
     let tutorial_accepted_component = document.createElement('tutorial_complete');
     let tutorial_accepted_component_html;
@@ -2605,7 +2605,9 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
             text: 'Yes',
             handler: async () => {
                 device_feedback();
-
+                alert(post_id);
+                alert(student_number);
+                alert(user.getAvatar());
                 //Update the tutorial 
                 let begin_response = await access_route({tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
                 let begin_buttons = [
@@ -2753,7 +2755,7 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                     }
                 ];
 
-                create_toast("Tutorial canceled!", "dark", 2000, cancel_buttons);
+                create_toast("Tutorial finished!", "dark", 2000, cancel_buttons);
 
                 user_notifications.addUnreadNotificationsToDOM();
                 user_notifications.addToNotifications(end_response.tutor_notification.response);
