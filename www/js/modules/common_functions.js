@@ -486,7 +486,12 @@ function isCanvasBlank(canvas) {
 
 function load_post_agreement_offered_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-
+    
+    let tutor_info = "";
+    if(this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+    
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
             <ion-toolbar>
@@ -510,7 +515,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                     <p>${this_post.std_email}</p>
                 </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
             </ion-item>
-
+            
+            ${tutor_info}
 
             <ion-item-divider class="divider"></ion-item-divider>
             <ion-item lines="none">
@@ -565,10 +571,10 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             </ion-item>
             <div class="wrapper">
             <ul class="StepProgress">
-              <li class="StepProgress-item current"><strong>Open</strong>
+              <li class="StepProgress-item is-done"><strong>Open</strong>
               <span>Tutorial requested. No tutor assigned.</span>
               </li>
-              <li class="StepProgress-item"><strong>Pending</strong>
+              <li class="StepProgress-item current"><strong>Pending</strong>
               <span>Tutor has been assigned.</span>
               </li>
               <li class="StepProgress-item"><strong>Ongoing</strong>
@@ -877,7 +883,12 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
 
 function load_pending_tutorial_component_signed(nav_controller, this_tutorial, tutorial_status, tutorial_tag) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-
+    
+    let tutor_info = "";
+    if(this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+    
     let tutor_tutorial_element = document.createElement('tutorial');
     let tutor_tutorial_element_html = `
                             <ion-header translucent>
@@ -903,7 +914,8 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                     </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+                                
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     <ion-label>
@@ -1061,6 +1073,11 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
+    
+    let tutor_info = "";
+    if(this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
 
     let tutorial_accepted_component = document.createElement('tutorial_requested');
     let tutorial_accepted_component_html;
@@ -1088,7 +1105,8 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                     </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+    
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     
@@ -1725,15 +1743,25 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
 function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
     let cancel_button = "";
+    let begin_button = "";
 
     //Check to see if tutorial in progress, add another line of code to check if to add the "Begin tutorial" or "Finish tutorial" button. Use same method for creating method as u can see below.
     if (!this_post.tutorial_started) {
         cancel_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>';
+        if(this_post.std_email !== user.getEmail()) {
+            begin_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="begin_tutorial">Begin Tutorial</ion-button>';
+        }
+    }
+    else
+    {
+        if(this_post.std_email !== user.getEmail()) {
+            begin_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>';
+        }
     }
     
-    //Checking to see if user is student or tutor, if student, we DO NOT display Begin tutorial, if tutor, we display it
+    let tutor_info = "";
     if(this_post.std_email !== user.getEmail()) {
-        
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
 
     let tutorial_accepted_component = document.createElement('tutorial_agreement_accepted');
@@ -1762,7 +1790,8 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                     </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+                                
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     
@@ -1788,8 +1817,8 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 </ion-chip>
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="begin_tutorial">Begin Tutorial</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
+                                    ${begin_button}
+                                    <ion-button style="display:none;" expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
@@ -1803,13 +1832,13 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 </ion-item>
                                 <div class="wrapper">
                                 <ul class="StepProgress">
-                                  <li class="StepProgress-item current"><strong>Open</strong>
+                                  <li class="StepProgress-item is-done"><strong>Open</strong>
                                   <span>Tutorial requested. No tutor assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Pending</strong>
+                                  <li class="StepProgress-item is-done"><strong>Pending</strong>
                                   <span>Tutor has been assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Ongoing</strong>
+                                  <li class="StepProgress-item current"><strong>Ongoing</strong>
                                   <span>Agreement generated and signed. </span>
                                   </li>
                                   <li class="StepProgress-item"><strong>Done</strong>
@@ -2082,8 +2111,13 @@ async function load_open_tutorial_component(nav_controller, this_post) {
 }
 
 async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
-    let tutorial_links = get_tutorial_links(tutorial_status);
-
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+    
+    let tutor_info = "";
+    if(this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+    
     let tutorial_accepted_component = document.createElement('tutorial_complete');
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `
@@ -2110,7 +2144,8 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                     </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+                                
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     
@@ -2149,13 +2184,13 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                 </ion-item>
                                 <div class="wrapper">
                                 <ul class="StepProgress">
-                                  <li class="StepProgress-item"><strong>Open</strong>
+                                  <li class="StepProgress-item is-done"><strong>Open</strong>
                                   <span>Tutorial requested. No tutor assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Pending</strong>
+                                  <li class="StepProgress-item is-done"><strong>Pending</strong>
                                   <span>Tutor has been assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Ongoing</strong>
+                                  <li class="StepProgress-item is-done"><strong>Ongoing</strong>
                                   <span>Agreement generated and signed. </span>
                                   </li>
                                   <li class="StepProgress-item current"><strong>Done</strong>
@@ -2667,6 +2702,9 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
                 begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
 
                 //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
+                var element = document.getElementById("begin_tutorial");
+                element.parentNode.removeChild(element);
+                document.getElementById("finish_tutorial").style.display = "block";
 
 
                 user_notifications.sendNewNotification(begin_response.tutor_notification.response);

@@ -89,10 +89,13 @@ document.addEventListener(start, async function () {
 
     <ion-content fullscreen>
       <ion-slides pager="true">
+        <div id="swipe" class="swipe-hint swipe-horizontal">
+            <img src="images/swipe.png" alt=""/>
+        </div>
 
-        <ion-slide>
-            
-          <img src="images/slide-1.png"/>
+        <ion-slide id="slide-1" style="background-color: black;">
+
+              <img id="slide-1-img" style="opacity:0.4;" src="images/slide-1.png"/>
           
           
         </ion-slide>
@@ -126,12 +129,15 @@ document.addEventListener(start, async function () {
           </ion-toolbar>
         </ion-header>
 
-        <ion-content fullscreen>
+        <ion-content id="slides-content" fullscreen>
           <ion-slides pager="true">
+            <div id="swipe" class="swipe-hint swipe-horizontal">
+                <img src="images/swipe.png" alt=""/>
+            </div>
+        
+            <ion-slide id="slide-1" style="background-color: black;">
 
-            <ion-slide>
-
-              <img src="images/slide-1.png"/>
+              <img id="slide-1-img" style="opacity:0.4;" src="images/slide-1.png"/>
 
 
             </ion-slide>
@@ -169,11 +175,24 @@ document.addEventListener(start, async function () {
             }
             nav.pop();
         }
+        
+        //Remove swipe gesture from the slides
+        let removeSwipe;
+        let removeSwipeHandler = async function () {
+            document.getElementById("swipe").style.display = "none";
+            document.getElementById("slide-1-img").style.opacity = "1";
+            document.getElementById("slide-1").style.backgroundColor = "white";
+        }
 
         let ionNavDidChangeEvent = async function () {
             if (document.getElementById('continue_slides') !== null) {
                 closeTutorial = document.getElementById("continue_slides");
                 closeTutorial.addEventListener('click', closeTutorialHandler, false);
+                
+                removeSwipe = document.getElementById("slides-content");
+                removeSwipe.addEventListener('touchstart', removeSwipeHandler, false);
+                
+                
             }
 
             let active_component = await nav.getActive();
@@ -185,6 +204,7 @@ document.addEventListener(start, async function () {
             if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
                 if (typeof closeTutorial !== 'undefined') {
                     closeTutorial.removeEventListener("click", closeTutorialHandler, false);
+                    removeSwipe.removeEventListener("touchstart", removeSwipeHandler, false);
                     nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
                 }
             }
