@@ -28,7 +28,7 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                         <ion-list-header>
                             ACCOUNT SETTINGS
                         </ion-list-header><!--<p>Manage information about you...</p>-->
-                        <ion-list class="ion-activatable ripple">
+                        <ion-list id="personal_info" class="ion-activatable ripple">
                             <ion-item lines='none' >
                                 <ion-avatar slot="start">
                                     <img src="images/i_person.png">
@@ -60,7 +60,7 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                         <ion-list-header>
                             SECURITY
                         </ion-list-header>
-                        <ion-list class="ion-activatable ripple">
+                        <ion-list id="change_pass" class="ion-activatable ripple">
                             <ion-item lines='none'>
                                 <ion-avatar slot="start">
                                     <img src="images/i_lock.png">
@@ -592,6 +592,117 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
     }
 });
 
+document.getElementById('personal_info').addEventListener('click', async () => {
+    device_feedback();
+    let modal_text;
+
+    modal_text = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-title>Personal Information</ion-title>
+              <ion-buttons onclick="device_feedback()" slot="end">
+                <ion-button id="modal_close">Close</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+              <ion-list class="fields" style="text-align:center;">
+            <p><strong>Personal Information</strong></p>
+            <p>Bellow you can change your personal information.</p>
+            
+              </ion-list>
+        <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+            <ion-item class="line">
+            </ion-item>
+            
+        <!--<ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Full Name</ion-label>
+            <ion-input align="center" placeholder="John Wick" id="new_full_name" type="text" ></ion-input>
+        </ion-item>
+
+        <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Student Email</ion-label>
+            <ion-input align="center" placeholder="example@gmail.com" id="new_email" type="email" ></ion-input>
+        </ion-item>-->
+
+        <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Phone Number</ion-label>
+            <ion-input align="center" placeholder="1234567890" id="new_phone_number" type="tel" ></ion-input>
+        </ion-item>
+
+        <div class="ion-padding-top">
+          <ion-button expand="block" type="button" class="ion-no-margin" id="update_info">Update Information</ion-button>
+        </div>
+            <p style="text-align: center; color: gray;">Make sure information is correct!</p>
+
+          </ion-content>
+        `;
+
+    let modal_created = await createModal(controller, modal_text);
+
+    modal_created.present().then(() => {
+        currentModal = modal_created;
+
+        document.getElementById("modal_close").addEventListener('click', () => { 
+            dismissModal(currentModal);
+        });
+    });
+});
+
+document.getElementById('change_pass').addEventListener('click', async () => {
+    device_feedback();
+    let modal_text;
+
+    modal_text = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-title>Change Password</ion-title>
+              <ion-buttons onclick="device_feedback()" slot="end">
+                <ion-button id="modal_close">Close</ion-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+              <ion-list class="fields" style="text-align:center;">
+            <p><strong>Change Password</strong></p>
+            <p>To change your password, please enter old password and new password twice.</p>
+            
+              </ion-list>
+        <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+            <ion-item class="line">
+            </ion-item>
+            
+          <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Old password <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="********" id="old_password" required type="password"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">New password <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="********" id="new_password" required type="password"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Confirm password <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="********" id="conf_new_password" required type="password"></ion-input>
+          </ion-item>
+
+        <div class="ion-padding-top">
+          <ion-button expand="block" type="button" class="ion-no-margin" id="change_password">Change Password</ion-button>
+        </div>
+            <p style="text-align: center; color: gray;">You cannot undo this action!</p>
+
+          </ion-content>
+        `;
+
+    let modal_created = await createModal(controller, modal_text);
+
+    modal_created.present().then(() => {
+        currentModal = modal_created;
+
+        document.getElementById("modal_close").addEventListener('click', () => { 
+            dismissModal(currentModal);
+        });
+    });
+});
 
 document.getElementById('terms_and_conditons').addEventListener('click', async () => {
     device_feedback();

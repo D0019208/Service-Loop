@@ -39,6 +39,11 @@ function load_profile_page(nav_controller) {
                 <p id="user_email_profile">D00194503@student.dkit.ie</p>
                 <br>
                 <h2><strong id="user_status_profile">TUTOR</strong></h2>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star checked"></span>
+                <span class="fa fa-star"></span>
+                <span class="fa fa-star"></span>
             </ion-label>
         </ion-item>
             
