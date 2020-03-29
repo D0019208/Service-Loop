@@ -191,7 +191,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -212,7 +212,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -232,7 +232,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -316,7 +316,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -335,7 +335,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -382,7 +382,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -428,7 +428,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -450,7 +450,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -470,7 +470,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -490,7 +490,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -510,7 +510,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -527,7 +527,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -649,7 +649,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -669,7 +669,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -689,7 +689,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -709,7 +709,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -1246,6 +1246,12 @@ function load_tutorial_accepted_component(this_post, notification_tags) {
 
 function load_post_agreement_signed_component(this_post) {
     let tutorial_accepted_component = document.createElement('tutorial_requested');
+    
+    let tutor_info = "";
+    if(this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+    
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `<ion-header translucent>
                                                         <ion-toolbar>
@@ -1266,7 +1272,8 @@ function load_post_agreement_signed_component(this_post) {
                                                                 <p>${this_post.std_email}</p>
                                                             </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                                         </ion-item>
-
+                                                        
+                                                        ${tutor_info}
 
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                         <ion-item lines="none">

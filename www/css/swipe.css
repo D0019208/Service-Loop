@@ -1,0 +1,130 @@
+.swipe-hint {
+                margin: 100px;
+                z-index: 1000;
+            }
+            .swipe-hint.swipe-horizontal {
+                position: absolute;
+                width: 165px;
+                left: 40px;
+            }
+            .swipe-hint.swipe-horizontal img {
+                position: absolute;
+                display: inline-block;
+                -webkit-animation: hint-finger ease-in 2s;
+                animation: hint-finger ease-in 2s;
+                -webkit-animation-iteration-count: infinite;
+                animation-iteration-count: infinite;
+                z-index: 1000;
+            }
+            .swipe-hint.swipe-horizontal:before {
+                position: absolute;
+                content: " ";
+                background: -webkit-gradient(linear, left top, right top, from(#1e5799), color-stop(15%, rgba(44, 102, 165, 0.5)), color-stop(99%, rgba(124, 184, 231, 0)), to(rgba(125, 185, 232, 0)));
+                background: linear-gradient(to right, #1e5799 0%, rgba(44, 102, 165, 0.5) 15%, rgba(124, 184, 231, 0) 99%, rgba(125, 185, 232, 0) 100%);
+                right: 136px;
+                top: 13px;
+                width: 0;
+                height: 20px;
+                -webkit-animation: hint-dot ease-in 2s;
+                animation: hint-dot ease-in 2s;
+                -webkit-animation-iteration-count: infinite;
+                animation-iteration-count: infinite;
+            }
+
+            @-webkit-keyframes hint-finger {
+                0% {
+                    right: 0;
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                }
+                20% {
+                    right: 0;
+                    -webkit-transform: scale(0.9);
+                    transform: scale(0.9);
+                }
+                50% {
+                    right: 100px;
+                    -webkit-transform: scale(0.9);
+                    transform: scale(0.9);
+                }
+                60% {
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                }
+                70% {
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                    right: 100px;
+                }
+                100% {
+                    right: 0;
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                }
+            }
+
+            @keyframes hint-finger {
+                0% {
+                    right: 0;
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                }
+                20% {
+                    right: 0;
+                    -webkit-transform: scale(0.9);
+                    transform: scale(0.9);
+                }
+                50% {
+                    right: 100px;
+                    -webkit-transform: scale(0.9);
+                    transform: scale(0.9);
+                }
+                60% {
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                }
+                70% {
+                    right: 100px;
+                }
+                100% {
+                    right: 0;
+                    -webkit-transform: scale(1);
+                    transform: scale(1);
+                }
+            }
+            @-webkit-keyframes hint-dot {
+                20% {
+                    opacity: 0;
+                    width: 0;
+                }
+                50% {
+                    opacity: 0.7;
+                    width: 100px;
+                }
+                60% {
+                    opacity: 0;
+                    width: 100px;
+                }
+                100% {
+                    opacity: 0;
+                    width: 0;
+                }
+            }
+            @keyframes hint-dot {
+                20% {
+                    opacity: 0;
+                    width: 0;
+                }
+                50% {
+                    opacity: 0.7;
+                    width: 100px;
+                }
+                60% {
+                    opacity: 0;
+                    width: 100px;
+                }
+                100% {
+                    opacity: 0;
+                    width: 0;
+                }
+            }
