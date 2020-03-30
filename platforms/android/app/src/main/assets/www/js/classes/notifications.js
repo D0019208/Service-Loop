@@ -50,7 +50,7 @@ class Notifications extends User {
 
     getTotalNotifications() {
         return this.total_notifications;
-    } 
+    }
 
     subtractUnreadNotifications() {
         if (this.unread_notifications != 0) {
@@ -217,15 +217,23 @@ class Notifications extends User {
             this.notifications_length += 1;
         }
     }  
-    
+
+    sendTutorialFinished(notification, post) {
+        this.socket.emit('finish_tutorial', {the_notification: notification, the_post: post});
+    }
+
     sendNewNotification(notification) {
         this.socket.emit('send_notification', notification);
+    }
+
+    sendBeginTutorialNotification(notification, post) {
+        this.socket.emit('begin_tutorial', {the_notification: notification, the_post: post});
     }
 
     sendTutorialAcceptedNotification(notification, post) {
         this.socket.emit('tutorial_request_accepted', {the_notification: notification, the_post: post});
     }
-    
+
     sendAgreementGeneratedNotification(notification, post) {
         this.socket.emit('agreement_generated', {the_notification: notification, the_post: post});
     }
@@ -233,14 +241,14 @@ class Notifications extends User {
     sendAgreementRejectedNotification(notification, post) {
         this.socket.emit('agreement_rejected', {the_notification: notification, the_post: post});
     }
-    
+
     sendAgreementAcceptedNotification(notification, post) {
         this.socket.emit('agreement_accepted', {the_notification: notification, the_post: post});
     }
 
     wait_for_agreement_rejected() {
         let socket = this.socket;
-        
+
         socket.on('agreement_rejected_tutor', (data) => {
             let toast_buttons = [
                 {
@@ -257,12 +265,21 @@ class Notifications extends User {
             new_message_ping.play();
             tutor_tutorials.update_tutorial("Pending", data.post);
             posts.replace_notification_posts(data.post);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
-        
+
         socket.on('agreement_accepted_tutor', (data) => {
             let toast_buttons = [
                 {
@@ -277,26 +294,106 @@ class Notifications extends User {
 
             create_toast("A tutorial agreement has been accepted!", "dark", 3000, toast_buttons);
             new_message_ping.play();
-            tutor_tutorials.update_tutorial("Pending", data.post);
+
+            //PROBLEM HERE, Cannot read property 'parentNode' of undefined, TUTOR_TUTORIAL LINE 300
+            tutor_tutorials.remove_tutor_tutorial_from_DOM("Pending", {updated_tutorial: {_id: data.post._id}}, data.post);
+            tutor_tutorials.add_tutorial_to_DOM("Ongoing", data.post)
             posts.replace_notification_posts(data.post);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
-    } 
+    }
 
     waitForNewNotifications() {
         let socket = this.socket;
 
-        socket.on('new_notification', (data) => { 
+        socket.on('new_notification', (data) => {
             new_message_ping.play();
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
             console.log(data);
         });
-        
-        
+
+        socket.on('tutorial_has_finished', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial has finished!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
+
+            posts.replace_notification_posts(data.post);
+
+            tutorials.remove_tutorial_from_DOM("Ongoing", {updated_tutorial: {_id: data.post._id}}, data.post);
+
+            tutorials.add_post_to_segment("Done", document.getElementById('done_tutorials_header'), data.post);
+
+            posts.replace_notification_posts(data.post);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+
+            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response);
+
+            console.log(data);
+        });
+
+        socket.on('tutorial_has_begun', (data) => {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial has been begun!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
+
+            tutorials.update_my_tutorial("Ongoing", data.post);
+
+            posts.replace_notification_posts(data.post);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+
+            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response);
+
+            console.log(data);
+        });
 
         socket.on('add_tutorial_request_accepted_notification', (data) => {
             let toast_buttons = [
@@ -312,15 +409,20 @@ class Notifications extends User {
 
             create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
             new_message_ping.play();
+
             posts.replace_notification_posts(data.post);
+
+            tutorials.remove_tutorial_from_DOM("Open", {updated_tutorial: {_id: data.post._id}}, data.post);
+
+            tutorials.add_post_to_segment("Pending", document.getElementById('pending_tutorials_header'), data.post);
 
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
-        
-        socket.on('add_agreement_created_notification', (data) => { 
+
+        socket.on('add_agreement_created_notification', (data) => {
             let toast_buttons = [
                 {
                     side: 'end',
@@ -334,7 +436,10 @@ class Notifications extends User {
 
             create_toast("A new agreement has been created!", "dark", 3000, toast_buttons);
             new_message_ping.play();
+
             posts.replace_notification_posts(data.post);
+
+            tutorials.update_my_tutorial("Pending", data.post);
 
             //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);

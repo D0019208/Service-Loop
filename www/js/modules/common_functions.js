@@ -2891,7 +2891,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
             </ion-list>
 
             <div class="ion-padding-top">
-                <ion-button expand="block" type="button" class="ion-no-margin" id="rate_tutor_button">Rate Tutor</ion-button>
+                <ion-button expand="block" style="padding-left:5%;padding-right: 5%;" type="button" class="ion-no-margin" id="rate_tutor_button">Rate Tutor</ion-button>
             </div>
             <!--<p style="text-align: center; color: gray;">Any extra text!</p>-->
 

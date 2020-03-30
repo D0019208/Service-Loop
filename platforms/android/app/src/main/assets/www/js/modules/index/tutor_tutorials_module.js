@@ -35,7 +35,7 @@ function all_tutor_tutorials(nav_controller) {
             }
 
             let html;
-            if (tutor_tutorials_response.response === "There are no posts to display!") {
+            if (tutor_tutorials.get_all_tutor_tutorials() === "There are no posts to display!") {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
@@ -316,7 +316,7 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!tutor_tutorials_ongoing_loaded || document.getElementById('tutor_tutorials_ongoing').childElementCount <= 2) {
+                        if (!tutor_tutorials_ongoing_loaded || document.getElementById('tutor_tutorials_ongoing').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3  
                             if (tutor_tutorials.get_ongoing_tutor_tutorials().length <= 3) {
                                 tutor_tutorials.ongoing_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_ongoing_tutor_tutorials().length, ongoingInfiniteScroll, tutor_tutorials.ongoing_tutor_tutorials, tutor_tutorials.ongoing_tutor_tutorials_length);
@@ -356,7 +356,7 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.ongoing.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!tutor_tutorials_done_loaded || document.getElementById('tutor_tutorials_done').childElementCount <= 2) {
+                        if (!tutor_tutorials_done_loaded || document.getElementById('tutor_tutorials_done').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutor_tutorials.get_done_tutor_tutorials().length <= 3) {
                                 tutor_tutorials.done_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_done_tutor_tutorials().length, doneInfiniteScroll, tutor_tutorials.done_tutor_tutorials, tutor_tutorials.done_tutor_tutorials_length);
@@ -426,7 +426,7 @@ function all_tutor_tutorials(nav_controller) {
                             console.log(this_tutorial)
                             load_ongoing_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         } else if(tutorial_status == "Done" && active_component.component == "nav-my-tutorials") {
-                            load_done_tutorial_component(nav_controller, this_tutorial, tutorial_status, tutorial_tag);
+                            load_done_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         }
                     }
                 });

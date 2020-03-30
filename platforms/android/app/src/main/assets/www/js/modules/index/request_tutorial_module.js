@@ -130,28 +130,29 @@ console.log("Notification posts 2")
 
 
                     //MAYBE USELESS CODE (1ST IF)
-                    if (document.getElementById('open-tutorials-infinite-scroll') !== null) {
-                        if (tutorials.total_open_tutorials == 0) {
-                            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
-                            
-                        }
-                        
-                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]); 
-                        console.log(tutorials.open_tutorials);
-                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
-                        
-                        tutorials.appendPosts(1, document.getElementById('open-tutorials-infinite-scroll'), [tutorial_request_response.response[0]], tutorials.open_tutorials_length);
-                    } else {
-                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]);  
-                        console.log("idl");
-                        console.log(tutorials.open_tutorials);
-                        console.log(tutorials.open_tutorials.length)
-                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
-                    }
-
+//                    if (document.getElementById('open-tutorials-infinite-scroll') !== null) {
+//                        if (tutorials.total_open_tutorials == 0) {
+//                            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
+//                            
+//                        }
+//                        
+//                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]); 
+//                        console.log(tutorials.open_tutorials);
+//                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+//                        
+//                        tutorials.appendPosts(1, document.getElementById('open-tutorials-infinite-scroll'), [tutorial_request_response.response[0]], tutorials.open_tutorials_length);
+//                    } else {
+//                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]);  
+//                        console.log("idl");
+//                        console.log(tutorials.open_tutorials);
+//                        console.log(tutorials.open_tutorials.length)
+//                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+//                    }
                     
-                    //UPDATE THE AMOUNT OF OPEN TUTORIALS THAT THIS USER HAS (USED IN PROFILE)
-                    user.setOpenTutorials(user.getOpenTutorials() + 1);
+                    tutorials.add_post_to_segment("Open", document.getElementById('pending_tutorials_header'), tutorial_request_response.response[0]);
+                    if(typeof tutorials.all_tutorials === 'string') {
+                        tutorials.all_tutorials = [tutorial_request_response.response[0]];
+                    }
 
 
 

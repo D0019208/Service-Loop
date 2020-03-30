@@ -54,14 +54,14 @@ document.addEventListener(start, async function () {
 
     if (localhost) {
         //Set status of user to tutor
-        user.setName("John Doe".replace(/\s+$/, ''));
-        user.setStatus("Student");
-        user.setEmail("D00192082@student.dkit.ie");
+//        user.setName("John Doe".replace(/\s+$/, ''));
+//        user.setStatus("Student");
+//        user.setEmail("D00192082@student.dkit.ie");
 
         //Set status of user to tutor
-//        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-//        user.setStatus("Tutor");
-//        user.setEmail("nikito888@gmail.com");
+        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+        user.setStatus("Tutor");
+        user.setEmail("nikito888@gmail.com");
     }
 
     if (!localhost) {
@@ -245,7 +245,7 @@ document.addEventListener(start, async function () {
                             </ion-content>-->
                             
                             <ion-avatar id="profile_home" style="width: 80px;height: 80px; margin: auto; margin-top: -5px;" >
-                                <img id="user_avatar_home" src=${user.getAvatar()}>
+                                <img id="user_avatar_home" src=${user.getAvatar() + "?" + performance.now()}>
                             </ion-avatar>
                             <ion-label style="text-align:center;">
                                 <h1 style="color:white;"><strong id="user_name">John</strong></h1>
@@ -329,7 +329,7 @@ document.addEventListener(start, async function () {
                                 <ion-button expand="block" onclick="openMenu()">Open Menu</ion-button>
                             </ion-content>-->
                             <ion-avatar id="profile_home" style="width: 80px;height: 80px; margin: auto; margin-top: -5px;" >
-                                <img id="user_avatar_home" src="${user.getAvatar()}">
+                                <img id="user_avatar_home" src="${user.getAvatar() + "?" + performance.now()}">
                             </ion-avatar>
                             <ion-label style="text-align:center;">
                                 <h1 style="color:white;"><strong id="user_name">John</strong></h1>

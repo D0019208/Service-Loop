@@ -489,7 +489,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
     let tutor_info = "";
-    if (this_post.std_email !== user.getEmail()) {
+    if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
 
@@ -745,8 +745,13 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
         if (!localhost) {
             push.send_notification("Tutor assigned", "A tutor has been assigned for the tutorial '" + post_acceptated_response.response.post.post_title + "'. Click on this notification to open it.", post_acceptated_response.response.post.std_email, "Tutorial accepted", post_acceptated_response.response.post, post_acceptated_response.response.student_notification);
         }
-
-        tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
+        
+        if(typeof tutor_tutorials.all_tutor_tutorials === 'string') {
+            tutor_tutorials.all_tutor_tutorials = [post_acceptated_response.response.post];
+        }
+        
+        tutor_tutorials.add_tutorial_to_DOM("Pending", post_acceptated_response.response.post);
+//        tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
 
         let name = post_acceptated_response.response.post.std_name;
 
@@ -886,8 +891,8 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
     let tutor_info = "";
-    if (this_post.std_email !== user.getEmail()) {
-        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    if (this_tutorial.std_email === user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_tutorial.post_tutor_name}<br><strong>Email:</strong> ${this_tutorial.post_tutor_email}</p></ion-item>`;
     }
 
     let tutor_tutorial_element = document.createElement('tutorial');
@@ -1076,7 +1081,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
     let tutor_info = "";
-    if (this_post.std_email !== user.getEmail()) {
+    if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
 
@@ -1661,22 +1666,13 @@ async function accept_agreement(nav_controller, this_tutorial) {
             ];
 
             create_toast("Agreement accepted.", "dark", 2000, toast_buttons);
-
-            user_notifications.addToNotifications(agreement_accepted_response.student_notification.response);
             user_notifications.sendAgreementAcceptedNotification({response: agreement_accepted_response.tutor_notification.response}, agreement_accepted_response.updated_tutorial);
 
             //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
             posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
-            tutorials.add_ongoing_post(agreement_accepted_response.updated_tutorial);
-
-            if (document.getElementById('ongoing_tutorials_header') !== null) {
-                tutorials.remove_tutorial_by_id(tutorials.pending_tutorials, agreement_accepted_response.updated_tutorial._id);
-                tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), this_tutorial);
-            }
-
-            if (document.getElementById('pending_tutorials_header') !== null) {
-                tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
-            }
+            
+            tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), agreement_accepted_response.updated_tutorial);
+            tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
         } else {
             create_ionic_alert("Failed to accept agreement", agreement_accepted_response.response, ["OK"]);
         }
@@ -1719,12 +1715,6 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
         }
 
         tutorials.total_open_tutorials = tutorials.open_tutorials.length;
-
-        if (document.getElementById('open_tutorials_header') !== null) {
-            tutorials.add_post_to_segment("Open", document.getElementById('open_tutorials_header'), agreement_rejected_response.updated_tutorial);
-            tutorials.remove_tutorial_from_DOM("Pending", agreement_rejected_response, this_tutorial);
-        }
-
         tutorials.update_my_tutorial("Pending", agreement_rejected_response.updated_tutorial);
     } else {
         create_ionic_alert("Failed to reject agreement", agreement_rejected_response.response, ["OK"]);
@@ -1760,7 +1750,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     }
 
     let tutor_info = "";
-    if (this_post.std_email !== user.getEmail()) {
+    if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
 
@@ -1869,8 +1859,9 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 
     let begin_tutorial;
     let begin_tutorial_handler = async function () {
-        let student_number = await activate_bar_code_scanner();
-
+        //let student_number = await activate_bar_code_scanner();
+        let student_number = "1234";
+        
         if (student_number !== "Canceled") {
             start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler);
         }
@@ -1955,9 +1946,14 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             validate_agreement.removeEventListener('click', validate_agreement_handler, false);
             finish_tutorial.removeEventListener("click", finish_tutorial_handler, false);
-            begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
+            if (typeof begin_tutorial !== 'undefined') {
+                begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
+            }
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-            cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
+
+            if (typeof cancel_tutorial !== 'undefined') {
+                cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
+            }
         }
     };
 
@@ -2114,12 +2110,12 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
     let tutor_info = "";
-    if (this_post.std_email !== user.getEmail()) {
+    if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
-    
+
     let rate_button = "";
-    if(!this_post.tutor_rated && this_post.std_email === user.getEmail()) {
+    if (!this_post.tutor_rated && this_post.std_email === user.getEmail()) {
         rate_button = `<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="rate_tutor">Rate tutor</ion-button>`
     }
 
@@ -2285,11 +2281,11 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
             openPdf.removeEventListener("click", openPdfHandler, false);
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             validate_agreement.removeEventListener('click', validate_agreement_handler, false);
-            
-            if (rate_the_tutor !== null || typeof rate_the_tutor === 'undefined') {
+
+            if (rate_the_tutor !== null && typeof rate_the_tutor !== 'undefined') {
                 rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
             }
-            
+
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
@@ -2723,9 +2719,9 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
                 var element = document.getElementById("begin_tutorial");
                 element.parentNode.removeChild(element);
                 document.getElementById("finish_tutorial").style.display = "block";
-
-
-                user_notifications.sendNewNotification(begin_response.tutor_notification.response);
+console.log("STOP!!!!!!!!")
+console.log(begin_response.student_notification.response);
+                user_notifications.sendBeginTutorialNotification(begin_response.student_notification.response, begin_response.updated_tutorial);
             }
         },
         {
@@ -2835,7 +2831,7 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                 //REMOVE BEGIN TUTORIAL EVENT LISTENER
                 finish_tutorial.removeEventListener("click", finish_tutorial_handler, false);
 
-                user_notifications.sendNewNotification(end_response.student_notification.response);
+                user_notifications.sendTutorialFinished(end_response.student_notification.response, end_response.updated_tutorial);
 
 
                 nav_controller.pop();
@@ -2853,9 +2849,9 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
 }
 
 function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_tutor, rate_the_tutor_handler) {
-    
+
     let menu_buttons = '';
-    if(from_forum) {
+    if (from_forum) {
         menu_buttons = `<ion-buttons onclick="device_feedback()" slot="start">
                                         <ion-back-button defaultHref="/"></ion-back-button>
                                     </ion-buttons>
@@ -2863,7 +2859,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
                                         <ion-menu-button></ion-menu-button>
                                     </ion-buttons>`;
     }
-    
+
     let rate_tutor_component = document.createElement('rate_tutor');
     let rate_tutor_component_html;
     rate_tutor_component_html = `
@@ -2895,7 +2891,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
             </ion-list>
 
             <div class="ion-padding-top">
-                <ion-button expand="block" type="button" class="ion-no-margin" id="rate_tutor_button">Rate Tutor</ion-button>
+                <ion-button expand="block" style="padding-left:5%;padding-right: 5%;" type="button" class="ion-no-margin" id="rate_tutor_button">Rate Tutor</ion-button>
             </div>
             <!--<p style="text-align: center; color: gray;">Any extra text!</p>-->
 
@@ -2938,9 +2934,6 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
 
             console.log("Notification Posts Remove")
             console.log(posts.notification_posts)
-
-            //RELEASE 3
-            //user_notifications.sendNewNotification(end_response.student_notification.response);
 
             let cancel_buttons = [
                 {
