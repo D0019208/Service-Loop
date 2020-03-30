@@ -1859,8 +1859,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 
     let begin_tutorial;
     let begin_tutorial_handler = async function () {
-        //let student_number = await activate_bar_code_scanner();
-        let student_number = "1234";
+        let student_number = await activate_bar_code_scanner();
         
         if (student_number !== "Canceled") {
             start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler);
