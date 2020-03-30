@@ -290,6 +290,8 @@ function dismissModal(currentModal) {
             currentModal = null;
         });
     }
+
+    return null;
 }
 
 /*
@@ -486,6 +488,11 @@ function isCanvasBlank(canvas) {
 function load_post_agreement_offered_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
+    let tutor_info = "";
+    if (this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
             <ion-toolbar>
@@ -509,7 +516,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                     <p>${this_post.std_email}</p>
                 </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
             </ion-item>
-
+            
+            ${tutor_info}
 
             <ion-item-divider class="divider"></ion-item-divider>
             <ion-item lines="none">
@@ -564,10 +572,10 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             </ion-item>
             <div class="wrapper">
             <ul class="StepProgress">
-              <li class="StepProgress-item current"><strong>Open</strong>
+              <li class="StepProgress-item is-done"><strong>Open</strong>
               <span>Tutorial requested. No tutor assigned.</span>
               </li>
-              <li class="StepProgress-item"><strong>Pending</strong>
+              <li class="StepProgress-item current"><strong>Pending</strong>
               <span>Tutor has been assigned.</span>
               </li>
               <li class="StepProgress-item"><strong>Ongoing</strong>
@@ -877,6 +885,11 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
 function load_pending_tutorial_component_signed(nav_controller, this_tutorial, tutorial_status, tutorial_tag) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
+    let tutor_info = "";
+    if (this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+
     let tutor_tutorial_element = document.createElement('tutorial');
     let tutor_tutorial_element_html = `
                             <ion-header translucent>
@@ -902,7 +915,8 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                     </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+                                
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     <ion-label>
@@ -1061,6 +1075,11 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
+    let tutor_info = "";
+    if (this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+
     let tutorial_accepted_component = document.createElement('tutorial_requested');
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `
@@ -1087,7 +1106,8 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                     </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+    
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     
@@ -1724,15 +1744,24 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
 function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
     let cancel_button = "";
+    let begin_button = "";
 
     //Check to see if tutorial in progress, add another line of code to check if to add the "Begin tutorial" or "Finish tutorial" button. Use same method for creating method as u can see below.
     if (!this_post.tutorial_started) {
         cancel_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="cancel_tutorial">Cancel Tutorial</ion-button>';
+        if (this_post.std_email !== user.getEmail()) {
+            begin_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="begin_tutorial">Begin Tutorial</ion-button>';
+        }
+    } else
+    {
+        if (this_post.std_email !== user.getEmail()) {
+            begin_button = '<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>';
+        }
     }
-    
-    //Checking to see if user is student or tutor, if student, we DO NOT display Begin tutorial, if tutor, we display it
-    if(this_post.std_email !== user.getEmail()) {
-        
+
+    let tutor_info = "";
+    if (this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
 
     let tutorial_accepted_component = document.createElement('tutorial_agreement_accepted');
@@ -1761,7 +1790,8 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                     </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+                                
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     
@@ -1787,8 +1817,8 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 </ion-chip>
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="begin_tutorial">Begin Tutorial</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
+                                    ${begin_button}
+                                    <ion-button style="display:none;" expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
@@ -1802,13 +1832,13 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                 </ion-item>
                                 <div class="wrapper">
                                 <ul class="StepProgress">
-                                  <li class="StepProgress-item current"><strong>Open</strong>
+                                  <li class="StepProgress-item is-done"><strong>Open</strong>
                                   <span>Tutorial requested. No tutor assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Pending</strong>
+                                  <li class="StepProgress-item is-done"><strong>Pending</strong>
                                   <span>Tutor has been assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Ongoing</strong>
+                                  <li class="StepProgress-item current"><strong>Ongoing</strong>
                                   <span>Agreement generated and signed. </span>
                                   </li>
                                   <li class="StepProgress-item"><strong>Done</strong>
@@ -2081,7 +2111,17 @@ async function load_open_tutorial_component(nav_controller, this_post) {
 }
 
 async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
-    let tutorial_links = get_tutorial_links(tutorial_status);
+    let tutorial_links = get_tutorial_links(tutorial_tag);
+
+    let tutor_info = "";
+    if (this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+    
+    let rate_button = "";
+    if(!this_post.tutor_rated && this_post.std_email === user.getEmail()) {
+        rate_button = `<ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="rate_tutor">Rate tutor</ion-button>`
+    }
 
     let tutorial_accepted_component = document.createElement('tutorial_complete');
     let tutorial_accepted_component_html;
@@ -2109,7 +2149,8 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                     </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                 </ion-item>
 
-
+                                ${tutor_info}
+                                
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">
                                     
@@ -2138,6 +2179,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
+                                    ${rate_button}
                                 </div> 
                                  <ion-item-divider class="divider2"></ion-item-divider>   
                                 
@@ -2148,13 +2190,13 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                 </ion-item>
                                 <div class="wrapper">
                                 <ul class="StepProgress">
-                                  <li class="StepProgress-item"><strong>Open</strong>
+                                  <li class="StepProgress-item is-done"><strong>Open</strong>
                                   <span>Tutorial requested. No tutor assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Pending</strong>
+                                  <li class="StepProgress-item is-done"><strong>Pending</strong>
                                   <span>Tutor has been assigned.</span>
                                   </li>
-                                  <li class="StepProgress-item"><strong>Ongoing</strong>
+                                  <li class="StepProgress-item is-done"><strong>Ongoing</strong>
                                   <span>Agreement generated and signed. </span>
                                   </li>
                                   <li class="StepProgress-item current"><strong>Done</strong>
@@ -2174,6 +2216,11 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
 
     nav_controller.push(tutorial_accepted_component);
+
+    let rate_the_tutor;
+    let rate_the_tutor_handler = async function () {
+        rate_tutor(nav_controller, this_post, this_post._id, true, rate_the_tutor, rate_the_tutor_handler);
+    };
 
     let tutorial_log;
     let tutorial_log_handler = async function () {
@@ -2213,6 +2260,11 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
             }
         }
 
+        if (document.getElementById('rate_tutor') !== null && this_post.std_name === user.getName()) {
+            rate_the_tutor = document.getElementById("rate_tutor");
+            rate_the_tutor.addEventListener('click', rate_the_tutor_handler, false);
+        }
+
         if (document.getElementById('view_agreement') !== null) {
             openPdf = document.getElementById("view_agreement");
             openPdf.addEventListener('click', openPdfHandler, false);
@@ -2229,10 +2281,15 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
         }
 
         let notifications_active_component = await nav_controller.getActive();
-        if (notifications_active_component.component.tagName !== "TUTORIAL_COMPLETE" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG") {
+        if (notifications_active_component.component.tagName !== "TUTORIAL_COMPLETE" && notifications_active_component.component.tagName !== "BLOCKCHAIN_AUDIT_LOG" && notifications_active_component.component.tagName !== "RATE_TUTOR") {
             openPdf.removeEventListener("click", openPdfHandler, false);
             tutorial_log.removeEventListener("click", tutorial_log_handler, false);
             validate_agreement.removeEventListener('click', validate_agreement_handler, false);
+            
+            if (rate_the_tutor !== null || typeof rate_the_tutor === 'undefined') {
+                rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
+            }
+            
             nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
         }
     };
@@ -2604,9 +2661,6 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
             text: 'Yes',
             handler: async () => {
                 device_feedback();
-                alert(post_id);
-                alert(student_number);
-                alert(user.getAvatar());
                 //Update the tutorial 
                 let begin_response = await access_route({tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
                 let begin_buttons = [
@@ -2666,6 +2720,9 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
                 begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
 
                 //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
+                var element = document.getElementById("begin_tutorial");
+                element.parentNode.removeChild(element);
+                document.getElementById("finish_tutorial").style.display = "block";
 
 
                 user_notifications.sendNewNotification(begin_response.tutor_notification.response);
@@ -2793,6 +2850,166 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
             }
         }
     ]);
+}
+
+function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_tutor, rate_the_tutor_handler) {
+    
+    let menu_buttons = '';
+    if(from_forum) {
+        menu_buttons = `<ion-buttons onclick="device_feedback()" slot="start">
+                                        <ion-back-button defaultHref="/"></ion-back-button>
+                                    </ion-buttons>
+                                    <ion-buttons onclick="device_feedback()" slot="end">
+                                        <ion-menu-button></ion-menu-button>
+                                    </ion-buttons>`;
+    }
+    
+    let rate_tutor_component = document.createElement('rate_tutor');
+    let rate_tutor_component_html;
+    rate_tutor_component_html = `
+                            <ion-header translucent>
+            <ion-toolbar>
+                ${menu_buttons}
+                <ion-title style="text-align:center;">Rate Tutor</ion-title>
+            </ion-toolbar>
+        </ion-header>
+        <ion-content>
+            <ion-list class="fields" style="text-align:center;">
+                <p><strong>Rate Tutor Experience</strong></p>
+                <p>Please rate your tutor based on the tutorial experience you have experienced.</p>
+            </ion-list>
+
+            <ion-list align="center" style="">
+                <fieldset class="rating">
+                    <input type="radio" id="star5" name="rating" value="5" /><label class = "star full" value="5" for="star5"></label>
+                    <input type="radio" id="star4half" name="rating" value="4.5" /><label class="star half" value="4.5" for="star4half"></label>
+                    <input type="radio" id="star4" name="rating" value="4" /><label class = "star full" value="4" for="star4"></label>
+                    <input type="radio" id="star3half" name="rating" value="3.5" /><label class="star half" value="3.5" for="star3half"></label>
+                    <input type="radio" id="star3" name="rating" value="3" /><label class = "star full" value="3" for="star3"></label>
+                    <input type="radio" id="star2half" name="rating" value="2.5" /><label class="star half" value="2.5" for="star2half"></label>
+                    <input type="radio" id="star2" name="rating" value="2" /><label class = "star full" value="2" for="star2"></label>
+                    <input type="radio" id="star1half" name="rating" value="1.5" /><label class="star half" value="1.5" for="star1half"></label>
+                    <input type="radio" id="star1" name="rating" value="1" /><label class = "star full" value="1" for="star1"></label>
+                    <input type="radio" id="starhalf" name="rating" value="0.5" /><label class="star half" value="0.5" for="starhalf"></label>
+                </fieldset>
+            </ion-list>
+
+            <div class="ion-padding-top">
+                <ion-button expand="block" type="button" class="ion-no-margin" id="rate_tutor_button">Rate Tutor</ion-button>
+            </div>
+            <!--<p style="text-align: center; color: gray;">Any extra text!</p>-->
+
+        </ion-content>`;
+
+    rate_tutor_component.innerHTML = rate_tutor_component_html;
+
+    nav_controller.push(rate_tutor_component);
+
+    let rating = 0;
+
+    let rate;
+    let rate_handler = async function () {
+        device_feedback();
+
+        if (rating !== 0) {
+            let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating}, "rate_tutor");
+
+            tutorials.remove_tutorial_by_id(tutorials.done_tutorials, tutorial_id);
+            tutorials.done_tutorials.push(rate_response.updated_tutorial);
+
+
+
+            console.log("Tutorial removed?");
+            console.log(tutorials.done_tutor_tutorials);
+
+            //IMPORTNAT!!!! LOOK INTO ADDING THIS FOR CANCEL, BEGIN AND FINISH TUTORIAL!!!!!!!!
+            posts.replace_notification_posts(rate_response.updated_tutorial);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== tutorial_id;
+                });
+
+                notification_posts.push(rate_response.updated_tutorial);
+            }
+
+            console.log("Notification Posts");
+            console.log(notification_posts);
+
+            console.log("Notification Posts Remove")
+            console.log(posts.notification_posts)
+
+            //RELEASE 3
+            //user_notifications.sendNewNotification(end_response.student_notification.response);
+
+            let cancel_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("Tutor rated " + rating + "/5!", "dark", 2000, cancel_buttons);
+
+            if (from_forum) {
+                rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
+                rate_the_tutor.remove();
+            }
+
+            nav_controller.pop();
+        } else {
+            let cancel_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("Please choose a rating!", "dark", 2000, cancel_buttons);
+        }
+    };
+
+    let tab_bar = document.querySelector('ion-tab-bar');
+    tab_bar.style.display = 'none';
+
+    let all_stars;
+    let all_stars_handler = function () {
+        rating = this.getAttribute("value");
+    };
+
+    let ionNavDidChangeEvent = async function () {
+        all_stars = document.getElementsByClassName('star');
+        for (let i = 0; i < all_stars.length; i++) {
+            all_stars[i].addEventListener('click', all_stars_handler, false);
+        }
+
+        if (document.getElementById('rate_tutor_button') !== null) {
+            rate = document.getElementById("rate_tutor_button");
+            rate.addEventListener('click', rate_handler, false);
+        }
+
+        let notifications_active_component = await nav_controller.getActive();
+        if (notifications_active_component.component.tagName !== "RATE_TUTOR") {
+            rate.removeEventListener("click", rate_handler, false);
+            nav_controller.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+
+            tab_bar.style.display = 'flex';
+
+            for (let i = 0; i < all_stars.length; i++) {
+                all_stars[i].removeEventListener('click', all_stars_handler, false);
+            }
+        }
+    };
+
+    nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
 function convertDate(inputFormat) {

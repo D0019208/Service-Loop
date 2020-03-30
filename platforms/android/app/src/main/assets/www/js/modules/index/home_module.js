@@ -16,6 +16,7 @@ var active_nav;
 var push;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
+//var localhost = false;
 var localhost = false;
 
 Element.prototype.appendAfter = function (element) {
@@ -53,14 +54,14 @@ document.addEventListener(start, async function () {
 
     if (localhost) {
         //Set status of user to tutor
-//        user.setName("John Doe".replace(/\s+$/, ''));
-//        user.setStatus("Student");
-//        user.setEmail("D00192082@student.dkit.ie");
+        user.setName("John Doe".replace(/\s+$/, ''));
+        user.setStatus("Student");
+        user.setEmail("D00192082@student.dkit.ie");
 
         //Set status of user to tutor
-        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-        user.setStatus("Tutor");
-        user.setEmail("nikito888@gmail.com");
+//        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+//        user.setStatus("Tutor");
+//        user.setEmail("nikito888@gmail.com");
     }
 
     if (!localhost) {
@@ -88,10 +89,13 @@ document.addEventListener(start, async function () {
 
     <ion-content fullscreen>
       <ion-slides pager="true">
+        <div id="swipe" class="swipe-hint swipe-horizontal">
+            <img src="images/swipe.png" alt=""/>
+        </div>
 
-        <ion-slide>
-            
-          <img src="images/slide-1.png"/>
+        <ion-slide id="slide-1" style="background-color: black;">
+
+              <img id="slide-1-img" style="opacity:0.4;" src="images/slide-1.png"/>
           
           
         </ion-slide>
@@ -125,12 +129,15 @@ document.addEventListener(start, async function () {
           </ion-toolbar>
         </ion-header>
 
-        <ion-content fullscreen>
+        <ion-content id="slides-content" fullscreen>
           <ion-slides pager="true">
+            <div id="swipe" class="swipe-hint swipe-horizontal">
+                <img src="images/swipe.png" alt=""/>
+            </div>
+        
+            <ion-slide id="slide-1" style="background-color: black;">
 
-            <ion-slide>
-
-              <img src="images/slide-1.png"/>
+              <img id="slide-1-img" style="opacity:0.4;" src="images/slide-1.png"/>
 
 
             </ion-slide>
@@ -169,10 +176,23 @@ document.addEventListener(start, async function () {
             nav.pop();
         }
 
+        //Remove swipe gesture from the slides
+        let removeSwipe;
+        let removeSwipeHandler = async function () {
+            document.getElementById("swipe").style.display = "none";
+            document.getElementById("slide-1-img").style.opacity = "1";
+            document.getElementById("slide-1").style.backgroundColor = "white";
+        }
+
         let ionNavDidChangeEvent = async function () {
             if (document.getElementById('continue_slides') !== null) {
                 closeTutorial = document.getElementById("continue_slides");
                 closeTutorial.addEventListener('click', closeTutorialHandler, false);
+
+                removeSwipe = document.getElementById("slides-content");
+                removeSwipe.addEventListener('touchstart', removeSwipeHandler, false);
+
+
             }
 
             let active_component = await nav.getActive();
@@ -184,6 +204,7 @@ document.addEventListener(start, async function () {
             if (active_component.component.tagName !== "TUTORIAL_SLIDES") {
                 if (typeof closeTutorial !== 'undefined') {
                     closeTutorial.removeEventListener("click", closeTutorialHandler, false);
+                    removeSwipe.removeEventListener("touchstart", removeSwipeHandler, false);
                     nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
                 }
             }
@@ -596,19 +617,23 @@ document.addEventListener(start, async function () {
         let selected_tab = await tab_controller.getSelected();
         let can_go_back = await active_nav.canGoBack();
 
+        if (typeof currentModal !== 'undefined' && currentModal !== null) {
+            currentModal = dismissModal(currentModal);
+        } else {
+            if (can_go_back) {
+                active_nav.pop();
+            }
 
-        if (can_go_back) {
-            active_nav.pop();
-        }
+            if (!can_go_back && selected_tab === "home") {
+                navigator.app.exitApp();
+            }
 
-        if (!can_go_back && selected_tab === "home") {
-            navigator.app.exitApp();
-        }
-
-        if (!can_go_back && selected_tab !== "home") {
-            if (current_tab !== previous_tab) {
-                tab_controller.select(previous_tab);
+            if (!can_go_back && selected_tab !== "home") {
+                if (current_tab !== previous_tab) {
+                    tab_controller.select(previous_tab);
+                }
             }
         }
+
     }, false);
 });

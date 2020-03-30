@@ -196,7 +196,7 @@ class User {
 
             const content = await rawResponse.json();
             this.id = content.user._id;
-            this.avatar = content.user.user_avatar;
+            this.avatar = content.user.response.user_avatar;
 
             this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
             this.pending_tutorials = content.tutorials_count.my_tutorials.pending_count;
@@ -206,6 +206,7 @@ class User {
             this.tutored_pending_tutorials = content.tutorials_count.my_tutored_tutorials.pending_count;
             this.tutored_ongoing_tutorials = content.tutorials_count.my_tutored_tutorials.ongoing_count;
             this.tutored_done_tutorials = content.tutorials_count.my_tutored_tutorials.done_count;
+            
         } catch (ex) {
             console.log(ex);
             return;

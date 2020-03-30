@@ -297,7 +297,10 @@ class Tutor_Tutorials extends User {
         }
 
         console.log(tutorial);
-        tutorial.parentNode.remove();
+        
+        if(typeof tutorial !== 'undefined' && tutorial !== null) {
+            tutorial.parentNode.remove();
+        }
     }
 
     add_tutorial_to_DOM(segment, this_tutorial) {
@@ -339,24 +342,24 @@ class Tutor_Tutorials extends User {
             container = document.getElementById('tutor_tutorials_pending');
 
             if (container) {
-                total_tutorials = this.total_tutor_pending_tutorials;
+                //total_tutorials = this.total_tutor_pending_tutorials;
 
-                if (total_tutorials > 0) {
-                    if (total_tutorials == 0) {
+                //if (total_tutorials > 0) {
+                    //if (total_tutorials == 0) {
                         document.getElementById('pending_tutor_tutorials_header').innerText = "PENDING TUTORIALS";
-                    }
+                    //}
 
                     this.total_tutor_pending_tutorials++;
 
                     document.getElementById("pending_tutorials_badge").innerText = this.total_tutor_pending_tutorials;
 
                     this.pending_tutor_tutorials.push(this_tutorial);
-                }
+                //}
             } else {
-                if (total_tutorials > 0) {
+                //if (total_tutorials > 0) {
                     this.total_tutor_pending_tutorials++;
                     this.pending_tutor_tutorials.push(this_tutorial);
-                }
+                //}
             }
         } else if (segment == "Ongoing") {
             append_to = document.getElementById('ongoing-tutorials-infinite-scroll');
@@ -382,7 +385,6 @@ class Tutor_Tutorials extends User {
                     this.ongoing_tutor_tutorials.push(this_tutorial);
                 }
 
-                append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
             } else {
                 if (total_tutorials > 0) {
                     this.total_tutor_ongoing_tutorials++;

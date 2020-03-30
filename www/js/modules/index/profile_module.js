@@ -125,7 +125,7 @@ function load_profile_page(nav_controller) {
         <ion-content fullscreen>
         <ion-item style="margin-top:15px;" lines="none">
           <ion-avatar class="profile_avatar">
-            <img id="user_avatar" src="${user.getAvatar() + "?" + performance.now()}">
+            <img id="user_avatar" src="${user.getAvatar()}">
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
@@ -266,13 +266,14 @@ function load_profile_page(nav_controller) {
                       <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                     <ion-item>
                         <ion-select class="my-select" multiple="true" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
-                            <ion-select-option value="HTML5">HTML5</ion-select-option>
-                            <ion-select-option value="CSS3">CSS3</ion-select-option>    
-                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
-                            <ion-select-option value="PHP">PHP</ion-select-option>
                             <ion-select-option value="Java">Java</ion-select-option>
-                            <ion-select-option value="C++">C++</ion-select-option>
-                            <ion-select-option value="Maths">Maths</ion-select-option>
+                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
+                            <ion-select-option value="HTML">HTML</ion-select-option>
+                            <ion-select-option value="CSS">CSS</ion-select-option>    
+                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
+                            <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
+                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="Databases">Databases</ion-select-option>
                         </ion-select>
                     </ion-item>
                     <div id="p"></div>
@@ -345,7 +346,7 @@ function load_profile_page(nav_controller) {
 
                         create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons); 
                         
-                        dismissModal(currentModal);
+                        currentModal = dismissModal(currentModal);
                         
                         document.getElementById("profile_skills").innerHTML = "";  //update skills
                         for (var i = 0; i < user.modules.length; i++) {
@@ -354,7 +355,7 @@ function load_profile_page(nav_controller) {
                     });
 
                     document.getElementById("modal_close").addEventListener('click', () => {
-                        dismissModal(currentModal);
+                        currentModal = dismissModal(currentModal);
                     });
                 });
             })
