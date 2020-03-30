@@ -217,13 +217,8 @@ class User {
         //HTTPS
         //const socket = io.connect("https://my.website.com:3002", { secure: true, reconnection: true, rejectUnauthorized: false });
         let modules = encodeURIComponent(JSON.stringify(this.modules));
-        let socket;
+        let socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
         
-        if (!localhost) {
-            socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
-        } else {
-            socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
-        }
         this.socket = socket;
 
         console.log(socket);
