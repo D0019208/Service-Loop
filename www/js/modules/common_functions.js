@@ -1862,7 +1862,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
         let student_number = await activate_bar_code_scanner();
         
         if (student_number !== "Canceled") {
-            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler);
+            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler);
         }
     };
 
@@ -2647,7 +2647,7 @@ function get_tutorial_links(tutorial_tag) {
     return tutorial_links;
 }
 
-function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler) {
+function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler) {
     console.log("Start");
     console.log(begin_tutorial);
     console.log(begin_tutorial_handler)
@@ -2713,7 +2713,9 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
 
                 //REMOVE BEGIN TUTORIAL EVENT LISTENER
                 begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
-
+                cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
+                cancel_tutorial.remove();
+                
                 //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
                 var element = document.getElementById("begin_tutorial");
                 element.parentNode.removeChild(element);
