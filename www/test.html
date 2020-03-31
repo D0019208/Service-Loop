@@ -8,6 +8,7 @@
         <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.esm.js"></script>
         <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>
+        <link href="css/rating.css" rel="stylesheet" type="text/css"/>
         <script src="js/main.js" type="text/javascript"></script>
         <link href="css/style.css" rel="stylesheet" type="text/css"/>
         <style>
@@ -15,103 +16,58 @@
                 --ion-safe-area-top: 0px;
                 --ion-safe-area-bottom: 0px;
             }
-            
+
         </style>
     </head>
     <body>
     <ion-app>
-<ion-header translucent>
+        <ion-header translucent>
             <ion-toolbar>
-                <ion-title><h1>PDF</h1></ion-title>
+                <ion-title style="text-align:center;">Rate Tutor</ion-title>
             </ion-toolbar>
         </ion-header>
-        <ion-content fullscreen>
-<section class="blockchain">
-   <div class="blockchain_line"></div>
-   <div class="blockchain_entry">
-      <div class="blockchain_cube"><span class="blockchain_icon"><ion-icon src="images/cube-outline.svg"></ion-icon></span></div>
-      <div class="blockchain_block">
-         <!--<div style="top: 24px; left: 100%; border-color: transparent transparent transparent rgb(255, 255, 255);"></div>-->
-         <div class="blockchain_title">Agreement Generated</div>
-         <div class="blockchain_body">
-            <p><b>Description: </b>Some description about agreement</p>
-            <!--<br><b>Number of Tx: </b>1-->
-            <span style="background-color:#3880ff;color:white;padding: 5px;"><b>19:05<b></span><span style="position:absolute;right: 15px; font-weight: 100;font-size:8.7pt; bottom: 10px;">18/02/2020</span>
-            <div class="blockchain_clear"></div>
-         </div>
-      </div>
-      <div class="blockchain_clear"></div>
-   </div>
-   <div class="blockchain_entry">
-      <div class="blockchain_cube"><span class="blockchain_icon"><ion-icon src="images/cube-outline.svg"></ion-icon></span></div>
-      <div class="blockchain_block">
-         <!--<div style="top: 24px; left: 100%; border-color: transparent transparent transparent rgb(255, 255, 255);"></div>-->
-         <div class="blockchain_title">Agreement Generated</div>
-         <div class="blockchain_body">
-            <p><b>Description: </b>Some description about agreement</p>
-            <!--<br><b>Number of Tx: </b>1-->
-            <span style="background-color:#3880ff;color:white;padding: 5px;"><b>19:05<b></span><span style="position:absolute;right: 15px; font-weight: 100;font-size:8.7pt; bottom: 10px;">18/02/2020</span>
-            <div class="blockchain_clear"></div>
-         </div>
-      </div>
-      <div class="blockchain_clear"></div>
-   </div>
-   <div class="blockchain_entry">
-      <div class="blockchain_cube"><span class="blockchain_icon"><ion-icon src="images/cube-outline.svg"></ion-icon></span></div>
-      <div class="blockchain_block">
-         <!--<div style="top: 24px; left: 100%; border-color: transparent transparent transparent rgb(255, 255, 255);"></div>-->
-         <div class="blockchain_title">Agreement Generated</div>
-         <div class="blockchain_body">
-            <p><b>Description: </b>Some description about agreement</p>
-            <!--<br><b>Number of Tx: </b>1-->
-            <span style="background-color:#3880ff;color:white;padding: 5px;"><b>19:05<b></span><span style="position:absolute;right: 15px; font-weight: 100;font-size:8.7pt; bottom: 10px;">18/02/2020</span>
-            <div class="blockchain_clear"></div>
-         </div>
-      </div>
-      <div class="blockchain_clear"></div>
-   </div>
-</section>
+        <ion-content>
+            <ion-list class="fields" style="text-align:center;">
+                <p><strong>Rate Tutor Experience</strong></p>
+                <p>Please rate your tutor based on the tutorial experience you have received</p>
+            </ion-list>
 
-</ion-content>
-</ion-app>
-<ion-menu-controller></ion-menu-controller>
+            <ion-list align="center" style="">
+                <fieldset class="rating">
+                    <input type="radio" id="star5" name="rating" value="5" /><label class = "star full" value="5" for="star5"></label>
+                    <input type="radio" id="star4half" name="rating" value="4.5" /><label class="star half" value="4.5" for="star4half"></label>
+                    <input type="radio" id="star4" name="rating" value="4" /><label class = "star full" value="4" for="star4"></label>
+                    <input type="radio" id="star3half" name="rating" value="3.5" /><label class="star half" value="3.5" for="star3half"></label>
+                    <input type="radio" id="star3" name="rating" value="3" /><label class = "star full" value="3" for="star3"></label>
+                    <input type="radio" id="star2half" name="rating" value="2.5" /><label class="star half" value="2.5" for="star2half"></label>
+                    <input type="radio" id="star2" name="rating" value="2" /><label class = "star full" value="2" for="star2"></label>
+                    <input type="radio" id="star1half" name="rating" value="1.5" /><label class="star half" value="1.5" for="star1half"></label>
+                    <input type="radio" id="star1" name="rating" value="1" /><label class = "star full" value="1" for="star1"></label>
+                    <input type="radio" id="starhalf" name="rating" value="0.5" /><label class="star half" value="0.5" for="starhalf"></label>
+                </fieldset>
+            </ion-list>
 
-<script src="js/modules/common_functions.js" type="text/javascript"></script>
-<script src="js/classes/Blockchain.js" type="text/javascript"></script>
-<script>
-    const menuCtrl = document.querySelector('ion-menu-controller');
+            <div class="ion-padding-top">
+                <ion-button expand="block" type="button" class="ion-no-margin" id="rate_tutor">Rate Tutor</ion-button>
+            </div>
+            <!--<p style="text-align: center; color: gray;">Any extra text!</p>-->
 
-function openFirst() {
-  menuCtrl.enable(true, 'first');
-  menuCtrl.open('first');
-}
-function menuClose()
-{
-    menuCtrl.close('first');
-}
+        </ion-content>
+    </ion-app>
+    <ion-menu-controller></ion-menu-controller>
+    <script>
+        let all_stars = document.getElementsByClassName('star');
+        var star_click = function () {
+            console.log(this)
+            var attribute = this.getAttribute("value");
+            alert(attribute);
+        };
 
-function openEnd() {
-  menuCtrl.open('end');
-}
+        for (let i = 0; i < all_stars.length; i++) {
+            all_stars[i].addEventListener('click', star_click, false);
+        }
 
-function openCustom() {
-  menuCtrl.enable(true, 'custom');
-  menuCtrl.open('custom');
-}
-
-let blockchain = new Blockchain();
-
-let t = { 
-        txId: '7226969757cbd1c3df8e3210eb5f6517a13151b50286e7b93dea49b72b533e95', payload: [ { TxId: '0eacb7e37ea44995f1d0a5fb48207ae0c3b01480095b6ca37787e1659d3725f5',
-       Timestamp: [{ seconds: { low: 1582547656, high: 0, unsigned: false }, nanos: 781000000 }],
-       IsDelete: false,
-       Value:'An agremeent for the tutorial, fef has been offered by the tutor, Nichita Postolachi. The student must now accept or reject the agreement.' 
-   } 
-   ] 
-    }
-
-blockchain.blockchain_content = [{post_id: "12345", content: "This is content", timestamp: "1111"}]; 
-blockchain.load_blockchain_content('5e53c193c2bff749d0cca111'); 
-</script>
+       
+    </script>
 </body>
 </html>

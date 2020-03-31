@@ -17,7 +17,7 @@ var push;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
 //var localhost = false;
-var localhost = true;
+var localhost = false;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -175,7 +175,7 @@ document.addEventListener(start, async function () {
             }
             nav.pop();
         }
-        
+
         //Remove swipe gesture from the slides
         let removeSwipe;
         let removeSwipeHandler = async function () {
@@ -188,11 +188,11 @@ document.addEventListener(start, async function () {
             if (document.getElementById('continue_slides') !== null) {
                 closeTutorial = document.getElementById("continue_slides");
                 closeTutorial.addEventListener('click', closeTutorialHandler, false);
-                
+
                 removeSwipe = document.getElementById("slides-content");
                 removeSwipe.addEventListener('touchstart', removeSwipeHandler, false);
-                
-                
+
+
             }
 
             let active_component = await nav.getActive();
@@ -245,7 +245,7 @@ document.addEventListener(start, async function () {
                             </ion-content>-->
                             
                             <ion-avatar id="profile_home" style="width: 80px;height: 80px; margin: auto; margin-top: -5px;" >
-                                <img id="user_avatar_home" src=${user.getAvatar()}>
+                                <img id="user_avatar_home" src=${user.getAvatar() + "?" + performance.now()}>
                             </ion-avatar>
                             <ion-label style="text-align:center;">
                                 <h1 style="color:white;"><strong id="user_name">John</strong></h1>
@@ -329,7 +329,7 @@ document.addEventListener(start, async function () {
                                 <ion-button expand="block" onclick="openMenu()">Open Menu</ion-button>
                             </ion-content>-->
                             <ion-avatar id="profile_home" style="width: 80px;height: 80px; margin: auto; margin-top: -5px;" >
-                                <img id="user_avatar_home" src="${user.getAvatar()}">
+                                <img id="user_avatar_home" src="${user.getAvatar() + "?" + performance.now()}">
                             </ion-avatar>
                             <ion-label style="text-align:center;">
                                 <h1 style="color:white;"><strong id="user_name">John</strong></h1>
@@ -617,19 +617,23 @@ document.addEventListener(start, async function () {
         let selected_tab = await tab_controller.getSelected();
         let can_go_back = await active_nav.canGoBack();
 
+        if (typeof currentModal !== 'undefined' && currentModal !== null) {
+            currentModal = dismissModal(currentModal);
+        } else {
+            if (can_go_back) {
+                active_nav.pop();
+            }
 
-        if (can_go_back) {
-            active_nav.pop();
-        }
+            if (!can_go_back && selected_tab === "home") {
+                navigator.app.exitApp();
+            }
 
-        if (!can_go_back && selected_tab === "home") {
-            navigator.app.exitApp();
-        }
-
-        if (!can_go_back && selected_tab !== "home") {
-            if (current_tab !== previous_tab) {
-                tab_controller.select(previous_tab);
+            if (!can_go_back && selected_tab !== "home") {
+                if (current_tab !== previous_tab) {
+                    tab_controller.select(previous_tab);
+                }
             }
         }
+
     }, false);
 });

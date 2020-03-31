@@ -7,13 +7,16 @@ let my_requested_posts_pending;
 let my_requested_posts_ongoing;
 let my_requested_posts_done;
 
-let my_requested_posts_open_loaded = true;
+let my_requested_posts_open_loaded = false;
 let my_requested_posts_pending_loaded = false;
 let my_requested_posts_ongoing_loaded = false;
 let my_requested_posts_done_loaded = false;
 
 let popover_title2 = "";
 let popover_content2 = "";
+
+let active_segment = "Open";
+
 function load_my_requested_tutorials(nav_controller) {
     customElements.get('nav-my-requested-tutorials') || customElements.define('nav-my-requested-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
@@ -38,7 +41,7 @@ function load_my_requested_tutorials(nav_controller) {
             }
 
             let html;
-            if (my_requested_posts_response.response === "There are no posts to display!") {
+            if (tutorials.get_all_tutorials() === "There are no posts to display!") {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
@@ -355,6 +358,7 @@ function load_my_requested_tutorials(nav_controller) {
             for (let i = 0; i < segments.length; i++) {
                 segments[i].addEventListener('ionChange', (ev) => {
                     if (ev.detail.value === "open_segment") {
+                        active_segment = "Open";
                         popover_title2 = "Open";
                         popover_content2 = "All tutorials with no assigned tutor";
 
@@ -363,6 +367,7 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.ongoing.classList.add("hide");
                         segment_elements.done.classList.add("hide");
                     } else if (ev.detail.value === "pending_segment") {
+                        active_segment = "Pending";
                         popover_title2 = "Pending";
                         popover_content2 = "All tutorials that need to be confirmed by tutor and student";
 
@@ -372,7 +377,7 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener 
-                        if (!my_requested_posts_pending_loaded || document.getElementById('pending').childElementCount <= 2) {
+                        if (!my_requested_posts_pending_loaded || document.getElementById('pending').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutorials.get_pending_tutorials().length <= 3) {
                                 tutorials.pending_tutorials_length = tutorials.appendPosts(tutorials.get_pending_tutorials().length, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
@@ -408,6 +413,7 @@ function load_my_requested_tutorials(nav_controller) {
                             my_requested_posts_pending_loaded = true;
                         }
                     } else if (ev.detail.value === "ongoing_segment") {
+                        active_segment = "Ongoing";
                         popover_title2 = "Ongoing";
                         popover_content2 = "All tutorials that are in progress";
 
@@ -417,7 +423,7 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_ongoing_loaded || document.getElementById('ongoing').childElementCount <= 2) {
+                        if (!my_requested_posts_ongoing_loaded || document.getElementById('ongoing').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutorials.get_ongoing_tutorials().length <= 3) {
                                 tutorials.ongoing_tutorials_length = tutorials.appendPosts(tutorials.get_ongoing_tutorials().length, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
@@ -453,6 +459,7 @@ function load_my_requested_tutorials(nav_controller) {
                             my_requested_posts_ongoing_loaded = true;
                         }
                     } else if (ev.detail.value === "done_segment") {
+                        active_segment = "Done"
                         popover_title2 = "Done";
                         popover_content2 = "All tutorials that have being completed";
 
@@ -462,7 +469,7 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.open.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_done_loaded || document.getElementById('ongoing').childElementCount <= 2) {
+                        if (!my_requested_posts_done_loaded || document.getElementById('done').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutorials.get_done_tutorials().length <= 3) {
                                 tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.get_done_tutorials().length, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
@@ -546,6 +553,8 @@ function load_my_requested_tutorials(nav_controller) {
             my_requested_posts_pending_loaded = false;
             my_requested_posts_ongoing_loaded = false;
             my_requested_posts_done_loaded = false;
+            
+            active_segment = "Open";
             
             console.log('Custom square element removed from page.');
         }

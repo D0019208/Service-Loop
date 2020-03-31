@@ -151,7 +151,7 @@ class Tutor_Tutorials extends User {
 //            }
 
             el.classList.add('ion-activatable', 'ripple', "not_read");
-            el.setAttribute('onClick', 'device_feedback()'); 
+            el.setAttribute('onClick', 'device_feedback()');
             el.innerHTML = `
                 <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">
@@ -209,13 +209,13 @@ class Tutor_Tutorials extends User {
             }
         }
     }
-    
+
     remove_tutor_tutorial_from_DOM(segment, response, this_tutorial) {
         let container;
         let total_tutorials;
         let tutorial_id;
         let tutorial;
-        
+
         if (segment == "Pending") {
             container = document.getElementById('tutor_tutorials_pending');
 
@@ -255,8 +255,11 @@ class Tutor_Tutorials extends User {
                     if (total_tutorials == 1) {
                         document.getElementById('ongoing_tutor_tutorials_header').innerText = "NO ONGOING TUTORIALS";
                     }
-
-                    this.total_tutor_ongoing_tutorials--;
+                    
+                    //FIX -1 BUG
+                    if (this.total_tutor_ongoing_tutorials !== 0) {
+                        this.total_tutor_ongoing_tutorials--;
+                    }
 
                     document.getElementById("ongoing_tutorials_badge").innerText = this.total_tutor_ongoing_tutorials;
 
@@ -297,7 +300,10 @@ class Tutor_Tutorials extends User {
         }
 
         console.log(tutorial);
-        tutorial.parentNode.remove();
+
+        if (typeof tutorial !== 'undefined' && tutorial !== null) {
+            tutorial.parentNode.remove();
+        }
     }
 
     add_tutorial_to_DOM(segment, this_tutorial) {
@@ -339,24 +345,28 @@ class Tutor_Tutorials extends User {
             container = document.getElementById('tutor_tutorials_pending');
 
             if (container) {
-                total_tutorials = this.total_tutor_pending_tutorials;
+                //total_tutorials = this.total_tutor_pending_tutorials;
 
-                if (total_tutorials > 0) {
-                    if (total_tutorials == 0) {
-                        document.getElementById('pending_tutor_tutorials_header').innerText = "PENDING TUTORIALS";
-                    }
+                //if (total_tutorials > 0) {
+                //if (total_tutorials == 0) {
+                document.getElementById('pending_tutor_tutorials_header').innerText = "PENDING TUTORIALS";
+                //}
 
-                    this.total_tutor_pending_tutorials++;
+                this.total_tutor_pending_tutorials++;
 
-                    document.getElementById("pending_tutorials_badge").innerText = this.total_tutor_pending_tutorials;
+                document.getElementById("pending_tutorials_badge").innerText = this.total_tutor_pending_tutorials;
 
-                    this.pending_tutor_tutorials.push(this_tutorial);
-                }
+                this.pending_tutor_tutorials.push(this_tutorial);
+                //}
             } else {
-                if (total_tutorials > 0) {
-                    this.total_tutor_pending_tutorials++;
-                    this.pending_tutor_tutorials.push(this_tutorial);
-                }
+                //if (total_tutorials > 0) {
+                this.total_tutor_pending_tutorials++;
+                this.pending_tutor_tutorials.push(this_tutorial);
+                //}
+            }
+            
+            if(document.getElementById('tutor_tutorials_peding') !== null && active_tutor_segment === "Pending" && this.pending_tutor_tutorials_length !== 3) {
+                append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
             }
         } else if (segment == "Ongoing") {
             append_to = document.getElementById('ongoing-tutorials-infinite-scroll');
@@ -382,7 +392,6 @@ class Tutor_Tutorials extends User {
                     this.ongoing_tutor_tutorials.push(this_tutorial);
                 }
 
-                append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
             } else {
                 if (total_tutorials > 0) {
                     this.total_tutor_ongoing_tutorials++;
@@ -396,6 +405,10 @@ class Tutor_Tutorials extends User {
                     console.log("Ongoing tutorials <>")
                     console.log(this.ongoing_tutor_tutorials)
                 }
+            }
+            
+            if(document.getElementById('tutor_tutorials_ongoing') !== null && active_tutor_segment === "Ongoing" && this.ongoing_tutor_tutorials_length !== 3) {
+                append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
             }
         } else {
             append_to = document.getElementById('done-tutorials-infinite-scroll');
@@ -426,6 +439,10 @@ class Tutor_Tutorials extends User {
                     this.done_tutor_tutorials.push(this_tutorial);
                 }
             }
+            
+            if(document.getElementById('tutor_tutorials_done') !== null && active_tutor_segment === "Done" && this.done_tutor_tutorials_length !== 3) {
+                append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
+            }
         }
     }
 
@@ -441,15 +458,15 @@ class Tutor_Tutorials extends User {
                 }
             }
         }
-        
+
         console.log(this.pending_tutor_tutorials)
     }
-    
+
     remove_tutorial(segment, tutorial) {
         console.log("Removing")
-        if(segment === "Pending") {
-            this.pending_tutor_tutorials.filter(function(e) {
-                return e !== 'seven' 
+        if (segment === "Pending") {
+            this.pending_tutor_tutorials.filter(function (e) {
+                return e !== 'seven'
             });
         }
     }

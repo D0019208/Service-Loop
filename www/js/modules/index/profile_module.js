@@ -6,7 +6,7 @@ function load_profile_page(nav_controller) {
         connectedCallback() {
             var currentModal;
             //Displays correct profile page based on user's status
-            if (user.getStatus() === "Tutor") { 
+            if (user.getStatus() === "Tutor") {
                 this.innerHTML = `
             <ion-header translucent>
             <ion-toolbar>
@@ -125,7 +125,7 @@ function load_profile_page(nav_controller) {
         <ion-content fullscreen>
         <ion-item style="margin-top:15px;" lines="none">
           <ion-avatar class="profile_avatar">
-            <img id="user_avatar" src="${user.getAvatar() + "?" + performance.now()}">
+            <img id="user_avatar" src="${user.getAvatar()}">
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
@@ -191,7 +191,7 @@ function load_profile_page(nav_controller) {
                 document.getElementById('user_status_profile').innerText = "TUTOR";
             } else {
                 document.getElementById('user_status_profile').innerText = "STUDENT";
-            } 
+            }
 
             //var button = document.activeElement.tagName;
             //button.onclick = addItem;
@@ -232,19 +232,30 @@ function load_profile_page(nav_controller) {
                 function onSuccess(imageData) {
                     var profile_avatar = document.getElementById('user_avatar');
                     profile_avatar.src = "data:image/jpeg;base64," + imageData;
-                    
+
                     var home_avatar = document.getElementById("user_avatar_home");
                     home_avatar.src = "data:image/jpeg;base64," + imageData;
-                    
-                    (async () => {
-                        let response = await access_route({email: user.getEmail(), image: imageData}, "update_avatar"); 
-                        user.setAvatar(response); 
-                    })();
+
+                    let response = new Promise(async (resolve, reject) => {
+                        resolve(await access_route({email: user.getEmail(), image: imageData}, "update_avatar"));
+                    })
+
+                    user.setAvatar(response.user_avatar);
 
                 }
 
                 function onFail(message) {
-                    alert('Failed because: ' + message);
+                    let begin_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+                    create_toast('Failed because: ' + message, "dark", 2000, begin_buttons);
                 }
             }
 
@@ -266,13 +277,14 @@ function load_profile_page(nav_controller) {
                       <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                     <ion-item>
                         <ion-select class="my-select" multiple="true" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
-                            <ion-select-option value="HTML5">HTML5</ion-select-option>
-                            <ion-select-option value="CSS3">CSS3</ion-select-option>    
-                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
-                            <ion-select-option value="PHP">PHP</ion-select-option>
+                            <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
+                            <ion-select-option value="CSS">CSS</ion-select-option>
+                            <ion-select-option value="Databases">Databases</ion-select-option>
+                            <ion-select-option value="HTML">HTML</ion-select-option>
                             <ion-select-option value="Java">Java</ion-select-option>
-                            <ion-select-option value="C++">C++</ion-select-option>
-                            <ion-select-option value="Maths">Maths</ion-select-option>
+                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
+                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
                         </ion-select>
                     </ion-item>
                     <div id="p"></div>
@@ -290,7 +302,7 @@ function load_profile_page(nav_controller) {
                     currentModal = modal_created;
 
                     //Function that adds skill to the page
-                    function addItem() { 
+                    function addItem() {
                         device_feedback();
                         var textInput = document.getElementById("profile_tutorial_modules");  //getting text input
                         var skill = textInput.value;   //getting value of text input element
@@ -312,7 +324,7 @@ function load_profile_page(nav_controller) {
                     ion_select.addEventListener('ionChange', function () {
                         addItem();
                     });
-                    ion_select.value = user.getModules(); 
+                    ion_select.value = user.getModules();
 
                     document.getElementById('save_button').addEventListener('click', () => {
                         device_feedback();
@@ -328,25 +340,25 @@ function load_profile_page(nav_controller) {
                         ];
                         //USE THIS TO REMOVE ELEMENT FROM MAIN PROFILE PAGE ON SAVE
                         //console.log(document.getElementById('profile_skills').children);
-                        
+
                         console.log(document.getElementById('p').children);
                         let skills_array = [];
                         let skills_list = document.getElementById('p').children;
-                        
-                        for(let i = 0; i < skills_list.length; i++) {
+
+                        for (let i = 0; i < skills_list.length; i++) {
                             skills_array.push(skills_list[i].innerText);
-                        } 
-                        
+                        }
+
                         console.log(skills_array);
-                        
+
                         access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
-                        set_secure_storage("user_modules", skills_array); 
+                        set_secure_storage("user_modules", skills_array);
                         user.setModules(skills_array);
 
-                        create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons); 
-                        
-                        dismissModal(currentModal);
-                        
+                        create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons);
+
+                        currentModal = dismissModal(currentModal);
+
                         document.getElementById("profile_skills").innerHTML = "";  //update skills
                         for (var i = 0; i < user.modules.length; i++) {
                             document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
@@ -354,7 +366,7 @@ function load_profile_page(nav_controller) {
                     });
 
                     document.getElementById("modal_close").addEventListener('click', () => {
-                        dismissModal(currentModal);
+                        currentModal = dismissModal(currentModal);
                     });
                 });
             })

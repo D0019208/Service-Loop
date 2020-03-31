@@ -10,6 +10,10 @@ let tutor_tutorials_pending_loaded = false;
 let tutor_tutorials_ongoing_loaded = false;
 let tutor_tutorials_done_loaded = false;
 
+let popover_title = "";
+let popover_content = "";
+
+let active_tutor_segment = "Pending";
 
 function all_tutor_tutorials(nav_controller) {
     customElements.get('nav-my-tutorials') || customElements.define('nav-my-tutorials', class RequestTutorial extends HTMLElement {
@@ -34,7 +38,7 @@ function all_tutor_tutorials(nav_controller) {
             }
 
             let html;
-            if (tutor_tutorials_response.response === "There are no posts to display!") {
+            if (tutor_tutorials.get_all_tutor_tutorials() === "There are no posts to display!") {
                 html = `
            <ion-header translucent>
             <ion-toolbar>
@@ -204,8 +208,7 @@ function all_tutor_tutorials(nav_controller) {
 //            // Insert the new node before the reference node
 //            doneReferenceNode.parentNode.insertBefore(append_done_tutorials_infinite_scroll, doneReferenceNode.nextSibling);
             
-            let popover_title = "";
-            let popover_content = "";
+            
             //Ionic popover 
             let currentPopover = null;
             var popover;
@@ -232,7 +235,7 @@ function all_tutor_tutorials(nav_controller) {
                     });
                 }
             }
-
+            
             customElements.get('popover-example-page') || customElements.define('popover-example-page', class ModalContent extends HTMLElement {
                 connectedCallback() {
                     this.innerHTML = `
@@ -296,11 +299,12 @@ function all_tutor_tutorials(nav_controller) {
 
 
             let segment_elements = {pending: document.getElementById("tutor_tutorials_pending"), ongoing: document.getElementById("tutor_tutorials_ongoing"), done: document.getElementById("tutor_tutorials_done")};
-
+            
             const segments = document.querySelectorAll('ion-segment')
             for (let i = 0; i < segments.length; i++) {
                 segments[i].addEventListener('ionChange', (ev) => {
                     if (ev.detail.value === "tutor_tutorials_pending_segment") {
+                        active_tutor_segment = "Pending";
                         popover_title = "Pending";
                         popover_content = "All tutorials that need to be confirmed by tutor and student";
                         
@@ -308,6 +312,7 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.pending.classList.remove("hide");
                         segment_elements.done.classList.add("hide");
                     } else if (ev.detail.value === "tutor_tutorials_ongoing_segment") {
+                        active_tutor_segment = "Ongoing";
                         popover_title = "Ongoing";
                         popover_content = "All tutorials that are in progress";
                         
@@ -316,7 +321,7 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!tutor_tutorials_ongoing_loaded || document.getElementById('tutor_tutorials_ongoing').childElementCount <= 2) {
+                        if (!tutor_tutorials_ongoing_loaded || document.getElementById('tutor_tutorials_ongoing').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3  
                             if (tutor_tutorials.get_ongoing_tutor_tutorials().length <= 3) {
                                 tutor_tutorials.ongoing_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_ongoing_tutor_tutorials().length, ongoingInfiniteScroll, tutor_tutorials.ongoing_tutor_tutorials, tutor_tutorials.ongoing_tutor_tutorials_length);
@@ -348,6 +353,7 @@ function all_tutor_tutorials(nav_controller) {
                             tutor_tutorials_ongoing_loaded = true;
                         }
                     } else if (ev.detail.value === "tutor_tutorials_done_segment") {
+                        active_tutor_segment = "Done";
                         popover_title = "Done";
                         popover_content = "All tutorials that have being completed";
                         
@@ -356,7 +362,7 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.ongoing.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!tutor_tutorials_done_loaded || document.getElementById('tutor_tutorials_done').childElementCount <= 2) {
+                        if (!tutor_tutorials_done_loaded || document.getElementById('tutor_tutorials_done').childElementCount <= 3) {
                             //If we have less than 3 tutorials we display all of them otherwise we display only 3 
                             if (tutor_tutorials.get_done_tutor_tutorials().length <= 3) {
                                 tutor_tutorials.done_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_done_tutor_tutorials().length, doneInfiniteScroll, tutor_tutorials.done_tutor_tutorials, tutor_tutorials.done_tutor_tutorials_length);
@@ -426,7 +432,7 @@ function all_tutor_tutorials(nav_controller) {
                             console.log(this_tutorial)
                             load_ongoing_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         } else if(tutorial_status == "Done" && active_component.component == "nav-my-tutorials") {
-                            load_done_tutorial_component(nav_controller, this_tutorial, tutorial_status, tutorial_tag);
+                            load_done_tutorial_component(nav_controller, this_tutorial, tutorial_tag, tutorial_status);
                         }
                     }
                 });
@@ -438,6 +444,8 @@ function all_tutor_tutorials(nav_controller) {
         disconnectedCallback() {
             tutor_tutorials_ongoing_loaded = false;
             tutor_tutorials_done_loaded = false;
+            
+            active_tutor_segment = "Pending";
             
             console.log('Custom square element removed from page.');
         }
@@ -538,6 +546,10 @@ function all_tutor_tutorials(nav_controller) {
 //}
 
 function done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {
+    let tutor_info = "";
+    if(this_tutorial.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_tutorial.post_tutor_name}<br><strong>Email:</strong> ${this_tutorial.post_tutor_email}</p></ion-item>`;
+    }
     let tutor_tutorial_element = document.createElement('tutorial');
     let tutor_tutorial_element_html = `
                             <ion-header translucent>
@@ -562,7 +574,8 @@ function done_tutorial_component(this_tutorial, tutorial_status, tutorial_tag) {
                                         <p>${this_tutorial.std_email}</p>
                                     </ion-label><p class="date">${formatDate(this_tutorial.post_posted_on)}</p>
                                 </ion-item>
-
+                                
+                                ${tutor_info}
 
                                 <ion-item-divider class="divider"></ion-item-divider>
                                 <ion-item lines="none">

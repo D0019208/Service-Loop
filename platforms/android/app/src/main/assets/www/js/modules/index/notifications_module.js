@@ -191,7 +191,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -212,7 +212,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -232,7 +232,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                     <ion-menu-button></ion-menu-button>
                 </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -316,7 +316,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -335,7 +335,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -382,7 +382,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -428,7 +428,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -450,7 +450,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -470,7 +470,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -490,7 +490,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -510,7 +510,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -527,7 +527,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -649,7 +649,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -669,7 +669,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -689,7 +689,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -709,7 +709,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 <ion-buttons onclick="device_feedback()" slot="end">
                                 <ion-menu-button></ion-menu-button>
                             </ion-buttons>
-              <ion-title>${this_notification.notification_title}</ion-title>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen class="ion-padding">
@@ -974,7 +974,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         `;
 
             nav_notifications.push(nav_notification_tutorial_agreement_rejected);
-        } else {
+        } else if (this_post.post_status === "In negotiation") {
             nav_notification_tutorial_agreement_rejected.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
@@ -1001,7 +1001,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
             let tutorial_status = this_post.post_status;
             let tutorial_tag = this_post.post_modules.join(', ');
 
-            let new_tutorial_agreement_reject_event_handler = function () {
+            let agreement_reject_event_handler = function () {
                 device_feedback();
 
 
@@ -1022,19 +1022,38 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 if (document.getElementById('open_tutorial_post') !== null) {
                     open_tutorial_post_button = document.getElementById('open_tutorial_post');
 
-                    open_tutorial_post_button.addEventListener('click', new_tutorial_agreement_reject_event_handler, false);
+                    open_tutorial_post_button.addEventListener('click', agreement_reject_event_handler, false);
                 }
 
 
                 let notifications_active_component = await nav_notifications.getActive();
 
                 if (notifications_active_component.component === "nav-notifications") {
-                    open_tutorial_post_button.removeEventListener("click", new_tutorial_agreement_reject_event_handler, false);
+                    open_tutorial_post_button.removeEventListener("click", agreement_reject_event_handler, false);
                     nav_notifications.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
                 }
             };
 
             nav_notifications.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+        } else {
+            nav_notification_tutorial_agreement_rejected.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+
+            nav_notifications.push(nav_notification_tutorial_agreement_rejected);
         }
     } else if (notification_tags.includes("Tutorial cancelled") && notification_tags.length !== 0) {
         device_feedback();
@@ -1091,6 +1110,9 @@ document.querySelector('body').addEventListener('click', async function (event) 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
+        console.log("!yoyoyoyoy");
+        console.log(this_notification)
+        console.log(notification_posts)
 
         //We get the post that this notifiaction relates to by comparing the post id's
         for (let i = 0; i < notification_posts.length; i++) {
@@ -1108,10 +1130,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
-        let nav_notification_tutorial_canceled = document.createElement('nav-notification-tutorial-agreement-accepted');
+        let nav_notification_tutorial_started = document.createElement('nav-notification-tutorial-agreement-accepted');
 
-
-        nav_notification_tutorial_canceled.innerHTML = `
+        if (typeof this_post === 'undefined') {
+            nav_notification_tutorial_started.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
               <ion-buttons onclick="device_feedback()" slot="start">
@@ -1128,8 +1150,80 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
 
-        //The button to which we are applying the event listener
-        nav_notifications.push(nav_notification_tutorial_canceled);
+            nav_notifications.push(nav_notification_tutorial_started);
+        } else if (this_post.post_status === "Ongoing") {
+            nav_notification_tutorial_started.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+                <div class="ion-padding-top">
+                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open post</ion-button>
+                </div>
+          </ion-content>
+        `;
+
+            //The button to which we are applying the event listener
+            let open_tutorial_post_button;
+            nav_notifications.push(nav_notification_tutorial_started);
+            let tutorial_status = this_post.post_status;
+            let tutorial_tag = this_post.post_modules.join(', ');
+
+            let tutorial_started_event_handler = function () {
+                device_feedback();
+
+
+                load_ongoing_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status)
+
+            };
+
+
+            let ionNavDidChangeEvent = async function () {
+                if (document.getElementById('open_tutorial_post') !== null) {
+                    open_tutorial_post_button = document.getElementById('open_tutorial_post');
+
+                    open_tutorial_post_button.addEventListener('click', tutorial_started_event_handler, false);
+                }
+
+
+                let notifications_active_component = await nav_notifications.getActive();
+
+                if (notifications_active_component.component === "nav-notifications") {
+                    open_tutorial_post_button.removeEventListener("click", tutorial_started_event_handler, false);
+                    nav_notifications.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+                }
+            };
+
+            nav_notifications.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+        } else {
+            nav_notification_tutorial_started.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+
+            nav_notifications.push(nav_notification_tutorial_started);
+        }
     } else if (notification_tags.includes("Tutorial finished") && notification_tags.length !== 0) {
         device_feedback();
         console.log("Notification <>")
@@ -1138,6 +1232,9 @@ document.querySelector('body').addEventListener('click', async function (event) 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
+        console.log("!yoyoyoyoy");
+        console.log(this_notification)
+        console.log(notification_posts)
 
         //We get the post that this notifiaction relates to by comparing the post id's
         for (let i = 0; i < notification_posts.length; i++) {
@@ -1155,10 +1252,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
-        let nav_notification_tutorial_canceled = document.createElement('nav-notification-tutorial-agreement-accepted');
+        let nav_notification_tutorial_finished = document.createElement('nav-notification-tutorial-agreement-accepted');
 
-
-        nav_notification_tutorial_canceled.innerHTML = `
+        if (typeof this_post === 'undefined') {
+            nav_notification_tutorial_finished.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
               <ion-buttons onclick="device_feedback()" slot="start">
@@ -1175,8 +1272,105 @@ document.querySelector('body').addEventListener('click', async function (event) 
           </ion-content>
         `;
 
-        //The button to which we are applying the event listener
-        nav_notifications.push(nav_notification_tutorial_canceled);
+            nav_notifications.push(nav_notification_tutorial_finished);
+        } else if (this_post.post_status === "Done") {
+            nav_notification_tutorial_finished.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+                <div class="ion-padding-top">
+                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open post</ion-button>
+                </div>
+          </ion-content>
+        `;
+
+            //The button to which we are applying the event listener
+            let open_tutorial_post_button;
+            nav_notifications.push(nav_notification_tutorial_finished);
+            let tutorial_status = this_post.post_status;
+            let tutorial_tag = this_post.post_modules.join(', ');
+
+            let tutorial_finished_event_handler = function () {
+                device_feedback();
+
+
+                load_done_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status)
+
+            };
+
+
+            let ionNavDidChangeEvent = async function () {
+                if (document.getElementById('open_tutorial_post') !== null) {
+                    open_tutorial_post_button = document.getElementById('open_tutorial_post');
+
+                    open_tutorial_post_button.addEventListener('click', tutorial_finished_event_handler, false);
+                }
+
+
+                let notifications_active_component = await nav_notifications.getActive();
+
+                if (notifications_active_component.component === "nav-notifications") {
+                    open_tutorial_post_button.removeEventListener("click", tutorial_finished_event_handler, false);
+                    nav_notifications.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
+                }
+            };
+
+            nav_notifications.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+        } else {
+            nav_notification_tutorial_finished.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+
+            nav_notifications.push(nav_notification_tutorial_finished);
+        }
+    } else if (notification_tags.includes("Tutor rated") && notification_tags.length !== 0) {
+        device_feedback();
+
+        //Find a notification from notifications object that matches the ID of the clicked element.
+        let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
+
+        let nav_notification_tutorial_finished = document.createElement('nav-notification-tutorial-agreement-accepted');
+        nav_notification_tutorial_finished.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons onclick="device_feedback()" slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+                <ion-buttons onclick="device_feedback()" slot="end">
+                                <ion-menu-button></ion-menu-button>
+                            </ion-buttons>
+              <ion-title style="text-align:center;">${this_notification.notification_title}</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <p>${this_notification.notification_desc}</p>
+          </ion-content>
+        `;
+
+        nav_notifications.push(nav_notification_tutorial_finished);
     }
 });
 
@@ -1246,6 +1440,12 @@ function load_tutorial_accepted_component(this_post, notification_tags) {
 
 function load_post_agreement_signed_component(this_post) {
     let tutorial_accepted_component = document.createElement('tutorial_requested');
+
+    let tutor_info = "";
+    if (this_post.std_email !== user.getEmail()) {
+        tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+
     let tutorial_accepted_component_html;
     tutorial_accepted_component_html = `<ion-header translucent>
                                                         <ion-toolbar>
@@ -1266,7 +1466,8 @@ function load_post_agreement_signed_component(this_post) {
                                                                 <p>${this_post.std_email}</p>
                                                             </ion-label><p class="date">${formatDate(this_post.post_posted_on)}</p>
                                                         </ion-item>
-
+                                                        
+                                                        ${tutor_info}
 
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                         <ion-item lines="none">
