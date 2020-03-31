@@ -31,14 +31,14 @@ function load_request_tutorial(nav_controller) {
                     <ion-item style="margin-top:-30px;">
 
                         <ion-select class="my-select" cancel-text="Cancel" ok-text="Request" id="tutorial_modules" style="max-width:100%;">
-                            <ion-select-option value="Java">Java</ion-select-option>
-                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
-                            <ion-select-option value="HTML">HTML</ion-select-option>
-                            <ion-select-option value="CSS">CSS</ion-select-option>    
-                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
                             <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
-                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="CSS">CSS</ion-select-option>
                             <ion-select-option value="Databases">Databases</ion-select-option>
+                            <ion-select-option value="HTML">HTML</ion-select-option>
+                            <ion-select-option value="Java">Java</ion-select-option>
+                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
+                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
                         </ion-select>
                     </ion-item>
                          <br>

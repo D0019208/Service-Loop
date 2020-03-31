@@ -277,14 +277,14 @@ function load_profile_page(nav_controller) {
                       <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                     <ion-item>
                         <ion-select class="my-select" multiple="true" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
-                            <ion-select-option value="Java">Java</ion-select-option>
-                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
-                            <ion-select-option value="HTML">HTML</ion-select-option>
-                            <ion-select-option value="CSS">CSS</ion-select-option>    
-                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
                             <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
-                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="CSS">CSS</ion-select-option>
                             <ion-select-option value="Databases">Databases</ion-select-option>
+                            <ion-select-option value="HTML">HTML</ion-select-option>
+                            <ion-select-option value="Java">Java</ion-select-option>
+                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
+                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
                         </ion-select>
                     </ion-item>
                     <div id="p"></div>

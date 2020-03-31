@@ -14,6 +14,9 @@ let my_requested_posts_done_loaded = false;
 
 let popover_title2 = "";
 let popover_content2 = "";
+
+let active_segment = "Open";
+
 function load_my_requested_tutorials(nav_controller) {
     customElements.get('nav-my-requested-tutorials') || customElements.define('nav-my-requested-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
@@ -355,6 +358,7 @@ function load_my_requested_tutorials(nav_controller) {
             for (let i = 0; i < segments.length; i++) {
                 segments[i].addEventListener('ionChange', (ev) => {
                     if (ev.detail.value === "open_segment") {
+                        active_segment = "Open";
                         popover_title2 = "Open";
                         popover_content2 = "All tutorials with no assigned tutor";
 
@@ -363,6 +367,7 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.ongoing.classList.add("hide");
                         segment_elements.done.classList.add("hide");
                     } else if (ev.detail.value === "pending_segment") {
+                        active_segment = "Pending";
                         popover_title2 = "Pending";
                         popover_content2 = "All tutorials that need to be confirmed by tutor and student";
 
@@ -408,6 +413,7 @@ function load_my_requested_tutorials(nav_controller) {
                             my_requested_posts_pending_loaded = true;
                         }
                     } else if (ev.detail.value === "ongoing_segment") {
+                        active_segment = "Ongoing";
                         popover_title2 = "Ongoing";
                         popover_content2 = "All tutorials that are in progress";
 
@@ -453,6 +459,7 @@ function load_my_requested_tutorials(nav_controller) {
                             my_requested_posts_ongoing_loaded = true;
                         }
                     } else if (ev.detail.value === "done_segment") {
+                        active_segment = "Done"
                         popover_title2 = "Done";
                         popover_content2 = "All tutorials that have being completed";
 
@@ -546,6 +553,8 @@ function load_my_requested_tutorials(nav_controller) {
             my_requested_posts_pending_loaded = false;
             my_requested_posts_ongoing_loaded = false;
             my_requested_posts_done_loaded = false;
+            
+            active_segment = "Open";
             
             console.log('Custom square element removed from page.');
         }

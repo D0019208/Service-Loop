@@ -1859,8 +1859,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 
     let begin_tutorial;
     let begin_tutorial_handler = async function () {
-        //let student_number = await activate_bar_code_scanner();
-        let student_number = "1234";
+        let student_number = await activate_bar_code_scanner();
         
         if (student_number !== "Canceled") {
             start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler);
@@ -2761,6 +2760,7 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                         total_tutorials = tutorials.total_ongoing_tutorials;
 
                         if (total_tutorials > 0) {
+                            alert("Subtract 1")
                             tutorials.total_ongoing_tutorials--;
                             tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
                         }
@@ -2783,6 +2783,7 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                         total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
 
                         if (total_tutorials > 0) {
+                            alert("4")
                             tutor_tutorials.total_tutor_ongoing_tutorials--;
                             tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
                         }
@@ -2909,14 +2910,11 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
 
         if (rating !== 0) {
             let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating}, "rate_tutor");
-
-            tutorials.remove_tutorial_by_id(tutorials.done_tutorials, tutorial_id);
-            tutorials.done_tutorials.push(rate_response.updated_tutorial);
-
-
+            
+            tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
 
             console.log("Tutorial removed?");
-            console.log(tutorials.done_tutor_tutorials);
+            console.log(tutorials.done_tutorials);
 
             //IMPORTNAT!!!! LOOK INTO ADDING THIS FOR CANCEL, BEGIN AND FINISH TUTORIAL!!!!!!!!
             posts.replace_notification_posts(rate_response.updated_tutorial);

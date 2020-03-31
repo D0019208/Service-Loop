@@ -12,6 +12,9 @@ let tutor_tutorials_done_loaded = false;
 
 let popover_title = "";
 let popover_content = "";
+
+let active_tutor_segment = "Pending";
+
 function all_tutor_tutorials(nav_controller) {
     customElements.get('nav-my-tutorials') || customElements.define('nav-my-tutorials', class RequestTutorial extends HTMLElement {
         constructor() {
@@ -301,6 +304,7 @@ function all_tutor_tutorials(nav_controller) {
             for (let i = 0; i < segments.length; i++) {
                 segments[i].addEventListener('ionChange', (ev) => {
                     if (ev.detail.value === "tutor_tutorials_pending_segment") {
+                        active_tutor_segment = "Pending";
                         popover_title = "Pending";
                         popover_content = "All tutorials that need to be confirmed by tutor and student";
                         
@@ -308,6 +312,7 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.pending.classList.remove("hide");
                         segment_elements.done.classList.add("hide");
                     } else if (ev.detail.value === "tutor_tutorials_ongoing_segment") {
+                        active_tutor_segment = "Ongoing";
                         popover_title = "Ongoing";
                         popover_content = "All tutorials that are in progress";
                         
@@ -348,6 +353,7 @@ function all_tutor_tutorials(nav_controller) {
                             tutor_tutorials_ongoing_loaded = true;
                         }
                     } else if (ev.detail.value === "tutor_tutorials_done_segment") {
+                        active_tutor_segment = "Done";
                         popover_title = "Done";
                         popover_content = "All tutorials that have being completed";
                         
@@ -438,6 +444,8 @@ function all_tutor_tutorials(nav_controller) {
         disconnectedCallback() {
             tutor_tutorials_ongoing_loaded = false;
             tutor_tutorials_done_loaded = false;
+            
+            active_tutor_segment = "Pending";
             
             console.log('Custom square element removed from page.');
         }
