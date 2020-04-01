@@ -745,11 +745,11 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
         if (!localhost) {
             push.send_notification("Tutor assigned", "A tutor has been assigned for the tutorial '" + post_acceptated_response.response.post.post_title + "'. Click on this notification to open it.", post_acceptated_response.response.post.std_email, "Tutorial accepted", post_acceptated_response.response.post, post_acceptated_response.response.student_notification);
         }
-        
-        if(typeof tutor_tutorials.all_tutor_tutorials === 'string') {
+
+        if (typeof tutor_tutorials.all_tutor_tutorials === 'string') {
             tutor_tutorials.all_tutor_tutorials = [post_acceptated_response.response.post];
         }
-        
+
         tutor_tutorials.add_tutorial_to_DOM("Pending", post_acceptated_response.response.post);
 //        tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
 
@@ -1260,7 +1260,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
                                     </ion-toolbar>
                                 </ion-header>
                                 <ion-content fullscreen> 
-                                    <p class="center">Please enter the following details</p>
+                                    <p class="center">Please enter the following details about the tutorial</p>
                                     <ion-item-divider class="divider">
                                     </ion-item-divider>
                                     <ion-item>
@@ -1268,8 +1268,12 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
                                         <ion-datetime id="tutorial_date" value="${current_date}" min="${year}" max="${year}" placeholder="Select Date"></ion-datetime>
                                     </ion-item>
                                     <ion-item>
-                                        <ion-label>Time <ion-text color="danger">*</ion-text></ion-label>
+                                        <ion-label>Start Time <ion-text color="danger">*</ion-text></ion-label>
                                         <ion-datetime id="tutorial_time" display-format="HH:mm" value="00:00"></ion-datetime>
+                                    </ion-item>
+                                    <ion-item>
+                                        <ion-label>End Time <ion-text color="danger">*</ion-text></ion-label>
+                                        <ion-datetime id="end_tutorial_time" display-format="HH:mm" value="00:00"></ion-datetime>
                                     </ion-item>
 
                                     <br><br>
@@ -1374,11 +1378,18 @@ async function generate_agreement(nav_controller, tutorial) {
         create_ionic_alert("Agreement creation failed", "Please fill in all fields before proceeding.", ["OK"]);
     } else {
         let agreement_generated_response;
-
-        if (typeof tutorial._id == 'undefined') {
-            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+        let date = new Date(document.getElementById('tutorial_date').value);
+        let final_date = date.getUTCFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
+        
+        if (new Date(final_date + ' ' + document.getElementById('end_tutorial_time').value) > new Date(final_date + ' ' + document.getElementById('tutorial_time').value)) {
+            if (typeof tutorial._id == 'undefined') {
+                agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            } else {
+                agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            }
         } else {
-            agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            create_ionic_alert("What's the rush?", "Tutorial end date must not be shorter than or the same as tutorial start time!", ["OK"]);
+            return;
         }
 
         console.log(agreement_generated_response);
@@ -1670,7 +1681,7 @@ async function accept_agreement(nav_controller, this_tutorial) {
 
             //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
             posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
-            
+
             tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), agreement_accepted_response.updated_tutorial);
             tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
         } else {
@@ -1860,7 +1871,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     let begin_tutorial;
     let begin_tutorial_handler = async function () {
         let student_number = await activate_bar_code_scanner();
-        
+
         if (student_number !== "Canceled") {
             start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler);
         }
@@ -2715,13 +2726,13 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
                 begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
                 cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
                 cancel_tutorial.remove();
-                
+
                 //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
                 var element = document.getElementById("begin_tutorial");
                 element.parentNode.removeChild(element);
                 document.getElementById("finish_tutorial").style.display = "block";
-console.log("STOP!!!!!!!!")
-console.log(begin_response.student_notification.response);
+                console.log("STOP!!!!!!!!")
+                console.log(begin_response.student_notification.response);
                 user_notifications.sendBeginTutorialNotification(begin_response.student_notification.response, begin_response.updated_tutorial);
             }
         },
@@ -2912,7 +2923,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
 
         if (rating !== 0) {
             let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating}, "rate_tutor");
-            
+
             tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
 
             console.log("Tutorial removed?");
