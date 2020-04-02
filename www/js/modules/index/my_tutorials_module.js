@@ -382,7 +382,11 @@ function load_my_requested_tutorials(nav_controller) {
                             if (tutorials.get_pending_tutorials().length <= 3) {
                                 tutorials.pending_tutorials_length = tutorials.appendPosts(tutorials.get_pending_tutorials().length, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
                             } else if (document.getElementById('pending').childElementCount <= 3) {
-                                tutorials.pending_tutorials_length = tutorials.appendPosts(3, pendingInfiniteScroll, tutorials.pending_tutorials, 0);                                
+                                if (tutorials.total_done_tutorials >= 3) {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(3, pendingInfiniteScroll, tutorials.pending_tutorials, 0);
+                                } else {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.total_pending_tutorials, pendingInfiniteScroll, tutorials.pending_tutorials, 0);
+                                }
                             } else {
                                 tutorials.pending_tutorials_length = tutorials.appendPosts(3, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
                             }
@@ -430,7 +434,11 @@ function load_my_requested_tutorials(nav_controller) {
                             if (tutorials.get_ongoing_tutorials().length <= 3) {
                                 tutorials.ongoing_tutorials_length = tutorials.appendPosts(tutorials.get_ongoing_tutorials().length, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
                             } else if (document.getElementById('ongoing').childElementCount <= 3) {
-                                tutorials.ongoing_tutorials_length = tutorials.appendPosts(3, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
+                                if (tutorials.total_done_tutorials >= 3) {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(3, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
+                                } else {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.total_ongoing_tutorials, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
+                                }
                             } else {
                                 tutorials.ongoing_tutorials_length = tutorials.appendPosts(3, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
                             }
@@ -478,7 +486,11 @@ function load_my_requested_tutorials(nav_controller) {
                             if (tutorials.get_done_tutorials().length <= 3 && document.getElementById('done').childElementCount > 3) {
                                 tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.get_done_tutorials().length, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
                             } else if (document.getElementById('done').childElementCount <= 3) {
-                                tutorials.done_tutorials_length = tutorials.appendPosts(3, doneInfiniteScroll, tutorials.done_tutorials, 0);
+                                if (tutorials.total_done_tutorials >= 3) {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(3, doneInfiniteScroll, tutorials.done_tutorials, 0);
+                                } else {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.total_done_tutorials, doneInfiniteScroll, tutorials.done_tutorials, 0);
+                                }
                             } else {
                                 tutorials.done_tutorials_length = tutorials.appendPosts(3, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
                             }

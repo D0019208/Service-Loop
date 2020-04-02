@@ -216,14 +216,14 @@ class Notifications extends User {
 
             this.notifications_length += 1;
         }
-    }  
+    }
 
     sendTutorialFinished(notification, post) {
         this.socket.emit('finish_tutorial', {the_notification: notification, the_post: post});
     }
 
-    sendNewNotification(notification) {
-        this.socket.emit('send_notification', notification);
+    sendNewNotification(notification, post) {
+        this.socket.emit('send_notification', {the_notification: notification, the_post: post});
     }
 
     sendBeginTutorialNotification(notification, post) {
@@ -243,6 +243,7 @@ class Notifications extends User {
     }
 
     sendAgreementAcceptedNotification(notification, post) {
+        console.log("WEBSOCKET ACTIVATED!!!!!!!")
         this.socket.emit('agreement_accepted', {the_notification: notification, the_post: post});
     }
 
@@ -321,6 +322,19 @@ class Notifications extends User {
         socket.on('new_notification', (data) => {
             new_message_ping.play();
             //window.plugins.deviceFeedback.haptic();
+            console.log("wtf is happening?")
+            console.log(data);
+
+            posts.replace_notification_posts(data.post);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+
             this.addToNotifications(data.response);
             console.log(data);
         });

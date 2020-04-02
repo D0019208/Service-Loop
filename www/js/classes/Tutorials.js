@@ -341,7 +341,7 @@ class Tutorials extends User {
             }
         } else if (segment == "Ongoing") {
             container = document.getElementById('ongoing');
-            total_tutorials = container.querySelectorAll('.test').length;
+            total_tutorials = this.total_ongoing_tutorials;
             
             if (container) {
                 if (total_tutorials > 0) {

@@ -102,9 +102,9 @@ function load_request_tutorial(nav_controller) {
 
                 //If no error occured, we add a new notification to the users current notfifications that his request was successful
                 if (!tutorial_request_response.error) {
-                    user_notifications.addToNotifications({notification_opened: false, _id: tutorial_request_response.response[1]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: user.getAvatar(), notification_title: "Tutorial request sent", notification_desc: tutorial_request_response.response[1].notification_desc, notification_desc_trunc: tutorial_request_response.response[1].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[1].notification_posted_on, notification_modules: tutorial_request_response.response[1].notification_modules, notification_tags: tutorial_request_response.response[1].notification_tags});
+                    user_notifications.addToNotifications(tutorial_request_response.response[1]);
                     //Send a new notification to all tutors
-                    user_notifications.sendNewNotification({notification_opened: false, _id: tutorial_request_response.response[2]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: user.getAvatar(), notification_title: "New tutorial request", notification_desc: tutorial_request_response.response[2].notification_desc, notification_desc_trunc: tutorial_request_response.response[2].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[2].notification_posted_on, notification_modules: tutorial_request_response.response[2].notification_modules, notification_tags: tutorial_request_response.response[2].notification_tags});
+                    user_notifications.sendNewNotification(tutorial_request_response.response[2], tutorial_request_response.response[0]);
 
                     //Send a tutorial to all available and eligible tutors
                     posts.sendNewTutorial(tutorial_request_response);

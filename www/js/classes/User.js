@@ -19,11 +19,11 @@ class User {
 
         this.socket = socket;
     }
-    
+
     set_tutor_rating(tutor_rating) {
         this.tutor_rating = tutor_rating;
     }
-    
+
     get_tutor_rating() {
         return this.tutor_rating;
     }
@@ -228,9 +228,14 @@ class User {
         //HTTPS
         //const socket = io.connect("https://my.website.com:3002", { secure: true, reconnection: true, rejectUnauthorized: false });
         let modules = encodeURIComponent(JSON.stringify(this.modules));
-        //let socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
-        let socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
+        let socket;
         
+        if (!localhost) {
+            socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
+        } else {
+            socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
+        }
+
         this.socket = socket;
 
         console.log(socket);
