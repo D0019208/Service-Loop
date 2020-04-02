@@ -741,15 +741,25 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
         user_notifications.addToNotifications(post_acceptated_response.response.tutor_notification);
         user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification, post_acceptated_response.response.post);
 
+        posts.replace_notification_posts(post_acceptated_response.response.post);
+
+        if (typeof notification_posts !== 'undefined') {
+            notification_posts = notification_posts.filter(function (obj) {
+                return obj._id !== post_acceptated_response.response.post._id;
+            });
+
+            notification_posts.push(post_acceptated_response.response.post);
+        }
+
         //Send push notification
         if (!localhost) {
             push.send_notification("Tutor assigned", "A tutor has been assigned for the tutorial '" + post_acceptated_response.response.post.post_title + "'. Click on this notification to open it.", post_acceptated_response.response.post.std_email, "Tutorial accepted", post_acceptated_response.response.post, post_acceptated_response.response.student_notification);
         }
-        
-        if(typeof tutor_tutorials.all_tutor_tutorials === 'string') {
+
+        if (typeof tutor_tutorials.all_tutor_tutorials === 'string') {
             tutor_tutorials.all_tutor_tutorials = [post_acceptated_response.response.post];
         }
-        
+
         tutor_tutorials.add_tutorial_to_DOM("Pending", post_acceptated_response.response.post);
 //        tutor_tutorials.add_tutorial_to_tutor_tutorials(post_acceptated_response.response.post);
 
@@ -1260,7 +1270,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
                                     </ion-toolbar>
                                 </ion-header>
                                 <ion-content fullscreen> 
-                                    <p class="center">Please enter the following details</p>
+                                    <p class="center">Please enter the following details about the tutorial</p>
                                     <ion-item-divider class="divider">
                                     </ion-item-divider>
                                     <ion-item>
@@ -1268,8 +1278,12 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
                                         <ion-datetime id="tutorial_date" value="${current_date}" min="${year}" max="${year}" placeholder="Select Date"></ion-datetime>
                                     </ion-item>
                                     <ion-item>
-                                        <ion-label>Time <ion-text color="danger">*</ion-text></ion-label>
+                                        <ion-label>Start Time <ion-text color="danger">*</ion-text></ion-label>
                                         <ion-datetime id="tutorial_time" display-format="HH:mm" value="00:00"></ion-datetime>
+                                    </ion-item>
+                                    <ion-item>
+                                        <ion-label>End Time <ion-text color="danger">*</ion-text></ion-label>
+                                        <ion-datetime id="end_tutorial_time" display-format="HH:mm" value="00:00"></ion-datetime>
                                     </ion-item>
 
                                     <br><br>
@@ -1374,11 +1388,18 @@ async function generate_agreement(nav_controller, tutorial) {
         create_ionic_alert("Agreement creation failed", "Please fill in all fields before proceeding.", ["OK"]);
     } else {
         let agreement_generated_response;
+        let date = new Date(document.getElementById('tutorial_date').value);
+        let final_date = date.getUTCFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
 
-        if (typeof tutorial._id == 'undefined') {
-            agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+        if (new Date(final_date + ' ' + document.getElementById('end_tutorial_time').value) > new Date(final_date + ' ' + document.getElementById('tutorial_time').value)) {
+            if (typeof tutorial._id == 'undefined') {
+                agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            } else {
+                agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            }
         } else {
-            agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: document.getElementById('tutorial_date').value, tutorial_time: document.getElementById('tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+            create_ionic_alert("What's the rush?", "Tutorial end date must not be shorter than or the same as tutorial start time!", ["OK"]);
+            return;
         }
 
         console.log(agreement_generated_response);
@@ -1392,6 +1413,14 @@ async function generate_agreement(nav_controller, tutorial) {
 
             user_notifications.addToNotifications(agreement_generated_response.tutor_notification.response);
             user_notifications.sendAgreementGeneratedNotification({response: agreement_generated_response.student_notification.response}, agreement_generated_response.updated_tutorial);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== agreement_generated_response.updated_tutorial._id;
+                });
+
+                notification_posts.push(agreement_generated_response.updated_tutorial);
+            }
 
             //tutor_tutorials.remove_tutorial_from_DOM("Pending", agreement_generated_response);
             tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
@@ -1649,6 +1678,9 @@ async function accept_agreement(nav_controller, this_tutorial) {
         let agreement_accepted_response = await access_route({tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
 
         if (!agreement_accepted_response.error) {
+            user_notifications.addUnreadNotificationsToDOM();
+            user_notifications.addToNotifications(agreement_accepted_response.student_notification.response);
+
             //Send push notification
             if (!localhost) {
                 push.send_notification("Agreement accepted", "The student has accepted your agreement for the '" + agreement_accepted_response.updated_tutorial.post_title + "' tutorial. Click on this notification to view it.", agreement_accepted_response.updated_tutorial.post_tutor_email, "Agreement accepted", {}, {});
@@ -1670,7 +1702,7 @@ async function accept_agreement(nav_controller, this_tutorial) {
 
             //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
             posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
-            
+
             tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), agreement_accepted_response.updated_tutorial);
             tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
         } else {
@@ -1684,25 +1716,30 @@ async function accept_agreement(nav_controller, this_tutorial) {
 }
 
 async function reject_this_agreement(nav_controller, this_tutorial) {
-    console.log("Test")
-    console.log(tutorials.open_tutorials)
-
     let agreement_rejected_response = await access_route({tutorial_id: this_tutorial._id}, "reject_agreement");
 
     if (!agreement_rejected_response.error) {
+        user_notifications.addUnreadNotificationsToDOM();
+        user_notifications.addToNotifications(agreement_rejected_response.student_notification.response);
+        user_notifications.sendAgreementRejectedNotification({response: agreement_rejected_response.tutor_notification.response}, agreement_rejected_response.updated_tutorial);
+
+        let reject_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+
+        create_toast("Tutorial canceled!", "dark", 2000, reject_buttons);
         //Send push notification
         if (!localhost) {
             push.send_notification("Agreement rejected", "The student has rejected your agreement for the '" + agreement_rejected_response.updated_tutorial.post_title + "' tutorial. Click on this notification to create a new one.", agreement_rejected_response.updated_tutorial.post_tutor_email, "Agreement rejected", {}, {});
         }
 
-        console.log(agreement_rejected_response)
-        console.log("Before");
-        console.log(tutorials.open_tutorials);
-        console.log("After");
-        console.log(tutorials.open_tutorials);
-
-        user_notifications.addToNotifications(agreement_rejected_response.student_notification.response);
-        user_notifications.sendAgreementRejectedNotification({response: agreement_rejected_response.tutor_notification.response}, agreement_rejected_response.updated_tutorial);
         posts.replace_notification_posts(agreement_rejected_response.updated_tutorial);
 
 
@@ -1859,10 +1896,16 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 
     let begin_tutorial;
     let begin_tutorial_handler = async function () {
-        let student_number = await activate_bar_code_scanner();
-        
+        let student_number;
+
+        if (!localhost) {
+            student_number = await activate_bar_code_scanner();
+        } else {
+            student_number = "";
+        }
+
         if (student_number !== "Canceled") {
-            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler);
+            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler);
         }
     };
 
@@ -2372,6 +2415,9 @@ async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status
                 console.log(tutor_tutorials.pending_tutor_tutorials);
 
                 let cancel_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(cancel_response.student_notification.response);
+
                 let cancel_buttons = [
                     {
                         side: 'end',
@@ -2384,9 +2430,6 @@ async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status
                 ];
 
                 create_toast("Tutorial canceled!", "dark", 2000, cancel_buttons);
-
-                user_notifications.addUnreadNotificationsToDOM();
-                user_notifications.addToNotifications(cancel_response.student_notification.response);
 
                 posts.removeNotificationPostByPostId(tutorial_id)
 
@@ -2647,7 +2690,7 @@ function get_tutorial_links(tutorial_tag) {
     return tutorial_links;
 }
 
-function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler) {
+function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler) {
     console.log("Start");
     console.log(begin_tutorial);
     console.log(begin_tutorial_handler)
@@ -2658,6 +2701,9 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
                 device_feedback();
                 //Update the tutorial 
                 let begin_response = await access_route({tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(begin_response.student_notification.response);
+
                 let begin_buttons = [
                     {
                         side: 'end',
@@ -2688,9 +2734,6 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
 
                 create_toast("Tutorial started!", "dark", 2000, begin_buttons);
 
-                user_notifications.addUnreadNotificationsToDOM();
-                user_notifications.addToNotifications(begin_response.student_notification.response);
-
                 //Remove notification post and add new one (The post object we are using to get the information for notifications)
                 posts.removeNotificationPostByPostId(post_id);
                 posts.notification_posts.push(begin_response.updated_tutorial);
@@ -2713,13 +2756,15 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
 
                 //REMOVE BEGIN TUTORIAL EVENT LISTENER
                 begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
+                cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
+                cancel_tutorial.remove();
 
                 //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
                 var element = document.getElementById("begin_tutorial");
                 element.parentNode.removeChild(element);
                 document.getElementById("finish_tutorial").style.display = "block";
-console.log("STOP!!!!!!!!")
-console.log(begin_response.student_notification.response);
+                console.log("STOP!!!!!!!!")
+                console.log(begin_response.student_notification.response);
                 user_notifications.sendBeginTutorialNotification(begin_response.student_notification.response, begin_response.updated_tutorial);
             }
         },
@@ -2745,6 +2790,8 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                 console.log(tutorial);
 
                 let end_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "finish_tutorial");
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(end_response.tutor_notification.response);
 
                 //Check what page we on, my tutorials or my requested tutorials
                 if (document.getElementById('my_posts_content') !== null) {
@@ -2809,9 +2856,6 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                 ];
 
                 create_toast("Tutorial finished!", "dark", 2000, cancel_buttons);
-
-                user_notifications.addUnreadNotificationsToDOM();
-                user_notifications.addToNotifications(end_response.tutor_notification.response);
 
                 posts.removeNotificationPostByPostId(tutorial_id)
 
@@ -2910,7 +2954,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
 
         if (rating !== 0) {
             let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating}, "rate_tutor");
-            
+
             tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
 
             console.log("Tutorial removed?");

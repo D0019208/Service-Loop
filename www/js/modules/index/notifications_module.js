@@ -1226,15 +1226,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial finished") && notification_tags.length !== 0) {
         device_feedback();
-        console.log("Notification <>")
-        console.log(notification);
-
+    
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
-        console.log("!yoyoyoyoy");
-        console.log(this_notification)
-        console.log(notification_posts)
 
         //We get the post that this notifiaction relates to by comparing the post id's
         for (let i = 0; i < notification_posts.length; i++) {
@@ -1242,6 +1237,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 this_post = notification_posts[i];
             }
         }
+        
+        console.log("This post");
+        console.log(this_post);
+        console.log(notification_posts)
 
         if (!this_notification.notification_opened) {
             this_notification.notification_opened = true;

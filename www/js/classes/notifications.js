@@ -1,6 +1,6 @@
 class Notifications extends User {
     constructor(id, notifications, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
-        super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
+        super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, 0, socket);
 
         this.all_notifications = notifications;
 
@@ -216,14 +216,14 @@ class Notifications extends User {
 
             this.notifications_length += 1;
         }
-    }  
+    }
 
     sendTutorialFinished(notification, post) {
         this.socket.emit('finish_tutorial', {the_notification: notification, the_post: post});
     }
 
-    sendNewNotification(notification) {
-        this.socket.emit('send_notification', notification);
+    sendNewNotification(notification, post) {
+        this.socket.emit('send_notification', {the_notification: notification, the_post: post});
     }
 
     sendBeginTutorialNotification(notification, post) {
@@ -244,6 +244,10 @@ class Notifications extends User {
 
     sendAgreementAcceptedNotification(notification, post) {
         this.socket.emit('agreement_accepted', {the_notification: notification, the_post: post});
+    }
+    
+    sendRateTutor(post, rating) {
+        this.socket.emit('send_rate_tutor', {the_rating: rating, the_post: post});
     }
 
     wait_for_agreement_rejected() {
@@ -317,10 +321,19 @@ class Notifications extends User {
 
     waitForNewNotifications() {
         let socket = this.socket;
-
+        
         socket.on('new_notification', (data) => {
             new_message_ping.play();
-            //window.plugins.deviceFeedback.haptic();
+            posts.replace_notification_posts(data.post);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+
             this.addToNotifications(data.response);
             console.log(data);
         });
@@ -447,8 +460,36 @@ class Notifications extends User {
             console.log(data);
         });
 
-        socket.on('news', function (data) {
+        socket.on('tutor_update_rating', (data) => {
+            console.log("Tutor rated!")
             console.log(data);
+            console.log(tutor_tutorials.done_tutor_tutorials)
+            new_message_ping.play();
+            posts.replace_notification_posts(data.post);
+            tutor_tutorials.update_tutorial("Done", data.post);
+            
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+
+                notification_posts.push(data.post);
+            }
+            
+            user.tutor_rating = data.rating;
+            
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("You have been rated!", "dark", 3000, toast_buttons);
         });
     }
 }

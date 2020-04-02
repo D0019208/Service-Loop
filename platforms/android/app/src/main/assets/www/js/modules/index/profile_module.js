@@ -39,11 +39,13 @@ function load_profile_page(nav_controller) {
                 <p id="user_email_profile">D00194503@student.dkit.ie</p>
                 <br>
                 <h2><strong id="user_status_profile">TUTOR</strong></h2>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star checked"></span>
-                <span class="fa fa-star"></span>
-                <span class="fa fa-star"></span>
+                <div id="rating_container">
+                    <span class="fa fa-star"></span>
+                    <span class="fa fa-star"></span>
+                    <span class="fa fa-star"></span>
+                    <span class="fa fa-star"></span>
+                    <span class="fa fa-star"></span>
+                </div>
             </ion-label>
         </ion-item>
             
@@ -176,6 +178,11 @@ function load_profile_page(nav_controller) {
 
 <ion-alert-controller></ion-alert-controller>
         `;
+            }
+            
+            //Add rating
+            for(let i = 1; i <= user.get_tutor_rating(); i++) {
+                document.querySelector(`#rating_container > span:nth-child(${i})`).classList.add('checked');
             }
 
             //Change user's info
