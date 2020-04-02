@@ -1089,7 +1089,11 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-
+    
+    if (tutorial_status == "In Negotiation") {
+        tutorial_status = "Pending";
+    }
+    
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
