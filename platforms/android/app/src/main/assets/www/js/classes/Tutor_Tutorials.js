@@ -469,6 +469,18 @@ class Tutor_Tutorials extends User {
                     this.pending_tutor_tutorials[i] = updated_tutorial;
                 }
             }
+        } else if(segment === "Ongoing") {
+            for (let i = 0; i < this.ongoing_tutor_tutorials.length; i++) {
+                if (this.ongoing_tutor_tutorials[i]._id === updated_tutorial._id) {
+                    this.ongoing_tutor_tutorials[i] = updated_tutorial;
+                }
+            }
+        } else if(segment === "Done") {
+            for (let i = 0; i < this.done_tutor_tutorials.length; i++) {
+                if (this.done_tutor_tutorials[i]._id === updated_tutorial._id) {
+                    this.done_tutor_tutorials[i] = updated_tutorial;
+                }
+            }
         }
 
         console.log(this.pending_tutor_tutorials)

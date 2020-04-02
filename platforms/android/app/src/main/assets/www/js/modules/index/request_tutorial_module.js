@@ -25,7 +25,7 @@ function load_request_tutorial(nav_controller) {
                     <p></p>
                     <br><br>
                     <div style="display:flex;position: absolute;width: 80%;z-index: 999;top: 3px;">
-                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Choose a Subject<ion-text color="danger">*</ion-text></ion-text>
+                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Choose a Subject <ion-text color="danger">*</ion-text></ion-text>
                     </div>
 
                     <ion-item style="margin-top:-30px;">

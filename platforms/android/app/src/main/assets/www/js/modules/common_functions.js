@@ -1089,7 +1089,11 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-
+    
+    if (tutorial_status == "In Negotiation") {
+        tutorial_status = "Pending";
+    }
+    
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
@@ -2150,7 +2154,28 @@ async function load_open_tutorial_component(nav_controller, this_post) {
 
 async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-
+    
+    let comment = "";
+    if(this_post.tutor_rated) {
+        comment = `<ion-list>
+                                <ion-list-header>
+                                  <strong>STUDENT COMMENT</strong>
+                                </ion-list-header>
+                                
+                                <ion-item lines="none" class="comment">
+                                    <ion-avatar class="comment_avatar" slot="start">
+                                        <img src="${this_post.std_avatar}">
+                                    </ion-avatar>
+                                    <ion-label class="ion-text-wrap">
+                                        <p class="comment_title"><strong>${this_post.std_name}</strong></p>
+                                        <p class="comment_desc">${this_post.comment}</p>
+                                    </ion-label>
+                                </ion-item>
+                                <ion-item-divider class="divider3"></ion-item-divider>
+                                
+                            </ion-list>`;
+    } 
+    
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
@@ -2246,9 +2271,10 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                         <ion-list-header class="collapsible">
                                             <strong>TUTORIAL LINKS</strong>
                                         </ion-list-header>
-                                    <ion-list class="content">
+                                    <ion-list id='tutorial_links_list' class="content">
                                         ${tutorial_links}
                                     </ion-list>
+                            ${comment}
                             </ion-content>`;
 
     tutorial_accepted_component.innerHTML = tutorial_accepted_component_html;
@@ -2917,7 +2943,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
         <ion-content>
             <ion-list class="fields" style="text-align:center;">
                 <p><strong>Rate Tutor Experience</strong></p>
-                <p>Please rate your tutor based on the tutorial experience you have experienced.</p>
+                <p>Please rate your tutor based on the tutorial experience you have experienced and leave a comment with some feedback.</p>
             </ion-list>
 
             <ion-list align="center" style="">
@@ -2934,6 +2960,12 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
                     <input type="radio" id="starhalf" name="rating" value="0.5" /><label class="star half" value="0.5" for="starhalf"></label>
                 </fieldset>
             </ion-list>
+    
+            <ion-item-divider class="divider"></ion-item-divider>
+            <ion-item>
+                <ion-label style="padding-left:34%;font-size: 19px;" align="center" position="stacked">Comment <ion-text color="danger">*</ion-text></ion-label>
+                <ion-textarea rows="5" align="center" placeholder="Comment" required type="text" id="comment"></ion-textarea>
+            </ion-item>
 
             <div class="ion-padding-top">
                 <ion-button expand="block" style="padding-left:5%;padding-right: 5%;" type="button" class="ion-no-margin" id="rate_tutor_button">Rate Tutor</ion-button>
@@ -2952,13 +2984,10 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
     let rate_handler = async function () {
         device_feedback();
 
-        if (rating !== 0) {
-            let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating}, "rate_tutor");
-
+        if (rating !== 0 && document.getElementById('comment').value !== '') {
+            let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating, comment: document.getElementById('comment').value}, "rate_tutor");
+            
             tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
-
-            console.log("Tutorial removed?");
-            console.log(tutorials.done_tutorials);
 
             //IMPORTNAT!!!! LOOK INTO ADDING THIS FOR CANCEL, BEGIN AND FINISH TUTORIAL!!!!!!!!
             posts.replace_notification_posts(rate_response.updated_tutorial);
@@ -2970,12 +2999,6 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
 
                 notification_posts.push(rate_response.updated_tutorial);
             }
-
-            console.log("Notification Posts");
-            console.log(notification_posts);
-
-            console.log("Notification Posts Remove")
-            console.log(posts.notification_posts)
 
             let cancel_buttons = [
                 {
@@ -2991,24 +3014,41 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
             create_toast("Tutor rated " + rating + "/5!", "dark", 2000, cancel_buttons);
 
             if (from_forum) {
+                tutorial.tutor_rated = true;
+                tutorial.comment = document.getElementById('comment').value;
+                
                 rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
                 rate_the_tutor.remove();
+                
+                if(document.getElementById('tutorial_links_list') !== null) {
+                    let comment = document.createElement('ion-list');
+                    comment.innerHTML = `<ion-list>
+                                <ion-list-header>
+                                  <strong>STUDENT COMMENT</strong>
+                                </ion-list-header>
+                                
+                                <ion-item lines="none" class="comment">
+                                    <ion-avatar class="comment_avatar" slot="start">
+                                        <img src="${rate_response.updated_tutorial.std_avatar}">
+                                    </ion-avatar>
+                                    <ion-label class="ion-text-wrap">
+                                        <p class="comment_title"><strong>${rate_response.updated_tutorial.std_name}</strong></p>
+                                        <p class="comment_desc">${rate_response.updated_tutorial.comment}</p>
+                                    </ion-label>
+                                </ion-item>
+                                <ion-item-divider class="divider3"></ion-item-divider>
+                                
+                            </ion-list>`;
+                    
+                    document.getElementById('tutorial_links_list').after(comment);
+                }
             }
-
+            
+            user_notifications.sendRateTutor(rate_response.updated_tutorial, rate_response.rating);
+            
             nav_controller.pop();
         } else {
-            let cancel_buttons = [
-                {
-                    side: 'end',
-                    text: 'Close',
-                    role: 'cancel',
-                    handler: () => {
-                        console.log('Cancel clicked');
-                    }
-                }
-            ];
-
-            create_toast("Please choose a rating!", "dark", 2000, cancel_buttons);
+            create_ionic_alert("Failed to rate tutor", "Please add a rating from half a star to 5 stars and add a comment.", ["OK"]);
         }
     };
 
