@@ -196,7 +196,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                 ];
 
                 create_toast("Fingerprint configuration successful", "dark", 2000, toast_buttons);
-                dismissModal(currentModal);
+                currentModal = dismissModal(currentModal);
             } else {
                 ionic_loading.dismiss();
 
@@ -212,7 +212,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                 ];
 
                 create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
-                dismissModal(currentModal);
+                currentModal = dismissModal(currentModal);
             }
         }
 
@@ -232,7 +232,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                 ];
 
                 create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
-                dismissModal(currentModal);
+                currentModal = dismissModal(currentModal);
             }
         }
 
@@ -251,7 +251,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
         ];
 
         create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
-        dismissModal(currentModal);
+        currentModal = dismissModal(currentModal);
     }
 
 }
@@ -298,16 +298,16 @@ async function remove_fingerprint(currentModal, email) {
                     ];
 
                     create_toast("Fingerprint successfully deactivated", "dark", 2000, toast_buttons);
-                    dismissModal(currentModal);
+                    currentModal = dismissModal(currentModal);
                 }
 
                 function errorCallback(error) {
                     ionic_loading.dismiss();
 
                     create_ionic_alert("Fingerprint removal failed", error, ["OK"], function () {
-                        return dismissModal(currentModal);
+                        currentModal = dismissModal(currentModal);
                     });
-                    dismissModal(currentModal);
+                    currentModal = dismissModal(currentModal);
                 }
             } else {
                 ionic_loading.dismiss();
@@ -329,7 +329,7 @@ async function remove_fingerprint(currentModal, email) {
             ionic_loading.dismiss();
 
             create_ionic_alert("Fingerprint removal failed", ex, ["OK"], function () {
-                return dismissModal(currentModal);
+                currentModal = dismissModal(currentModal);
             });
         }
 
@@ -348,7 +348,7 @@ async function remove_fingerprint(currentModal, email) {
         ];
 
         create_toast("Your device does not support fingerprint authentication", "dark", 2000, toast_buttons);
-        dismissModal(currentModal);
+        currentModal = dismissModal(currentModal);
     }
 }
 
@@ -400,7 +400,7 @@ async function setup_fingerprint(currentModal) {
             ];
 
             create_toast(ex, "dark", 2000, toast_buttons);
-            dismissModal(currentModal);
+            currentModal = dismissModal(currentModal);
         }
 
     } else {
@@ -418,7 +418,7 @@ async function setup_fingerprint(currentModal) {
         ];
 
         create_toast("Your device does not support fingerprint authentication", "dark", 2000, toast_buttons);
-        dismissModal(currentModal);
+        currentModal = dismissModal(currentModal);
     }
 }
 
@@ -535,7 +535,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
             });
 
             document.getElementById("modal_close").addEventListener('click', () => {
-                dismissModal(currentModal);
+                currentModal = dismissModal(currentModal);
             });
         });
 
@@ -646,6 +646,9 @@ document.getElementById('personal_info').addEventListener('click', async () => {
         document.getElementById("modal_close").addEventListener('click', () => { 
             dismissModal(currentModal);
         });
+        document.getElementById("update_info").addEventListener('click', () => { 
+            update_info();
+        });
     });
 });
 
@@ -700,6 +703,9 @@ document.getElementById('change_pass').addEventListener('click', async () => {
 
         document.getElementById("modal_close").addEventListener('click', () => { 
             dismissModal(currentModal);
+        });
+        document.getElementById("change_password").addEventListener('click', () => { 
+            change_pass();
         });
     });
 });

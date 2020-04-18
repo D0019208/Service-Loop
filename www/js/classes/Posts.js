@@ -1,6 +1,6 @@
 class Posts extends User {
     constructor(id, posts, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
-        super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket);
+        super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, 0, socket);
 
 
         this.all_posts = posts.response;
@@ -278,12 +278,14 @@ class Posts extends User {
     async getAllNotificationPosts() {
         //The list containing all the notifications
         let notification_list = user_notifications.getAllNotifications();
+        console.log("maryamrya")
+        console.log(notification_list)
         let post_ids = [];
 
         for (let i = 0; i < notification_list.length; i++) {
             post_ids.push(notification_list[i].post_id);
         }
-
+console.log(post_ids)
         let notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
         return notification_posts.response;
     }

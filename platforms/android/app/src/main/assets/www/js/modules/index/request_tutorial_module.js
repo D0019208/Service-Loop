@@ -25,20 +25,20 @@ function load_request_tutorial(nav_controller) {
                     <p></p>
                     <br><br>
                     <div style="display:flex;position: absolute;width: 80%;z-index: 999;top: 3px;">
-                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Choose a Subject<ion-text color="danger">*</ion-text></ion-text>
+                        <ion-text style="margin:auto;margin-bottom: 0px;font-size: 15px;" class="tut_req_title" position="stacked">Choose a Subject <ion-text color="danger">*</ion-text></ion-text>
                     </div>
 
                     <ion-item style="margin-top:-30px;">
 
                         <ion-select class="my-select" cancel-text="Cancel" ok-text="Request" id="tutorial_modules" style="max-width:100%;">
-                            <ion-select-option value="Java">Java</ion-select-option>
-                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
-                            <ion-select-option value="HTML">HTML</ion-select-option>
-                            <ion-select-option value="CSS">CSS</ion-select-option>    
-                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
                             <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
-                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="CSS">CSS</ion-select-option>
                             <ion-select-option value="Databases">Databases</ion-select-option>
+                            <ion-select-option value="HTML">HTML</ion-select-option>
+                            <ion-select-option value="Java">Java</ion-select-option>
+                            <ion-select-option value="JavaScript">JavaScript</ion-select-option>
+                            <ion-select-option value="Networking">Networking</ion-select-option>
+                            <ion-select-option value="Visual Basic">Visual Basic</ion-select-option>
                         </ion-select>
                     </ion-item>
                          <br>
@@ -102,9 +102,9 @@ function load_request_tutorial(nav_controller) {
 
                 //If no error occured, we add a new notification to the users current notfifications that his request was successful
                 if (!tutorial_request_response.error) {
-                    user_notifications.addToNotifications({notification_opened: false, _id: tutorial_request_response.response[1]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: user.getAvatar(), notification_title: "Tutorial request sent", notification_desc: tutorial_request_response.response[1].notification_desc, notification_desc_trunc: tutorial_request_response.response[1].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[1].notification_posted_on, notification_modules: tutorial_request_response.response[1].notification_modules, notification_tags: tutorial_request_response.response[1].notification_tags});
+                    user_notifications.addToNotifications(tutorial_request_response.response[1]);
                     //Send a new notification to all tutors
-                    user_notifications.sendNewNotification({notification_opened: false, _id: tutorial_request_response.response[2]._id, post_id: tutorial_request_response.response[0]._id, std_email: user.getEmail(), notification_avatar: user.getAvatar(), notification_title: "New tutorial request", notification_desc: tutorial_request_response.response[2].notification_desc, notification_desc_trunc: tutorial_request_response.response[2].notification_desc_trunc, notification_posted_on: tutorial_request_response.response[2].notification_posted_on, notification_modules: tutorial_request_response.response[2].notification_modules, notification_tags: tutorial_request_response.response[2].notification_tags});
+                    user_notifications.sendNewNotification(tutorial_request_response.response[2], tutorial_request_response.response[0]);
 
                     //Send a tutorial to all available and eligible tutors
                     posts.sendNewTutorial(tutorial_request_response);
@@ -130,28 +130,29 @@ console.log("Notification posts 2")
 
 
                     //MAYBE USELESS CODE (1ST IF)
-                    if (document.getElementById('open-tutorials-infinite-scroll') !== null) {
-                        if (tutorials.total_open_tutorials == 0) {
-                            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
-                            
-                        }
-                        
-                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]); 
-                        console.log(tutorials.open_tutorials);
-                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
-                        
-                        tutorials.appendPosts(1, document.getElementById('open-tutorials-infinite-scroll'), [tutorial_request_response.response[0]], tutorials.open_tutorials_length);
-                    } else {
-                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]);  
-                        console.log("idl");
-                        console.log(tutorials.open_tutorials);
-                        console.log(tutorials.open_tutorials.length)
-                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
-                    }
-
+//                    if (document.getElementById('open-tutorials-infinite-scroll') !== null) {
+//                        if (tutorials.total_open_tutorials == 0) {
+//                            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
+//                            
+//                        }
+//                        
+//                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]); 
+//                        console.log(tutorials.open_tutorials);
+//                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+//                        
+//                        tutorials.appendPosts(1, document.getElementById('open-tutorials-infinite-scroll'), [tutorial_request_response.response[0]], tutorials.open_tutorials_length);
+//                    } else {
+//                        insert_to_array_by_index(tutorials.open_tutorials, 0, tutorial_request_response.response[0]);  
+//                        console.log("idl");
+//                        console.log(tutorials.open_tutorials);
+//                        console.log(tutorials.open_tutorials.length)
+//                        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+//                    }
                     
-                    //UPDATE THE AMOUNT OF OPEN TUTORIALS THAT THIS USER HAS (USED IN PROFILE)
-                    user.setOpenTutorials(user.getOpenTutorials() + 1);
+                    tutorials.add_post_to_segment("Open", document.getElementById('pending_tutorials_header'), tutorial_request_response.response[0]);
+                    if(typeof tutorials.all_tutorials === 'string') {
+                        tutorials.all_tutorials = [tutorial_request_response.response[0]];
+                    }
 
 
 

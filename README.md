@@ -12,7 +12,7 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-No prerequisites needed to launch the app!
+To run the app in localhost mode, please follow the instructions to download and setup the Student Loop Server repository at https://github.com/D0019208/Service-Loop-Server
 ```
 
 ### Installing
@@ -29,105 +29,17 @@ git pull origin master
 
 Change this:
 ```
-document.addEventListener("deviceready", async function () {
+let localhost = false;
 ```
 To this:
 ```
-document.addEventListener("DOMContentLoaded", async function () {
+let localhost = true;
 ```
 
-"deviceready" is a cordova event listener that wait for the phone to be ready, since we are not on a phone and we do not have access to this event listener we would be stuck on a blank screen.
+3.) Run index.html
 
-Now we need to check how we get the information itself, you can choose to be either a "Tutor" or "Studet" with any name you want but the email must match an email from the database.
 
-Change this:
-```
-//Check to make sure that the users session has not expired
-await user.check_session();
-
-//Once we are sure that the users session is valid, we populate the User class
-user.setName(await get_secure_storage("user_name"));
-user.setEmail(await get_secure_storage("users_email"));
-user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
-
-//Set status of user to tutor
-//user.setName("John Doe");
-//user.setStatus("Tutor");
-//user.setEmail("D00192082@student.dkit.ie");
-```
-To this:
-```
-//Check to make sure that the users session has not expired
-await user.check_session();
-
-//Once we are sure that the users session is valid, we populate the User class
-//user.setName(await get_secure_storage("user_name"));
-//user.setEmail(await get_secure_storage("users_email"));
-//user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
-
-//Set status of user to tutor
-user.setName(ANY NAME);
-user.setStatus(A STRING, "Tutot" OR "Student");
-user.setEmail(ANY EMAIL FROM DATABASE);
-```
-
-This part sets your skills, if you are a tutor, you will only be able to tutor posts that match these skills.
-
-Change this:
-```
-user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-//user.setModules(["PHP", "JavaScript", "Java"]);
-```
-To this:
-```
-//user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-user.setModules(["PHP", "JavaScript", "Java"]);
-```
-
-Now we need to hide the function call that is ment to hide the splashscreen
-
-Change this:
-````
-//Hide splashscreen
-navigator.splashscreen.hide();
-````
-
-To this:
-````
-//Hide splashscreen
-//navigator.splashscreen.hide();
-````
-
-3.) In www -> js -> modules, find "common_functions.js", there we need to comment out the code that provides device feedback
-
-Change this:
-```
-   window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-        if (feedback.haptic && feedback.acoustic) {
-            window.plugins.deviceFeedback.haptic();
-            window.plugins.deviceFeedback.acoustic();
-        } else if (feedback.haptic) {
-            window.plugins.deviceFeedback.haptic();
-        } else if (feedback.acoustic) {
-            window.plugins.deviceFeedback.acoustic();
-        }
-    });
-```
-To this:
-```
-//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-//        if (feedback.haptic && feedback.acoustic) {
-//            window.plugins.deviceFeedback.haptic();
-//            window.plugins.deviceFeedback.acoustic();
-//        } else if (feedback.haptic) {
-//            window.plugins.deviceFeedback.haptic();
-//        } else if (feedback.acoustic) {
-//            window.plugins.deviceFeedback.acoustic();
-//        }
-//    });
-```
-
-Now you should be able to launch and run the app in a browser, to simulate a Tutor <--> Student interaction, open two broswers and change the Name, Email and Status values.
+Now you should be able to launch and run the app in a browser, to simulate a Tutor <--> Student interaction, open two tabs and change the Name, Email, Module and Status values in home_module.js
 
 ## Deployment
 
@@ -137,106 +49,22 @@ To deploy the application you first need to do the opposite of everything we jus
 
 Change this:
 ```
-document.addEventListener("DOMContentLoaded", async function () {
+let local_host = true;
 ```
 To this:
 ```
-document.addEventListener("deviceready", async function () {
+let local_host = false;
 ```
 
-"DOMContentLoaded" waits for the DOM to render, however this does not mean that all the device functionality is ready, this is why we use the 'deviceready' event listener. Without it we will have no native functionality.
-
-Now we need to check how we get the information itself, our informaton will be stored on the phone itself using secure storage
+2.1) If you have cordova installed and setup on your PC, run the following command:
 
 Change this:
 ```
-//Check to make sure that the users session has not expired
-await user.check_session();
-
-//Once we are sure that the users session is valid, we populate the User class
-//user.setName(await get_secure_storage("user_name"));
-//user.setEmail(await get_secure_storage("users_email"));
-//user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
-
-//Set status of user to tutor
-user.setName(ANY NAME);
-user.setStatus(A STRING, "Tutot" OR "Student");
-user.setEmail(ANY EMAIL FROM DATABASE);
-```
-To this:
-```
-//Check to make sure that the users session has not expired
-await user.check_session();
-
-//Once we are sure that the users session is valid, we populate the User class
-user.setName(await get_secure_storage("user_name"));
-user.setEmail(await get_secure_storage("users_email"));
-user.setStatus(JSON.parse(await get_secure_storage("user_status")) ? "Tutor" : "Student");
-
-//Set status of user to tutor
-//user.setName("John Doe");
-//user.setStatus("Tutor");
-//user.setEmail("D00192082@student.dkit.ie");
+cordova run
 ```
 
-This part sets your skills, if you are a tutor, you will only be able to tutor posts that match these skills.
+2.2) If you DO NOT have cordova installed and setup on your PC, zip the folder and upload it Phonegap:
 
-Change this:
-```
-//user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-user.setModules(["PHP", "JavaScript", "Java"]);
-```
-To this:
-```
-user.setModules(JSON.parse(await get_secure_storage("user_modules")));
-//user.setModules(["PHP", "JavaScript", "Java"]);
-```
-
-Now we need to uncomment the function call that is ment to hide the splashscreen
-
-Change this:
-````
-//Hide splashscreen
-//navigator.splashscreen.hide();
-````
-
-To this:
-````
-//Hide splashscreen
-navigator.splashscreen.hide();
-````
-
-3.) In www -> js -> modules, find "common_functions.js", there we need to uncomment the code that provides device feedback
-
-Change this:
-```
-//    window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-//        if (feedback.haptic && feedback.acoustic) {
-//            window.plugins.deviceFeedback.haptic();
-//            window.plugins.deviceFeedback.acoustic();
-//        } else if (feedback.haptic) {
-//            window.plugins.deviceFeedback.haptic();
-//        } else if (feedback.acoustic) {
-//            window.plugins.deviceFeedback.acoustic();
-//        }
-//    });
-
-```
-To this:
-```
-   window.plugins.deviceFeedback.isFeedbackEnabled(function (feedback) {
-        if (feedback.haptic && feedback.acoustic) {
-            window.plugins.deviceFeedback.haptic();
-            window.plugins.deviceFeedback.acoustic();
-        } else if (feedback.haptic) {
-            window.plugins.deviceFeedback.haptic();
-        } else if (feedback.acoustic) {
-            window.plugins.deviceFeedback.acoustic();
-        }
-    });
-```
-
-Now you should be able to compile the app by uploading it to Phonegap.
 
 ## Built With
 

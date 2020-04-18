@@ -1,11 +1,12 @@
 class User {
-    constructor(id = "", name = "", email = "", status = "", modules = ["none"], avatar = "", open_tutorials = 0, pending_tutorials = 0, ongoing_tutorials = 0, done_tutorials = 0, tutored_pending_tutorials = 0, tutored_ongoing_tutorials = 0, tutored_done_tutorials = 0, socket = "") {
+    constructor(id = "", name = "", email = "", status = "", modules = ["none"], avatar = "", open_tutorials = 0, pending_tutorials = 0, ongoing_tutorials = 0, done_tutorials = 0, tutored_pending_tutorials = 0, tutored_ongoing_tutorials = 0, tutored_done_tutorials = 0, tutor_rating = 0, socket = "") {
         this.id = id;
         this.name = name;
         this.email = email;
         this.status = status;
         this.modules = modules;
         this.avatar = avatar;
+        this.tutor_rating = tutor_rating;
 
         this.open_tutorials = open_tutorials;
         this.pending_tutorials = pending_tutorials;
@@ -18,11 +19,19 @@ class User {
 
         this.socket = socket;
     }
-    
+
+    set_tutor_rating(tutor_rating) {
+        this.tutor_rating = tutor_rating;
+    }
+
+    get_tutor_rating() {
+        return this.tutor_rating;
+    }
+
     setId(id) {
         this.id = id;
     }
-    
+
     getId() {
         return this.id;
     }
@@ -157,7 +166,8 @@ class User {
                 return;
             } else {
                 this.id = content.user._id;
-                this.avatar = content.user.user_avatar;
+                this.avatar = content.user.response.user_avatar;
+                this.tutor_rating = content.user.response.tutor_rating;
 
                 this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
                 this.pending_tutorials = content.tutorials_count.my_tutorials.pending_count;
@@ -196,7 +206,8 @@ class User {
 
             const content = await rawResponse.json();
             this.id = content.user._id;
-            this.avatar = content.user.user_avatar;
+            this.avatar = content.user.response.user_avatar;
+            this.tutor_rating = content.user.response.tutor_rating;
 
             this.open_tutorials = content.tutorials_count.my_tutorials.open_count;
             this.pending_tutorials = content.tutorials_count.my_tutorials.pending_count;
@@ -206,6 +217,7 @@ class User {
             this.tutored_pending_tutorials = content.tutorials_count.my_tutored_tutorials.pending_count;
             this.tutored_ongoing_tutorials = content.tutorials_count.my_tutored_tutorials.ongoing_count;
             this.tutored_done_tutorials = content.tutorials_count.my_tutored_tutorials.done_count;
+
         } catch (ex) {
             console.log(ex);
             return;
@@ -216,8 +228,14 @@ class User {
         //HTTPS
         //const socket = io.connect("https://my.website.com:3002", { secure: true, reconnection: true, rejectUnauthorized: false });
         let modules = encodeURIComponent(JSON.stringify(this.modules));
-        let socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
-        //let socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
+        let socket;
+        
+        if (!localhost) {
+            socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
+        } else {
+            socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
+        }
+
         this.socket = socket;
 
         console.log(socket);
@@ -250,7 +268,7 @@ class User {
 
         //Delete the current notifications so that we can add the new ones IF we have initialized the notifications module
         if (typeof document.getElementById('notifications_script') == null) {
-            document.getElementById('list').innerHTML = ""; 
+            document.getElementById('list').innerHTML = "";
             if (user_notifications.getAllNotifications().length <= 7) {
                 user_notifications.appendNotifications(user_notifications.getAllNotifications().length, document.getElementById('list'));
             } else {
