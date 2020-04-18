@@ -646,6 +646,9 @@ document.getElementById('personal_info').addEventListener('click', async () => {
         document.getElementById("modal_close").addEventListener('click', () => { 
             dismissModal(currentModal);
         });
+        document.getElementById("update_info").addEventListener('click', () => { 
+            update_info();
+        });
     });
 });
 
@@ -700,6 +703,9 @@ document.getElementById('change_pass').addEventListener('click', async () => {
 
         document.getElementById("modal_close").addEventListener('click', () => { 
             dismissModal(currentModal);
+        });
+        document.getElementById("change_password").addEventListener('click', () => { 
+            change_pass();
         });
     });
 });

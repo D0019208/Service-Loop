@@ -89,6 +89,7 @@ async function access_route(data, route, show_loading = true) {
 
     try {
         let path = localhost ? "http://localhost:3001/" : "http://serviceloopserver.ga/";
+        //let path = "http://serviceloopserver.ga/";
         const rawResponse = await fetch(path + route, {
             method: 'POST',
             headers: {
@@ -3085,6 +3086,24 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
     };
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+}
+
+//Change password
+async function change_pass() {
+	let change_pass_response;
+	change_pass_response = await access_route({old_password: document.getElementById('old_password').value, new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: user.getEmail()}, "change_password");
+	console.log(change_pass_response);
+        create_ionic_alert("Change Password", change_pass_response, ["OK"]);
+
+}
+
+//Update Personal Information
+async function update_info() {
+	let update_info_response;
+	update_info_response = await access_route({user_phone_number: document.getElementById('new_phone_number').value, users_email: user.getEmail()}, "change_phone");
+	
+    console.log(update_info_response);
+    create_ionic_alert("Personal Information", update_info_response, ["OK"]);
 }
 
 function convertDate(inputFormat) {

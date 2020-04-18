@@ -16,7 +16,7 @@ var active_nav;
 var push;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
-//var localhost = false;
+//var localhost = true;
 var localhost = false;
 
 Element.prototype.appendAfter = function (element) {
@@ -56,7 +56,7 @@ document.addEventListener(start, async function () {
         //Set status of user to tutor
         user.setName("John Doe".replace(/\s+$/, ''));
         user.setStatus("Student");
-        user.setEmail("D00192082@student.dkit.ie");
+        user.setEmail("micko@gmail.com");
 
         //Set status of user to tutor
 //        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
