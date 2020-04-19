@@ -88,8 +88,8 @@ async function access_route(data, route, show_loading = true) {
     }
 
     try {
-        //let path = localhost ? "http://localhost:3001/" : "http://serviceloopserver.ga/";
-        let path = "http://serviceloopserver.ga/";
+        let path = localhost ? "http://localhost:3001/" : "http://serviceloopserver.ga/";
+        //let path = "http://serviceloopserver.ga/";
         const rawResponse = await fetch(path + route, {
             method: 'POST',
             headers: {
