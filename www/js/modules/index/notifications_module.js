@@ -973,7 +973,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
-        let nav_notification_tutorial_agreement_rejected = document.createElement('nav-notification-tutorial-agreement-accepted');
+        let nav_notification_tutorial_agreement_rejected = document.createElement('nav-notification-tutorial-agreement-rejected');
 
         if (typeof this_post === 'undefined') {
             nav_notification_tutorial_agreement_rejected.innerHTML = `
@@ -1010,7 +1010,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           <ion-content fullscreen class="ion-padding">
             <p>${this_notification.notification_desc}</p>
                 <div class="ion-padding-top">
-                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open post</ion-button>
+                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open agreement form</ion-button>
                 </div>
           </ion-content>
         `;
@@ -1023,7 +1023,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
             let agreement_reject_event_handler = function () {
                 device_feedback();
-
 
                 if (user.getStatus() === "Student" && this_post.std_email.replace(/\s+$/, '') !== user.getEmail()) {
                     load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);

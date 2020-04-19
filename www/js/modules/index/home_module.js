@@ -14,10 +14,11 @@ var previous_tab;
 var signaturePad;
 var active_nav;
 var push;
+var handler;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
-//var localhost = true;
-var localhost = true;
+
+var localhost = false;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -54,14 +55,14 @@ document.addEventListener(start, async function () {
 
     if (localhost) {
         //Set status of user to tutor
-        user.setName("John Doe".replace(/\s+$/, ''));
-        user.setStatus("Tutor");
-        user.setEmail("d00194503@student.dkit.ie");
+//        user.setName("John Doe".replace(/\s+$/, ''));
+//        user.setStatus("Student");
+//        user.setEmail("D00192082@student.dkit.ie");
 
         //Set status of user to tutor
-//        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-//        user.setStatus("Tutor");
-//        user.setEmail("nikito888@gmail.com");
+        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+        user.setStatus("Tutor");
+        user.setEmail("nikito888@gmail.com");
     }
 
     if (!localhost) {
@@ -219,6 +220,8 @@ document.addEventListener(start, async function () {
             document.getElementById('menu_avatar').src = user.getAvatar();
 
             if (user.getStatus() === "Tutor") {
+                document.getElementById('apply_to_be_tutor_menu').classList.add('hide');
+                
                 if (!localhost) {
                     user.setModules(JSON.parse(await get_secure_storage("user_modules")));
                 } else {
@@ -310,6 +313,11 @@ document.addEventListener(start, async function () {
                 //We get all the users notifications based off his email and modules
                 notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: true, user_modules: user.getModules()}}, "get_all_notifications");
             } else {
+                document.getElementById('all_tutorial_requests_menu').classList.add('hide');
+                document.getElementById('all_tutorial_requests_menu').classList.add('hide');
+                document.getElementById('my_tutorials_menu').classList.add('hide');
+                
+                
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -399,7 +407,7 @@ document.addEventListener(start, async function () {
             //If the user is a tutor, we display the forum else we have a button to apply to become a tutor
             if (user.getStatus() === "Tutor") {
                 await include("js/modules/index/forum_module.js", "forum_script");
-                let handler = () => {
+                handler = () => {
                     device_feedback();
                     //Remember to move this to new file
                     all_tutorials(nav);
@@ -408,9 +416,9 @@ document.addEventListener(start, async function () {
             } else {
                 await include("js/modules/index/apply_to_be_tutor_module.js", "apply_to_be_tutor_script");
                 //To later remove the event listener, we create a reference to the function and we pass the handler to that function so that we can later remove the event listener
-                let handler = function () {
+                handler = function () {
                     device_feedback();
-                    apply_to_be_tutor(handler);
+                    apply_to_be_tutor(active_nav, handler);
                 };
                 document.getElementById("home_tutor_application").addEventListener('click', handler, false);
             }
@@ -479,7 +487,38 @@ document.addEventListener(start, async function () {
                 }
                 closeMenu();
             });
+
             document.getElementById('my_tutorials_menu').addEventListener('click', async function () {
+                device_feedback();
+
+                if (active_nav.getElementsByTagName("NAV-MY-TUTORIALS").length === 0) {
+                    await include("js/modules/index/tutor_tutorials_module.js", "tutor_tutorials_script");
+                    all_tutor_tutorials(active_nav);
+                }
+                closeMenu();
+            });
+
+            document.getElementById('all_tutorial_requests_menu').addEventListener('click', async function () {
+                device_feedback();
+
+                if (active_nav.getElementsByTagName("NAV-ALL-TUTORIALS").length === 0) {
+                    await include("js/modules/index/forum_module.js", "forum_script");
+                    all_tutorials(active_nav);
+                }
+                closeMenu();
+            });
+            
+            document.getElementById('apply_to_be_tutor_menu').addEventListener('click', async function () {
+                device_feedback();
+
+                if (active_nav.getElementsByTagName("NAV-APPLY_TO_BE_TUTOR").length === 0) {
+                    await include("js/modules/index/apply_to_be_tutor_module.js", "apply_to_be_tutor_script");
+                    apply_to_be_tutor(active_nav, handler);
+                }
+                closeMenu();
+            });
+
+            document.getElementById('my_requested_tutorials_menu').addEventListener('click', async function () {
                 device_feedback();
 
                 if (active_nav.getElementsByTagName("NAV-MY-REQUESTED-TUTORIALS").length === 0) {
