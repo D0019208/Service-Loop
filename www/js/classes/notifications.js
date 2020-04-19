@@ -114,6 +114,10 @@ class Notifications extends User {
             }
         }
     }
+    
+    deleteNotifications(){
+        document.getElementById("list").innerHTML = ""; 
+    }
 
     addToNotifications(notification) {
         console.log("A notification")
