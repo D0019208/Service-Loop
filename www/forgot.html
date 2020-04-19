@@ -67,6 +67,7 @@
     <script>
         var token;
         var phone;
+        var u_email;
         var localhost = false;
 
         document.addEventListener("DOMContentLoaded", function () {
@@ -113,7 +114,7 @@
 
             async function showPin(title) {
 
-                var u_email = document.getElementById('u_email').value;
+                u_email = document.getElementById('u_email').value;
                 let send_forgot_password;
                 send_forgot_password = await access_route({users_email: u_email}, "send_forgot_password");
                 console.log(send_forgot_password);
@@ -194,7 +195,7 @@
                         //showPin(title);
                         console.log(token);
                         console.log(phone);
-                        showPass(title, token, phone);
+                        showPass("Reset Password", token, phone);
                     });
                 }
             });
@@ -237,6 +238,20 @@
         </div>
           </ion-content> 
         `;
+                    document.getElementById("f_change_pass").addEventListener('click', async () => {
+                        let reset_password;
+                        reset_password = await access_route({new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: u_email}, "forgot_password");
+                        console.log(reset_password);
+                        //create_ionic_alert("Forgot Password", reset_password, ["OK"]);
+                        //window.location.href = 'login.html';
+                        create_ionic_alert("Forgot Password", reset_password, [
+                        {
+                            text: 'OK',
+                            handler: async () => {
+                                window.location.href = 'login.html';
+                            }
+                        }]);
+                    });
                 }
             });
         });
