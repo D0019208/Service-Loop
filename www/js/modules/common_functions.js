@@ -2733,10 +2733,6 @@ function get_tutorial_links(tutorial_tag) {
 }
 
 function start_tutorial(nav_controller, this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view) {
-    console.log("Start");
-    console.log(previous_view);
-    return;
-    
     if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
             nav_controller.pop();
         } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
