@@ -89,6 +89,7 @@ async function access_route(data, route, show_loading = true) {
 
     try {
         let path = localhost ? "http://localhost:3001/" : "http://serviceloopserver.ga/";
+        //let path = "http://serviceloopserver.ga/";
         const rawResponse = await fetch(path + route, {
             method: 'POST',
             headers: {
@@ -493,6 +494,10 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
 
+    if (tutorial_status == "In negotiation") {
+        tutorial_status = "Pending";
+    }
+
     let tutorial_element = document.createElement('tutorial');
     let tutorial_element_html = `<ion-header translucent>
             <ion-toolbar>
@@ -615,8 +620,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let accept_agreement;
     let accept_agreement_handler = async function () {
         device_feedback();
-        load_sign_accepted_agreement_component(nav_controller, this_post);
-
+        let previous_view = await nav_controller.getPrevious();
+        load_sign_accepted_agreement_component(nav_controller, this_post, previous_view);
     }
 
     let reject_agreement;
@@ -1089,11 +1094,11 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-    
+
     if (tutorial_status == "In Negotiation") {
         tutorial_status = "Pending";
     }
-    
+
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
@@ -1315,9 +1320,6 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        console.log("Eeeeey")
-        console.log(this_tutorial)
-
         if (this_tutorial.post_status = "In negotiation") {
             this_tutorial.post_status = "Pending"
         }
@@ -1333,6 +1335,11 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
     };
 
     let ionNavDidChangeEvent = async function () {
+        let previous_view = await nav_controller.getPrevious();
+
+        console.log("Previous View Before")
+        console.log(previous_view)
+
         //TUTORIAL LINKS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
@@ -1444,7 +1451,12 @@ async function generate_agreement(nav_controller, tutorial) {
 
             create_toast("Agreement offer sent.", "dark", 2000, toast_buttons);
 
-            nav_controller.pop();
+            let previous_view = await nav_controller.getPrevious();
+            if (previous_view.element.tagName === "NAV-NOTIFICATION" || previous_view.element.tagName === "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-REJECTED") {
+                nav_controller.popTo(0);
+            } else {
+                nav_controller.pop();
+            }
         } else {
             create_ionic_alert("Tutorial request error", agreement_generated_response.response, ["OK"]);
         }
@@ -1579,7 +1591,7 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
 
 
 
-function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
+function load_sign_accepted_agreement_component(nav_controller, this_tutorial, previous_view) {
     let tutor_tutorial_element = document.createElement('sign-tutorial-agreement');
     let date = new Date();
     let year = date.getFullYear();
@@ -1634,9 +1646,8 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
             create_ionic_alert("Accept agreement", "Please confirm that you wish to accept this agreement.", [
                 {
                     text: 'Accept',
-                    handler: () => {
-                        console.log('Accepted');
-                        accept_agreement(nav_controller, this_tutorial);
+                    handler: async () => {
+                        accept_agreement(nav_controller, this_tutorial, previous_view);
                     }
                 },
                 {
@@ -1675,7 +1686,7 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
 
 
 
-async function accept_agreement(nav_controller, this_tutorial) {
+async function accept_agreement(nav_controller, this_tutorial, previous_view) {
     if (isCanvasBlank(document.getElementById('signature-pad'))) {
         create_ionic_alert("Failed to accept agreement", "Please enter a signature to accept the agreement.", ["OK"]);
     } else {
@@ -1716,7 +1727,11 @@ async function accept_agreement(nav_controller, this_tutorial) {
         console.log(agreement_accepted_response);
     }
 
-    nav_controller.popToRoot();
+    if (previous_view.element.tagName === "NAV-NOTIFICATION") {
+        nav_controller.popTo(0);
+    } else if (previous_view.element.tagName === "TUTORIAL") {
+        nav_controller.popTo(1);
+    }
 }
 
 async function reject_this_agreement(nav_controller, this_tutorial) {
@@ -1738,7 +1753,7 @@ async function reject_this_agreement(nav_controller, this_tutorial) {
             }
         ];
 
-        create_toast("Tutorial canceled!", "dark", 2000, reject_buttons);
+        create_toast("Agreement rejected!", "dark", 2000, reject_buttons);
         //Send push notification
         if (!localhost) {
             push.send_notification("Agreement rejected", "The student has rejected your agreement for the '" + agreement_rejected_response.updated_tutorial.post_title + "' tutorial. Click on this notification to create a new one.", agreement_rejected_response.updated_tutorial.post_tutor_email, "Agreement rejected", {}, {});
@@ -1909,7 +1924,8 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
         }
 
         if (student_number !== "Canceled") {
-            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler);
+            let previous_view = await nav_controller.getPrevious();
+            start_tutorial(nav_controller, this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view);
         }
     };
 
@@ -2154,9 +2170,9 @@ async function load_open_tutorial_component(nav_controller, this_post) {
 
 async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-    
+
     let comment = "";
-    if(this_post.tutor_rated) {
+    if (this_post.tutor_rated) {
         comment = `<ion-list>
                                 <ion-list-header>
                                   <strong>STUDENT COMMENT</strong>
@@ -2174,8 +2190,8 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                 <ion-item-divider class="divider3"></ion-item-divider>
                                 
                             </ion-list>`;
-    } 
-    
+    }
+
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
@@ -2716,8 +2732,12 @@ function get_tutorial_links(tutorial_tag) {
     return tutorial_links;
 }
 
-function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler) {
-    console.log("Start");
+function start_tutorial(nav_controller, this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view) {
+    if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
+        nav_controller.pop();
+    } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+        nav_controller.popTo(0);
+    }
     console.log(begin_tutorial);
     console.log(begin_tutorial_handler)
     create_ionic_alert("Begin tutorial?", "Are you sure you want to begin this tutorial? Once a tutorial is started, it cannot be canceled or paused!", [
@@ -2792,6 +2812,10 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
                 console.log("STOP!!!!!!!!")
                 console.log(begin_response.student_notification.response);
                 user_notifications.sendBeginTutorialNotification(begin_response.student_notification.response, begin_response.updated_tutorial);
+
+                if (!localhost) {
+                    push.send_notification("Tutorial has begun", "The '" + begin_response.updated_tutorial.post_title + "' tutorial has begun", begin_response.updated_tutorial.std_email, "Tutorial has begun", {}, {});
+                }
             }
         },
         {
@@ -2904,6 +2928,9 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
 
                 user_notifications.sendTutorialFinished(end_response.student_notification.response, end_response.updated_tutorial);
 
+                if (!localhost) {
+                    push.send_notification("Tutorial has finished!", "The '" + end_response.updated_tutorial.post_title + "' tutorial has finished! Thank you for using Student Loop.", end_response.updated_tutorial.std_email, "Tutorial has finished", {}, {});
+                }
 
                 nav_controller.pop();
             }
@@ -2986,7 +3013,7 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
 
         if (rating !== 0 && document.getElementById('comment').value !== '') {
             let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating, comment: document.getElementById('comment').value}, "rate_tutor");
-            
+
             tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
 
             //IMPORTNAT!!!! LOOK INTO ADDING THIS FOR CANCEL, BEGIN AND FINISH TUTORIAL!!!!!!!!
@@ -3016,11 +3043,11 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
             if (from_forum) {
                 tutorial.tutor_rated = true;
                 tutorial.comment = document.getElementById('comment').value;
-                
+
                 rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
                 rate_the_tutor.remove();
-                
-                if(document.getElementById('tutorial_links_list') !== null) {
+
+                if (document.getElementById('tutorial_links_list') !== null) {
                     let comment = document.createElement('ion-list');
                     comment.innerHTML = `<ion-list>
                                 <ion-list-header>
@@ -3039,13 +3066,13 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
                                 <ion-item-divider class="divider3"></ion-item-divider>
                                 
                             </ion-list>`;
-                    
+
                     document.getElementById('tutorial_links_list').after(comment);
                 }
             }
-            
+
             user_notifications.sendRateTutor(rate_response.updated_tutorial, rate_response.rating);
-            
+
             nav_controller.pop();
         } else {
             create_ionic_alert("Failed to rate tutor", "Please add a rating from half a star to 5 stars and add a comment.", ["OK"]);
@@ -3085,6 +3112,24 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
     };
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+}
+
+//Change password
+async function change_pass() {
+    let change_pass_response;
+    change_pass_response = await access_route({old_password: document.getElementById('old_password').value, new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: user.getEmail()}, "change_password");
+    console.log(change_pass_response);
+    create_ionic_alert("Change Password", change_pass_response, ["OK"]);
+
+}
+
+//Update Personal Information
+async function update_info() {
+    let update_info_response;
+    update_info_response = await access_route({user_phone_number: document.getElementById('new_phone_number').value, users_email: user.getEmail()}, "change_phone");
+
+    console.log(update_info_response);
+    create_ionic_alert("Personal Information", update_info_response, ["OK"]);
 }
 
 function convertDate(inputFormat) {

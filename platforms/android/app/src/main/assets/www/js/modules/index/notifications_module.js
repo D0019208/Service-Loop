@@ -1,4 +1,5 @@
 "use strict"
+var notifications_response
 let notification_posts_loaded = false;
 //Notifications
 //function appendItems(number, list, notifications) {
@@ -63,11 +64,14 @@ customElements.get('nav-notifications') || customElements.define('nav-notificati
 
                     <ion-content fullscreen>
                         <!-- <h2><a href="login.html">Home</a></h2>-->
+                        
                         <ion-list>
                             <ion-list-header id="notifications_header">
                                 NOTIFICATIONS
                             </ion-list-header><!--<p>Manage information about you...</p>-->
-
+                            <ion-refresher slot="fixed" id="refresher">
+                               <ion-refresher-content></ion-refresher-content>
+                            </ion-refresher>
                             <ion-list id="list"></ion-list>
 
                             <ion-infinite-scroll threshold="100px" id="infinite-scroll">
@@ -97,6 +101,20 @@ customElements.get('nav-notifications') || customElements.define('nav-notificati
 const list = document.getElementById('list');
 const infiniteScroll = document.getElementById('infinite-scroll');
 let number_of_notifications_to_add;
+
+//Refresher
+const refresher = document.getElementById('refresher');
+refresher.addEventListener('ionRefresh', () => {
+      setTimeout(async () => {
+        //prependMessages(5, true);
+//        user_notifications.deleteNotifications();
+//        notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications");
+//        user_notifications = new Notifications(user.getId(), notifications_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
+//        user_notifications.appendNotifications(user_notifications.getAllNotifications().length, list);
+//        console.log(number_of_notifications_to_add);
+        refresher.complete();
+      }, 2000);
+    })
 
 if (user_notifications.getTotalNotifications() == 0) {
     document.getElementById("notifications_header").innerText = "YOU HAVE NO NOTIFICATIONS!";
@@ -138,6 +156,8 @@ if (user_notifications.getTotalNotifications() == 0) {
     }
 
 }
+
+
 
 
 
@@ -953,7 +973,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
-        let nav_notification_tutorial_agreement_rejected = document.createElement('nav-notification-tutorial-agreement-accepted');
+        let nav_notification_tutorial_agreement_rejected = document.createElement('nav-notification-tutorial-agreement-rejected');
 
         if (typeof this_post === 'undefined') {
             nav_notification_tutorial_agreement_rejected.innerHTML = `
@@ -990,7 +1010,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           <ion-content fullscreen class="ion-padding">
             <p>${this_notification.notification_desc}</p>
                 <div class="ion-padding-top">
-                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open post</ion-button>
+                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open agreement form</ion-button>
                 </div>
           </ion-content>
         `;
@@ -1003,7 +1023,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
             let agreement_reject_event_handler = function () {
                 device_feedback();
-
 
                 if (user.getStatus() === "Student" && this_post.std_email.replace(/\s+$/, '') !== user.getEmail()) {
                     load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);

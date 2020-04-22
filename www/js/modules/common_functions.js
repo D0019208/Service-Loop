@@ -493,8 +493,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
-    
-    if(tutorial_status == "In negotiation") {
+
+    if (tutorial_status == "In negotiation") {
         tutorial_status = "Pending";
     }
 
@@ -1729,7 +1729,7 @@ async function accept_agreement(nav_controller, this_tutorial, previous_view) {
 
     if (previous_view.element.tagName === "NAV-NOTIFICATION") {
         nav_controller.popTo(0);
-    } else if(previous_view.element.tagName === "TUTORIAL") {
+    } else if (previous_view.element.tagName === "TUTORIAL") {
         nav_controller.popTo(1);
     }
 }
@@ -2734,10 +2734,10 @@ function get_tutorial_links(tutorial_tag) {
 
 function start_tutorial(nav_controller, this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view) {
     if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
-            nav_controller.pop();
-        } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
-            nav_controller.popTo(0);
-        }
+        nav_controller.pop();
+    } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+        nav_controller.popTo(0);
+    }
     console.log(begin_tutorial);
     console.log(begin_tutorial_handler)
     create_ionic_alert("Begin tutorial?", "Are you sure you want to begin this tutorial? Once a tutorial is started, it cannot be canceled or paused!", [
