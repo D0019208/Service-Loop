@@ -114,9 +114,9 @@ class Notifications extends User {
             }
         }
     }
-    
-    deleteNotifications(){
-        document.getElementById("list").innerHTML = ""; 
+
+    deleteNotifications() {
+        document.getElementById("list").innerHTML = "";
     }
 
     addToNotifications(notification) {
@@ -226,6 +226,14 @@ class Notifications extends User {
         this.socket.emit('finish_tutorial', {the_notification: notification, the_post: post});
     }
 
+    sendTutorialCanceledNotification(notification, post) {
+        this.socket.emit('cancel_tutorial', {the_notification: notification, the_post: post});
+    }
+    
+    removeOpenPost(post) {
+        this.socket.emit('remove_open_post', {the_post: post});
+    }
+
     sendNewNotification(notification, post) {
         this.socket.emit('send_notification', {the_notification: notification, the_post: post});
     }
@@ -249,7 +257,7 @@ class Notifications extends User {
     sendAgreementAcceptedNotification(notification, post) {
         this.socket.emit('agreement_accepted', {the_notification: notification, the_post: post});
     }
-    
+
     sendRateTutor(post, rating) {
         this.socket.emit('send_rate_tutor', {the_rating: rating, the_post: post});
     }
@@ -258,6 +266,10 @@ class Notifications extends User {
         let socket = this.socket;
 
         socket.on('agreement_rejected_tutor', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             let toast_buttons = [
                 {
                     side: 'end',
@@ -282,13 +294,16 @@ class Notifications extends User {
                 notification_posts.push(data.post);
             }
 
-            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
 
         socket.on('agreement_accepted_tutor', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             let toast_buttons = [
                 {
                     side: 'end',
@@ -316,7 +331,6 @@ class Notifications extends User {
                 notification_posts.push(data.post);
             }
 
-            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
@@ -326,7 +340,29 @@ class Notifications extends User {
     waitForNewNotifications() {
         let socket = this.socket;
         
+        socket.on('remove_open_post', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
+            new_message_ping.play();
+            posts.removePostById(data.post._id, true);
+            posts.removeNotificationPostByPostId(data.post._id);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+            }
+
+            console.log(data);
+        });
+
         socket.on('new_notification', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             new_message_ping.play();
             posts.replace_notification_posts(data.post);
 
@@ -343,6 +379,10 @@ class Notifications extends User {
         });
 
         socket.on('tutorial_has_finished', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             let toast_buttons = [
                 {
                     side: 'end',
@@ -373,13 +413,16 @@ class Notifications extends User {
                 notification_posts.push(data.post);
             }
 
-            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
 
         socket.on('tutorial_has_begun', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             let toast_buttons = [
                 {
                     side: 'end',
@@ -406,13 +449,16 @@ class Notifications extends User {
                 notification_posts.push(data.post);
             }
 
-            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
 
         socket.on('add_tutorial_request_accepted_notification', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             let toast_buttons = [
                 {
                     side: 'end',
@@ -433,13 +479,16 @@ class Notifications extends User {
 
             tutorials.add_post_to_segment("Pending", document.getElementById('pending_tutorials_header'), data.post);
 
-            //window.plugins.deviceFeedback.haptic();
             this.addToNotifications(data.response);
 
             console.log(data);
         });
 
         socket.on('add_agreement_created_notification', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
             let toast_buttons = [
                 {
                     side: 'end',
@@ -458,20 +507,66 @@ class Notifications extends User {
 
             tutorials.update_my_tutorial("Pending", data.post);
 
-            //window.plugins.deviceFeedback.haptic();
+            this.addToNotifications(data.response);
+
+            console.log(data);
+        });
+
+        socket.on('tutorial_has_been_canceled', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
+            
+            let status = data.post.post_status;
+
+            if (status == "In negotiation") {
+                status = "Pending";
+            }
+
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("A tutorial has been canceled!", "dark", 3000, toast_buttons);
+            new_message_ping.play();
+
+            if (user.getEmail() == data.post.std_email) {
+                tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: data.post._id}}, data.post);
+            } else {
+                tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: data.post._id}}, data.post);
+            }
+
+            posts.removeNotificationPostByPostId(data.post._id);
+
+            if (typeof notification_posts !== 'undefined') {
+                notification_posts = notification_posts.filter(function (obj) {
+                    return obj._id !== data.post._id;
+                });
+            }
+
             this.addToNotifications(data.response);
 
             console.log(data);
         });
 
         socket.on('tutor_update_rating', (data) => {
+            if (!localhost) {
+                window.plugins.deviceFeedback.haptic();
+            }
             console.log("Tutor rated!")
             console.log(data);
             console.log(tutor_tutorials.done_tutor_tutorials)
             new_message_ping.play();
             posts.replace_notification_posts(data.post);
             tutor_tutorials.update_tutorial("Done", data.post);
-            
+
             if (typeof notification_posts !== 'undefined') {
                 notification_posts = notification_posts.filter(function (obj) {
                     return obj._id !== data.post._id;
@@ -479,9 +574,9 @@ class Notifications extends User {
 
                 notification_posts.push(data.post);
             }
-            
+
             user.tutor_rating = data.rating;
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
