@@ -61,7 +61,7 @@ function create_ionic_loading() {
     return new Promise((resolve, reject) => {
         ion_loading_controller.create({
             message: 'Please wait...',
-            duration: 30000
+            duration: 300000
         }).then((loading) => {
             loading.present();
             resolve(loading);
@@ -493,8 +493,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
     }
-    
-    if(tutorial_status == "In negotiation") {
+
+    if (tutorial_status == "In negotiation") {
         tutorial_status = "Pending";
     }
 
@@ -609,7 +609,9 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let tutorial_log;
@@ -1017,7 +1019,9 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, tutorial_status, previous);
     };
 
     let tutorial_log;
@@ -1211,7 +1215,9 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let tutorial_log;
@@ -1324,7 +1330,9 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
             this_tutorial.post_status = "Pending"
         }
 
-        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, this_tutorial.post_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, this_tutorial.post_status, previous);
     };
 
     let generate_agreement_button;
@@ -1729,7 +1737,7 @@ async function accept_agreement(nav_controller, this_tutorial, previous_view) {
 
     if (previous_view.element.tagName === "NAV-NOTIFICATION") {
         nav_controller.popTo(0);
-    } else if(previous_view.element.tagName === "TUTORIAL") {
+    } else if (previous_view.element.tagName === "TUTORIAL") {
         nav_controller.popTo(1);
     }
 }
@@ -1910,7 +1918,9 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let begin_tutorial;
@@ -1931,7 +1941,12 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
 
     let finish_tutorial;
     let finish_tutorial_handler = async function () {
-        end_tutorial(nav_controller, this_post, this_post._id, tutorial_status, finish_tutorial, finish_tutorial_handler);
+        let previous = await nav_controller.getPrevious();
+        
+        console.log("prev");
+        console.log(previous);
+
+        end_tutorial(nav_controller, this_post, this_post._id, tutorial_status, finish_tutorial, finish_tutorial_handler, previous);
     };
 
     let tutorial_log;
@@ -2130,7 +2145,9 @@ async function load_open_tutorial_component(nav_controller, this_post) {
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let ionNavDidChangeEvent = async function () {
@@ -2377,7 +2394,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status) {
+async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status, previous) {
     create_ionic_alert("Cancel tutorial?", "Are you sure you want to cancel this tutorial? You cannot undo this action!", [
         {
             text: 'Yes',
@@ -2387,74 +2404,77 @@ async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status
                 console.log("Tutorial to be removed");
                 console.log(tutorial);
 
-                //Check what page we on, my tutorials or my requested tutorials
-                if (document.getElementById('my_posts_content') !== null) {
-                    tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
-                } else {
-                    let total_tutorials;
+                //Canceler is THE student
+                if (user.getEmail() == tutorial.std_email) {
+                    //Check what page we on, my tutorials or my requested tutorials
+                    if (document.getElementById('my_posts_content') !== null) {
+                        tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+                    } else {
+                        let total_tutorials;
 
-                    if (status === "Open") {
-                        total_tutorials = tutorials.total_open_tutorials;
+                        if (status === "Open") {
+                            total_tutorials = tutorials.total_open_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutorials.total_open_tutorials--;
-                            tutorials.open_tutorials = tutorials.open_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Pending" || status === "In negotiation") {
-                        total_tutorials = tutorials.total_pending_tutorials;
+                            if (total_tutorials > 0) {
+                                tutorials.total_open_tutorials--;
+                                tutorials.open_tutorials = tutorials.open_tutorials.filter(e => e._id !== tutorial._id);
+                            }
+                        } else if (status === "Pending" || status === "In negotiation") {
+                            total_tutorials = tutorials.total_pending_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutorials.total_pending_tutorials--;
-                            tutorials.pending_tutorials = tutorials.pending_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Ongoing") {
-                        total_tutorials = tutorials.total_ongoing_tutorials;
+                            if (total_tutorials > 0) {
+                                tutorials.total_pending_tutorials--;
+                                tutorials.pending_tutorials = tutorials.pending_tutorials.filter(e => e._id !== tutorial._id);
+                            }
+                        } else if (status === "Ongoing") {
+                            total_tutorials = tutorials.total_ongoing_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutorials.total_ongoing_tutorials--;
-                            tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Done") {
-                        total_tutorials = tutorials.total_done_tutorials;
+                            if (total_tutorials > 0) {
+                                tutorials.total_ongoing_tutorials--;
+                                tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
+                            }
+                        } else if (status === "Done") {
+                            total_tutorials = tutorials.total_done_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutorials.total_done_tutorials--;
-                            tutorials.done_tutorials = tutorials.done_tutorials.filter(e => e._id !== tutorial._id);
+                            if (total_tutorials > 0) {
+                                tutorials.total_done_tutorials--;
+                                tutorials.done_tutorials = tutorials.done_tutorials.filter(e => e._id !== tutorial._id);
+                            }
                         }
                     }
-                }
+                } else {
+                    if (document.getElementById('my_tutored_posts_content') !== null) {
+                        tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial)
+                    } else {
+                        let total_tutorials;
 
-                if (document.getElementById('my_tutored_posts_content') !== null) {
-                    tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial)
-                } else if (user.getStatus() == "Tutor") {
-                    let total_tutorials;
+                        if (status === "Pending" || status === "In negotiation") {
+                            total_tutorials = tutor_tutorials.total_tutor_pending_tutorials;
 
-                    if (status === "Pending" || status === "In negotiation") {
-                        total_tutorials = tutor_tutorials.total_tutor_pending_tutorials;
+                            if (total_tutorials > 0) {
+                                tutor_tutorials.total_tutor_pending_tutorials--;
+                                tutor_tutorials.pending_tutor_tutorials = tutor_tutorials.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                            }
+                        } else if (status === "Ongoing") {
+                            total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutor_tutorials.total_tutor_pending_tutorials--;
-                            tutor_tutorials.pending_tutor_tutorials = tutor_tutorials.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Ongoing") {
-                        total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
+                            if (total_tutorials > 0) {
+                                tutor_tutorials.total_tutor_ongoing_tutorials--;
+                                tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                            }
+                        } else if (status === "Done") {
+                            total_tutorials = tutor_tutorials.total_tutor_done_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutor_tutorials.total_tutor_ongoing_tutorials--;
-                            tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Done") {
-                        total_tutorials = tutor_tutorials.total_tutor_done_tutorials;
-
-                        if (total_tutorials > 0) {
-                            tutor_tutorials.total_tutor_done_tutorials--;
-                            tutor_tutorials.done_tutor_tutorials = tutor_tutorials.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                            if (total_tutorials > 0) {
+                                tutor_tutorials.total_tutor_done_tutorials--;
+                                tutor_tutorials.done_tutor_tutorials = tutor_tutorials.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                            }
                         }
                     }
                 }
 
                 console.log("Tutorial removed?");
-                console.log(tutor_tutorials.pending_tutor_tutorials);
+                console.log(tutorial);
 
                 let cancel_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
                 user_notifications.addUnreadNotificationsToDOM();
@@ -2487,12 +2507,26 @@ async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status
                 console.log("Notification Posts Remove")
                 console.log(posts.notification_posts)
 
-                //Send notification to tutor if he exists
-                if (cancel_response.tutor_exists) {
-                    user_notifications.sendNewNotification(cancel_response.tutor_notification.response);
+                console.log("Cancel repsonse");
+                console.log(cancel_response);
+
+                //Canceler is a student, send notification to only tutor (if exists)
+                if (user.getEmail() == tutorial.std_email) {
+                    //Send notification to tutor if he exists
+                    if (cancel_response.tutor_exists) {
+                        user_notifications.sendTutorialCanceledNotification(cancel_response.tutor_notification.response, tutorial);
+                    } else {
+                        user_notifications.removeOpenPost(tutorial);
+                    }
+                } else {
+                    user_notifications.sendTutorialCanceledNotification(cancel_response.student_notification.response, tutorial);
                 }
 
-                nav_controller.pop();
+                if (previous.element.nodeName == "NAV-NOTIFICATION" || "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-ACCEPTED" || "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-REJECTED") {
+                    nav_controller.popToRoot();
+                } else {
+                    nav_controller.pop();
+                }
             }
         },
         {
@@ -2734,10 +2768,10 @@ function get_tutorial_links(tutorial_tag) {
 
 function start_tutorial(nav_controller, this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view) {
     if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
-            nav_controller.pop();
-        } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
-            nav_controller.popTo(0);
-        }
+        nav_controller.pop();
+    } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+        nav_controller.popTo(0);
+    }
     console.log(begin_tutorial);
     console.log(begin_tutorial_handler)
     create_ionic_alert("Begin tutorial?", "Are you sure you want to begin this tutorial? Once a tutorial is started, it cannot be canceled or paused!", [
@@ -2829,7 +2863,7 @@ function start_tutorial(nav_controller, this_post, post_id, tutorial_status, stu
     ]);
 }
 
-function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tutorial, finish_tutorial_handler) {
+function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tutorial, finish_tutorial_handler, previous) {
     create_ionic_alert("Finish tutorial?", "Are you sure you want to finish this tutorial? The tutorial will be moved to done and be considered completed.", [
         {
             text: 'Yes',
@@ -2932,7 +2966,11 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                     push.send_notification("Tutorial has finished!", "The '" + end_response.updated_tutorial.post_title + "' tutorial has finished! Thank you for using Student Loop.", end_response.updated_tutorial.std_email, "Tutorial has finished", {}, {});
                 }
 
-                nav_controller.pop();
+                if (previous.element.nodeName == "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-ACCEPTED") {
+                    nav_controller.popToRoot();
+                } else {
+                    nav_controller.pop();
+                }
             }
         },
         {

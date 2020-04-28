@@ -230,10 +230,10 @@ class User {
         let modules = encodeURIComponent(JSON.stringify(this.modules));
         let socket;
         
-        if (!localhost) {
-            socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
-        } else {
+        if (localhost) {
             socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
+        } else {
+            socket = io.connect('http://serviceloopserver.ga', {query: 'email=' + this.email + '&modules=' + modules});
         }
 
         this.socket = socket;

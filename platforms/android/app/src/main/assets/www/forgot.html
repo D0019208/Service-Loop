@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Service Loop</title>
+        <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.esm.js"></script>
+        <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/dist/ionic/ionic.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core@4.7.4/css/ionic.bundle.css"/>
+        <script src="js/modules/register_module.js" type="text/javascript"></script>
+        <style>
+            :root {
+                --ion-safe-area-top: 0px;
+                --ion-safe-area-bottom: 0px;
+            }
+
+            h1
+            { 
+                text-align: center;
+                font-weight: bold;
+                margin-top: 8px;
+            }
+            p,h6
+            {
+                text-align: center;
+                filter: opacity(85%);
+
+            }
+            img
+            {
+                padding: 10px;
+                width: 300px; 
+            }
+            .fields
+            {
+                padding-left: 10%;
+                padding-right: 10%;
+            }
+            ion-label
+            {
+                padding-left: 35%;
+                font-size: 19px !important;
+            }
+            .line
+            {
+                margin-top: -48px;
+            }
+            h6 a
+            {
+                color: #2d2d2d;
+                text-decoration: none;
+            }
+
+            #login_success_message {
+                text-align: initial;
+            } 
+
+            #fingerprint_footer {
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+    <ion-app>
+        <ion-nav root="nav-forgot"></ion-nav>
+    </ion-app>
+    <script>
+        var token;
+        var phone;
+        var u_email;
+        var localhost = false;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            customElements.define('nav-forgot', class NavForgot extends HTMLElement {
+                connectedCallback() {
+                    this.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-title style="text-align:center; margin-left:0px"><h1>Forgot Password</h1></ion-title>
+              <ion-buttons slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+              <ion-list class="fields" style="text-align:center;">
+            <p><strong>Forgot Password</strong></p>
+            <p>To reset your password, please enter your email.</p>
+
+              </ion-list>
+        <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+            <ion-item class="line">
+            </ion-item>
+
+          <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Student Email <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="example@gmail.com" id="u_email" type="email" ></ion-input>
+          </ion-item>
+
+        <div class="ion-padding-top">
+          <ion-button expand="block" type="button" class="ion-no-margin" id="reset_password">Reset Password</ion-button>
+          <h6><a href="index.html">Login</a></h6>
+        </div>
+          </ion-content>
+        `;
+                    document.getElementById("reset_password").addEventListener('click', async () => {
+                        showPin('Forgot Password')
+                    });
+                }
+            });
+
+            const nav = document.querySelector('ion-nav');
+
+            async function showPin(title) {
+
+                u_email = document.getElementById('u_email').value;
+                let send_forgot_password;
+                send_forgot_password = await access_route({users_email: u_email}, "send_forgot_password");
+                console.log(send_forgot_password);
+                send_forgot_password = JSON.parse(send_forgot_password);
+
+                console.log(send_forgot_password);
+                console.log(send_forgot_password.status);
+                console.log(typeof send_forgot_password);
+                //If the API does not respond with "SUCCESS", then we know something went wrong.
+                if (send_forgot_password.status !== "SUCCESS") {
+                    //Handle error
+                    sms_verification_errors(send_forgot_password);
+                } else
+                {
+                    //If there is no error, then we assign a value to the token variable created by the API
+                    console.log(send_forgot_password);
+                    token = send_forgot_password.token;
+                    phone = send_forgot_password.phone;
+                    nav.push('nav-pin', {title});
+
+                }
+            }
+
+            async function showPass(title, token, phone) {
+                let sms_verification_response2 = await verify_sms_code(token, document.getElementById('4_digit_verifier').value, phone);
+                console.log(sms_verification_response2);
+
+                if (sms_verification_response2.status !== "SUCCESS")
+                {
+                    //Handle error
+                    sms_verification_errors(sms_verification_response2);
+                } else
+                {
+                    nav.push('nav-pass', {title});
+                }
+
+                //nav.push('nav-pass', { title });
+            }
+
+
+            customElements.define('nav-pin', class NavPin extends HTMLElement {
+                connectedCallback() {
+                    this.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-title style="text-align:center; margin-left:-52px"><h1>${this.title}</h1></ion-title>
+              <ion-buttons slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+              <ion-list class="fields" style="text-align:center;">
+            <p><strong>Verify your identity with SMS</strong></p>
+            <p>Please input your 4 digit code sent by SMS. If you did not receive one then please request a new code or request a resend.</p>
+
+              </ion-list>
+
+        <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+            <ion-item class="line">
+            </ion-item>
+
+        <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">4 digit code <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="1234" id="4_digit_verifier" required type="number"></ion-input>
+          </ion-item>
+
+        <div class="ion-padding-top">
+          <ion-button expand="block" type="button" class="ion-no-margin" id="verify_submit">Verify me</ion-button>
+        <h6>
+            <a href="#" id="resend_sms">Resend Code</a>
+        </h6> 
+        </div>
+            <p style="text-align: center; color: gray; font-size: 0.85em;">This is a security precaution to safeguard you from malicious users. We appreciate your patience and cooperation.</p>
+          </ion-content> 
+        `;
+                    document.getElementById("verify_submit").addEventListener('click', async () => {
+                        //showPin(title);
+                        console.log(token);
+                        console.log(phone);
+                        showPass("Reset Password", token, phone);
+                    });
+                }
+            });
+
+
+
+            customElements.define('nav-pass', class NavPass extends HTMLElement {
+                connectedCallback() {
+                    this.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-title style="text-align:center; margin-left:-52px"><h1>${this.title}</h1></ion-title>
+              <ion-buttons slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content>
+              <ion-list class="fields" style="text-align:center;">
+            <p><strong>New Password.</strong></p>
+            <p>Please enter new password.</p>
+
+              </ion-list>
+
+        <ion-list lines="full" class="ion-no-margin ion-no-padding fields">
+            <ion-item class="line">
+            </ion-item>
+
+          <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">New password <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="********" id="new_password" required type="password"></ion-input>
+          </ion-item>
+          <ion-item>
+            <ion-label class="pass_label" align="center" position="stacked">Confirm password <ion-text color="danger">*</ion-text></ion-label>
+            <ion-input align="center" placeholder="********" id="conf_new_password" required type="password"></ion-input>
+          </ion-item>
+
+        <div class="ion-padding-top">
+          <ion-button expand="block" type="button" class="ion-no-margin" id="f_change_pass">Change Password</ion-button>
+        </div>
+          </ion-content> 
+        `;
+                    document.getElementById("f_change_pass").addEventListener('click', async () => {
+                        let reset_password;
+                        reset_password = await access_route({new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: u_email}, "forgot_password");
+                        console.log(reset_password);
+                        //create_ionic_alert("Forgot Password", reset_password, ["OK"]);
+                        //window.location.href = 'login.html';
+                        create_ionic_alert("Forgot Password", reset_password, [
+                        {
+                            text: 'OK',
+                            handler: async () => {
+                                window.location.href = 'login.html';
+                            }
+                        }]);
+                    });
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript" charset="utf-8" src="cordova.js"></script>   
+    <script src="js/modules/common_functions.js" type="text/javascript"></script>
+
+</body>
+</html>

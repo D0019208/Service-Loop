@@ -255,11 +255,8 @@ class Tutor_Tutorials extends User {
                     if (total_tutorials == 1) {
                         document.getElementById('ongoing_tutor_tutorials_header').innerText = "NO ONGOING TUTORIALS";
                     }
-
-                    //FIX -1 BUG
-                    if (this.total_tutor_ongoing_tutorials !== 0) {
-                        this.total_tutor_ongoing_tutorials--;
-                    }
+                    
+                    this.total_tutor_ongoing_tutorials--;
 
                     document.getElementById("ongoing_tutorials_badge").innerText = this.total_tutor_ongoing_tutorials;
 
