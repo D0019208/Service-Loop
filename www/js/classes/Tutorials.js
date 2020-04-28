@@ -151,8 +151,9 @@ class Tutorials extends User {
                 document.getElementById('pending_badge').innerText = this.total_pending_tutorials;
             }
             
-            if(document.getElementById('pending') !== null && active_segment === "Pending" && this.pending_tutorials_length !== 3) {
+            if(document.getElementById('pending') !== null && this.pending_tutorials_length !== 3) {
                 list.after(el, list.previousSibling);
+                this.pending_tutorials_length++;
             }
             //}
         } else if (segment == "Ongoing") {
@@ -165,8 +166,9 @@ class Tutorials extends User {
                 document.getElementById('ongoing_badge').innerText = this.total_ongoing_tutorials;
             }
             
-            if(document.getElementById('ongoing') !== null && active_segment === "Ongoing" && this.ongoing_tutorials_length !== 3) {
+            if(document.getElementById('ongoing') !== null && this.ongoing_tutorials_length !== 3) {
                 list.after(el, list.previousSibling);
+                this.ongoing_tutorials_length++;
             }
             //}
         } else {
@@ -179,8 +181,9 @@ class Tutorials extends User {
                 document.getElementById('done_badge').innerText = this.total_done_tutorials;
             }
             
-            if(document.getElementById('done') !== null && active_segment === "Done" && this.done_tutorials_length !== 3) {
+            if(document.getElementById('done') !== null && this.done_tutorials_length !== 3) {
                 list.after(el, list.previousSibling);
+                this.done_tutorials_length++;
             }
             //}
         }

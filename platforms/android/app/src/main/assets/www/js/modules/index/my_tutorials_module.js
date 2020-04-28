@@ -375,6 +375,9 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.open.classList.add("hide");
                         segment_elements.ongoing.classList.add("hide");
                         segment_elements.done.classList.add("hide");
+                        
+                        console.log("???????");
+                        console.log(tutorials.pending_tutorials);
 
                         //Add the infinite scroll listener 
                         if (!my_requested_posts_pending_loaded || document.getElementById('pending').childElementCount <= 3) {

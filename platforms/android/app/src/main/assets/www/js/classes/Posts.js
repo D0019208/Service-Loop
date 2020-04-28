@@ -229,7 +229,7 @@ class Posts extends User {
         });
     }
 
-    removePostById(id) {
+    removePostById(id, is_notifications = false) {
         if (this.all_posts.length !== 0) {
             this.all_posts = this.all_posts.filter(function (obj) {
                 return obj._id !== id;
@@ -242,7 +242,7 @@ class Posts extends User {
         console.log("Remove by id")
         console.log(this.all_posts);
 
-        if (typeof document.getElementById('forum_list') !== 'undefined') {
+        if (typeof document.getElementById('forum_list') !== 'undefined' && !is_notifications) {
             document.querySelector('[post_id="' + id + '"]').parentNode.remove();
 
             if (this.all_posts.length == 0) {

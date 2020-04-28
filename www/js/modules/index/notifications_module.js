@@ -576,6 +576,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if(tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };

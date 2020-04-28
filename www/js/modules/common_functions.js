@@ -1737,9 +1737,9 @@ async function accept_agreement(nav_controller, this_tutorial, previous_view) {
 
     if (previous_view.element.tagName === "NAV-NOTIFICATION") {
         nav_controller.popTo(0);
-    } else if (previous_view.element.tagName === "TUTORIAL") {
+    } else {
         nav_controller.popTo(1);
-    }
+    } 
 }
 
 async function reject_this_agreement(nav_controller, this_tutorial) {
@@ -2805,7 +2805,6 @@ function start_tutorial(nav_controller, this_post, post_id, tutorial_status, stu
 
                 if (user.getStatus() == "Tutor") {
                     if (tutorial_status === "Ongoing") {
-                        tutor_tutorials.total_tutor_ongoing_tutorials--;
                         tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== this_post._id);
 
                         tutor_tutorials.ongoing_tutor_tutorials.push(begin_response.updated_tutorial);

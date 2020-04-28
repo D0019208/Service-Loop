@@ -362,8 +362,9 @@ class Tutor_Tutorials extends User {
                 //}
             }
 
-            if (document.getElementById('tutor_tutorials_peding') !== null && active_tutor_segment === "Pending" && this.pending_tutor_tutorials_length !== 3) {
+            if (document.getElementById('tutor_tutorials_peding') !== null && this.pending_tutor_tutorials_length !== 3) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
+                this.pending_tutor_tutorials_length++;
             }
         } else if (segment == "Ongoing") {
             append_to = document.getElementById('ongoing-tutorials-infinite-scroll');
@@ -412,8 +413,9 @@ class Tutor_Tutorials extends User {
                 }
             }
 
-            if (document.getElementById('tutor_tutorials_ongoing') !== null && active_tutor_segment === "Ongoing" && this.ongoing_tutor_tutorials_length !== 3) {
+            if (document.getElementById('tutor_tutorials_ongoing') !== null && this.ongoing_tutor_tutorials_length !== 3) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
+                this.ongoing_tutor_tutorials_length++;
             }
         } else {
             append_to = document.getElementById('done-tutorials-infinite-scroll');
@@ -449,8 +451,9 @@ class Tutor_Tutorials extends User {
                 }
             }
 
-            if (document.getElementById('tutor_tutorials_done') !== null && active_tutor_segment === "Done" && this.done_tutor_tutorials_length !== 3) {
+            if (document.getElementById('tutor_tutorials_done') !== null && this.done_tutor_tutorials_length !== 3) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
+                this.done_tutor_tutorials_length++;
             }
         }
     }
