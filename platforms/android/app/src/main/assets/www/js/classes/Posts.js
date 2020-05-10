@@ -14,7 +14,30 @@ class Posts extends User {
 
         this.posts_length = 0;
         this.notification_posts = [];
-        console.log(this.all_posts);
+    }
+
+    update_with_new_posts(posts) {
+        this.append_unique_posts(posts.response);
+
+        this.all_posts = posts.response;
+
+        //Check to see if there are any posts (If empty, there will be a string)
+        if (typeof posts.response !== "string") {
+            this.total_posts = this.all_posts.length;
+        } else {
+            this.total_posts = 0;
+        }
+    }
+
+    append_unique_posts(posts) {
+        let context = this;
+
+        //Get all new notifications
+        let new_posts = posts.filter(new_post => context.all_posts.map(old_post => old_post._id).indexOf(new_post._id) === -1);
+
+        new_posts.filter((post) => {
+            context.addToPosts(post);
+        });
     }
 
     set_notification_posts(notification_posts) {
@@ -142,7 +165,7 @@ class Posts extends User {
             const el = document.createElement('ion-list');
             el.classList.add('ion-activatable', 'ripple', 'not_read');
             el.innerHTML = `
-                <ion-card class="test post" post_id="${post._id}" post_modules="${post.post_modules.join(', ')}">
+                <ion-card onclick="device_feedback();" class="test post" post_id="${post._id}" post_modules="${post.post_modules.join(', ')}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
                                 <img src="${post.std_avatar}">
@@ -248,7 +271,7 @@ class Posts extends User {
             if (this.all_posts.length == 0) {
                 document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
             }
-        }
+    }
     }
 
     removeNotificationPostByPostId(post_id) {
@@ -278,15 +301,14 @@ class Posts extends User {
     async getAllNotificationPosts() {
         //The list containing all the notifications
         let notification_list = user_notifications.getAllNotifications();
-        console.log("maryamrya")
-        console.log(notification_list)
+        let notification_posts;
         let post_ids = [];
 
         for (let i = 0; i < notification_list.length; i++) {
             post_ids.push(notification_list[i].post_id);
         }
-console.log(post_ids)
-        let notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
+
+        notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
         return notification_posts.response;
     }
 

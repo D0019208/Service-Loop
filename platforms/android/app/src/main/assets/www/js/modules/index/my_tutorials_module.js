@@ -81,7 +81,11 @@ function load_my_requested_tutorials(nav_controller) {
                         NO OPEN TUTORIALS
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
+                    <ion-refresher slot="fixed" id="tutorials_refresher">
+                        <ion-refresher-content></ion-refresher-content>
+                    </ion-refresher>
+                    
                     <ion-infinite-scroll threshold="100px" id="open-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -93,7 +97,7 @@ function load_my_requested_tutorials(nav_controller) {
                         NO PENDING TUTORIALS
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -104,7 +108,7 @@ function load_my_requested_tutorials(nav_controller) {
                         NO ONGOING TUTORIALS  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -115,7 +119,7 @@ function load_my_requested_tutorials(nav_controller) {
                         NO DONE TUTORIALS  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -164,7 +168,11 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.open_tutorials.length ? "OPEN TUTORIALS" : "NO OPEN TUTORIALS"}
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
+                    <ion-refresher slot="fixed" id="tutorials_refresher">
+                        <ion-refresher-content></ion-refresher-content>
+                    </ion-refresher>
+                    
                     <ion-infinite-scroll threshold="100px" id="open-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -176,7 +184,7 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.pending_tutorials.length ? "PENDING TUTORIALS" : "NO PENDING TUTORIALS"} 
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -187,7 +195,7 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.ongoing_tutorials.length ? "ONGOING TUTORIALS" : "NO ONGOING TUTORIALS"}  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -198,7 +206,7 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.done_tutorials.length ? "DONE TUTORIALS" : "NO DONE TUTORIALS"}  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -258,6 +266,7 @@ function load_my_requested_tutorials(nav_controller) {
             }
 
             async function handleButtonClick(ev) {
+                device_feedback();
                 popover = await popoverController.create({
                     component: 'popover-example-page2',
                     event: ev,
@@ -325,6 +334,18 @@ function load_my_requested_tutorials(nav_controller) {
             let number_of_ongoing_tutorials_to_add;
             let number_of_done_tutorials_to_add;
 
+            const tutorials_refresher = document.getElementById('tutorials_refresher');
+            tutorials_refresher.addEventListener('ionRefresh', async () => {
+                let load_more_response = await access_route({users_email: user.getEmail()}, "get_my_requested_posts", false);
+
+                if (typeof load_more_response.response !== "string") {
+                    //Update the posts object with the new reloaded values
+                    tutorials.refresh_tutorials(load_more_response, active_segment);
+                }
+
+                tutorials_refresher.complete();
+            });
+
             openInfiniteScroll.addEventListener('ionInfinite', async function () {
                 if (tutorials.open_tutorials_length < tutorials.get_open_tutorials().length) {
                     console.log('Loading data...');
@@ -375,7 +396,7 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.open.classList.add("hide");
                         segment_elements.ongoing.classList.add("hide");
                         segment_elements.done.classList.add("hide");
-                        
+
                         console.log("???????");
                         console.log(tutorials.pending_tutorials);
 

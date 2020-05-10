@@ -72,7 +72,11 @@ function all_tutor_tutorials(nav_controller) {
                         NO PENDING TUTORIALS
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
+                    <ion-refresher slot="fixed" id="tutor_tutorials_refresher">
+                        <ion-refresher-content></ion-refresher-content>
+                    </ion-refresher>
+                    
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -137,7 +141,11 @@ function all_tutor_tutorials(nav_controller) {
                         ${tutor_tutorials.pending_tutor_tutorials.length ? "PENDING TUTORIALS" : "NO PENDING TUTORIALS"} 
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
+                    <ion-refresher slot="fixed" id="tutor_tutorials_refresher">
+                        <ion-refresher-content></ion-refresher-content>
+                    </ion-refresher>
+                    
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -218,6 +226,7 @@ function all_tutor_tutorials(nav_controller) {
             }
 
             async function handleButtonClick(ev) {
+                device_feedback();
                 popover = await popoverController.create({
                     component: 'popover-example-page',
                     event: ev,
@@ -251,9 +260,6 @@ function all_tutor_tutorials(nav_controller) {
             tutor_tutorials.pending_tutor_tutorials_length = 0;
             tutor_tutorials.ongoing_tutor_tutorials_length = 0;
             tutor_tutorials.done_tutor_tutorials_length = 0;
-            
-            console.log("?W?W?W?W?W?W?");
-            console.log(tutor_tutorials.pending_tutor_tutorials);
             
             //List element we are appending our tutorials to  
             const pendingInfiniteScroll = document.getElementById('pending-tutorials-infinite-scroll');
@@ -295,6 +301,18 @@ function all_tutor_tutorials(nav_controller) {
                     console.log('No More Open Data 1');
                     pendingInfiniteScroll.disabled = true;
                 }
+            });
+            
+            const tutor_tutorials_refresher = document.getElementById('tutor_tutorials_refresher');
+            tutor_tutorials_refresher.addEventListener('ionRefresh', async () => {
+                let load_more_response = await access_route({users_email: user.getEmail()}, "get_all_tutor_tutorials", false);
+
+                if (typeof load_more_response.response !== "string") {
+                    //Update the posts object with the new reloaded values
+                    tutor_tutorials.refresh_tutor_tutorials(load_more_response, active_tutor_segment);
+                }
+
+                tutor_tutorials_refresher.complete();
             });
 
 

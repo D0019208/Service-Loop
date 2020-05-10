@@ -162,6 +162,11 @@ document.getElementById("slides").addEventListener('click', () => {
 
 async function encrypt_fingerprint(currentModal, email, password, ionic_loading) {
     try {
+//        FingerprintAuth.delete({
+//            clientId: "Service Loop User",
+//            username: email
+//        }, result => console.log(result), error => console.log(error));
+
         let encryptConfig = {
             clientId: "Service Loop User",
             username: email,
@@ -181,6 +186,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                 document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "true");
                 document.getElementById('fingerprint_message').innerText = "Turn off fingerprint login";
                 localStorage.setItem("fingerprint_setup", "true");
+                localStorage.setItem("fingerprint_user", email);
 
                 ionic_loading.dismiss();
 
@@ -195,7 +201,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                     }
                 ];
 
-                create_toast("Fingerprint configuration successful", "dark", 2000, toast_buttons);
+                create_toast("Fingerprint enabled", "dark", 2000, toast_buttons);
                 currentModal = dismissModal(currentModal);
             } else {
                 ionic_loading.dismiss();
@@ -211,7 +217,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                     }
                 ];
 
-                create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
+                create_toast("Fingerprint failed", "dark", 2000, toast_buttons);
                 currentModal = dismissModal(currentModal);
             }
         }
@@ -231,7 +237,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
                     }
                 ];
 
-                create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
+                create_toast("Fingerprint failed", "dark", 2000, toast_buttons);
                 currentModal = dismissModal(currentModal);
             }
         }
@@ -250,7 +256,7 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
             }
         ];
 
-        create_toast("Fingerprint configuration failed", "dark", 2000, toast_buttons);
+        create_toast("Fingerprint failed", "dark", 2000, toast_buttons);
         currentModal = dismissModal(currentModal);
     }
 
@@ -283,6 +289,7 @@ async function remove_fingerprint(currentModal, email) {
                     document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "false");
                     document.getElementById('fingerprint_message').innerText = "Turn on fingerprint login";
                     localStorage.removeItem("fingerprint_setup");
+                    localStorage.removeItem("fingerprint_user");
 
                     ionic_loading.dismiss();
 
@@ -297,7 +304,7 @@ async function remove_fingerprint(currentModal, email) {
                         }
                     ];
 
-                    create_toast("Fingerprint successfully deactivated", "dark", 2000, toast_buttons);
+                    create_toast("Fingerprint disabled", "dark", 2000, toast_buttons);
                     currentModal = dismissModal(currentModal);
                 }
 
@@ -323,7 +330,7 @@ async function remove_fingerprint(currentModal, email) {
                     }
                 ];
 
-                create_toast("Password supplied is incorrect", "dark", 2000, toast_buttons);
+                create_toast("Password is incorrect", "dark", 2000, toast_buttons);
             }
         } catch (ex) {
             ionic_loading.dismiss();
@@ -383,7 +390,7 @@ async function setup_fingerprint(currentModal) {
                     }
                 ];
 
-                create_toast("Password supplied is incorrect", "dark", 2000, toast_buttons);
+                create_toast("Password is incorrect", "dark", 2000, toast_buttons);
             }
         } catch (ex) {
             ionic_loading.dismiss();
@@ -456,7 +463,7 @@ async function logout(logout_button) {
  */
 active_nav = nav_settings;
 
-if (localStorage.getItem("fingerprint_setup") !== null) {
+if (localStorage.getItem("fingerprint_setup") !== null && localStorage.getItem("fingerprint_user") === user.getEmail()) {
     document.getElementById('fingerprint_message').innerText = "Turn off fingerprint login";
     document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "true");
 } else {
@@ -489,7 +496,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
     let modal_text;
 
     //This if statement prevents toggle from changing
-    if (localStorage.getItem("fingerprint_setup") !== null) {
+    if (localStorage.getItem("fingerprint_setup") !== null && localStorage.getItem("fingerprint_user") === user.getEmail()) {
         document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "true");
 
         modal_text = `
@@ -585,7 +592,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
                 setup_fingerprint(currentModal);
             });
 
-            document.getElementById("modal_close").addEventListener('click', () => { 
+            document.getElementById("modal_close").addEventListener('click', () => {
                 dismissModal(currentModal);
             });
         });
@@ -643,10 +650,10 @@ document.getElementById('personal_info').addEventListener('click', async () => {
     modal_created.present().then(() => {
         currentModal = modal_created;
 
-        document.getElementById("modal_close").addEventListener('click', () => { 
+        document.getElementById("modal_close").addEventListener('click', () => {
             dismissModal(currentModal);
         });
-        document.getElementById("update_info").addEventListener('click', () => { 
+        document.getElementById("update_info").addEventListener('click', () => {
             update_info();
         });
     });
@@ -701,10 +708,10 @@ document.getElementById('change_pass').addEventListener('click', async () => {
     modal_created.present().then(() => {
         currentModal = modal_created;
 
-        document.getElementById("modal_close").addEventListener('click', () => { 
+        document.getElementById("modal_close").addEventListener('click', () => {
             dismissModal(currentModal);
         });
-        document.getElementById("change_password").addEventListener('click', () => { 
+        document.getElementById("change_password").addEventListener('click', () => {
             change_pass();
         });
     });
@@ -848,7 +855,7 @@ document.getElementById('terms_and_conditons').addEventListener('click', async (
     modal_created.present().then(() => {
         currentModal = modal_created;
 
-        document.getElementById("modal_close").addEventListener('click', () => { 
+        document.getElementById("modal_close").addEventListener('click', () => {
             dismissModal(currentModal);
         });
     });
@@ -978,7 +985,7 @@ document.getElementById('privacy_policy').addEventListener('click', async () => 
     modal_created.present().then(() => {
         currentModal = modal_created;
 
-        document.getElementById("modal_close").addEventListener('click', () => { 
+        document.getElementById("modal_close").addEventListener('click', () => {
             dismissModal(currentModal);
         });
     });

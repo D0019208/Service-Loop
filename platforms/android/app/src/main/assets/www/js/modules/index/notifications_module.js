@@ -68,10 +68,10 @@ customElements.get('nav-notifications') || customElements.define('nav-notificati
                         <ion-list>
                             <ion-list-header id="notifications_header">
                                 NOTIFICATIONS
-                            </ion-list-header><!--<p>Manage information about you...</p>-->
-                            <!--<ion-refresher slot="fixed" id="refresher">
+                            </ion-list-header>
+                            <ion-refresher slot="fixed" id="notifications_refresher">
                                <ion-refresher-content></ion-refresher-content>
-                            </ion-refresher>-->
+                            </ion-refresher>
                             <ion-list id="list"></ion-list>
 
                             <ion-infinite-scroll threshold="100px" id="infinite-scroll">
@@ -88,8 +88,6 @@ customElements.get('nav-notifications') || customElements.define('nav-notificati
         if (!notification_posts_loaded && document.getElementById('list').hasChildNodes() && active_component.component === "nav-notifications") {
             //Function to get all ids from the notifications list and find the posts associated with them
             notification_posts = await posts.getAllNotificationPosts();
-            console.log("Notification posts")
-            console.log(notification_posts);
             posts.set_notification_posts(notification_posts);
         } else {
             notification_posts = posts.get_notification_posts();
@@ -103,18 +101,20 @@ const infiniteScroll = document.getElementById('infinite-scroll');
 let number_of_notifications_to_add;
 
 //Refresher
-//const refresher = document.getElementById('refresher');
-//refresher.addEventListener('ionRefresh', () => {
-//      setTimeout(async () => {
-//        //prependMessages(5, true);
-////        user_notifications.deleteNotifications();
-////        notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications");
-////        user_notifications = new Notifications(user.getId(), notifications_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getAvatar(), user.getOpenTutorials(), user.getPendingTutorials(), user.getOngoingTutorials(), user.getDoneTutorials(), user.getPendingTutoredTutorials(), user.getOngoingTutoredTutorials(), user.getDoneTutoredTutorials(), user.getSocket());
-////        user_notifications.appendNotifications(user_notifications.getAllNotifications().length, list);
-////        console.log(number_of_notifications_to_add);
-//        refresher.complete();
-//      }, 2000);
-//    })
+const notifications_refresher = document.getElementById('notifications_refresher');
+notifications_refresher.addEventListener('ionRefresh', async () => {
+    let load_more_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications", false);
+
+    if (typeof load_more_response.response !== "string") {
+        notification_posts = await posts.getAllNotificationPosts();
+        posts.set_notification_posts(notification_posts);
+
+        //Update the user_notifications object with the new reloaded values
+        user_notifications.update_with_new_notifications(load_more_response.response);
+    }
+
+    notifications_refresher.complete();
+});
 
 if (user_notifications.getTotalNotifications() == 0) {
     document.getElementById("notifications_header").innerText = "YOU HAVE NO NOTIFICATIONS!";
@@ -576,6 +576,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -1245,7 +1250,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial finished") && notification_tags.length !== 0) {
         device_feedback();
-    
+
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
@@ -1256,7 +1261,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 this_post = notification_posts[i];
             }
         }
-        
+
         console.log("This post");
         console.log(this_post);
         console.log(notification_posts)
