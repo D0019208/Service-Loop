@@ -40,7 +40,11 @@ async function all_tutorials(nav) {
                                                   <ion-list>
                                                       <ion-list-header id="posts_header">
                                                           ALL REQUESTED TUTORIALS
-                                                      </ion-list-header><!--<p>Manage information about you...</p>--> 
+                                                      </ion-list-header>
+            
+                                                        <ion-refresher slot="fixed" id="forum_refresher">
+                                                           <ion-refresher-content></ion-refresher-content>
+                                                        </ion-refresher>
 
                                                       <ion-infinite-scroll threshold="100px" id="forum-infinite-scroll">
                                                           <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -66,6 +70,19 @@ async function all_tutorials(nav) {
             //List element we are appending our tutorial requests to
             const list = document.getElementById('forum_list');
             const infiniteScroll = document.getElementById('forum-infinite-scroll');
+            const forum_refresher = document.getElementById('forum_refresher');
+
+            forum_refresher.addEventListener('ionRefresh', async () => {
+                let load_more_response = await access_route({email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+
+                if (typeof load_more_response.response !== "string") {
+                    //Update the posts object with the new reloaded values
+                    posts.update_with_new_posts(load_more_response);
+                }
+
+                forum_refresher.complete();
+            });
+
 
             //The number of posts we will add, this is calculated later
             let number_of_posts_to_add;
@@ -130,7 +147,7 @@ async function all_tutorials(nav) {
                     console.log(post);
                     //If we clicked on a post
                     //NEEDS TO BE CHANGED!!!!!!!
-                    if (post && active_component.component == "nav-all-tutorials") { 
+                    if (post && active_component.component == "nav-all-tutorials") {
                         //Find a post from posts object that matches the ID of the clicked element.
                         load_new_tutorial_request_component(nav, {post_id: post.getAttribute('post_id')}, {post: post, is_forum: true});
                     }

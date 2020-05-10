@@ -43,6 +43,47 @@ class Tutorials extends User {
         console.log(this.all_tutorials);
     }
 
+    refresh_tutorials(tutorials, active_segment) {
+        this.add_refreshed_tutorials(tutorials.response, active_segment);
+
+        this.all_tutorials = tutorials.response;
+
+        this.total_tutorials = this.all_tutorials.length;
+
+        this.open_tutorials = groupBy(this.all_tutorials, "Open");
+        this.pending_tutorials = groupBy(this.all_tutorials, "In negotiation");
+        this.ongoing_tutorials = groupBy(this.all_tutorials, "Ongoing");
+        this.done_tutorials = groupBy(this.all_tutorials, "Done");
+
+        this.total_open_tutorials = this.open_tutorials.length;
+        this.total_pending_tutorials = this.pending_tutorials.length;
+        this.total_ongoing_tutorials = this.ongoing_tutorials.length;
+        this.total_done_tutorials = this.done_tutorials.length;
+    }
+
+    add_refreshed_tutorials(tutorials, active_segment) {
+        let context = this;
+
+        //Get all new notifications
+        let new_tutorials = tutorials.filter(new_post => context.all_tutorials.map(old_post => old_post._id).indexOf(new_post._id) === -1);
+
+        new_tutorials.filter((tutorial) => {
+            let list;
+            
+            if(active_segment === "Open") {
+                list = document.getElementById('open_tutorials_header');
+            } else if(active_segment === "Pending") {
+                list = document.getElementById('pending_tutorials_header');
+            } else if(active_segment === "Ongoing") {
+                list = document.getElementById('onoing_tutorials_header');
+            } else if(active_segment === "Done") {
+                list = document.getElementById('done_tutorials_header');
+            }
+            
+            context.add_post_to_segment(active_segment, list, tutorial);
+        });
+    }
+
     //GETTERS
     get_all_tutorials() {
         return this.all_tutorials;
@@ -127,7 +168,6 @@ class Tutorials extends User {
                         </ion-item>
                         <ion-ripple-effect></ion-ripple-effect>
                     </ion-card> 
-            
         `;
 
 
@@ -150,9 +190,10 @@ class Tutorials extends User {
                 document.getElementById('pending_tutorials_header').innerText = "PENDING TUTORIALS";
                 document.getElementById('pending_badge').innerText = this.total_pending_tutorials;
             }
-            
-            if(document.getElementById('pending') !== null && active_segment === "Pending" && this.pending_tutorials_length !== 3) {
+
+            if (document.getElementById('pending') !== null && this.pending_tutorials_length !== 3) {
                 list.after(el, list.previousSibling);
+                this.pending_tutorials_length++;
             }
             //}
         } else if (segment == "Ongoing") {
@@ -164,9 +205,10 @@ class Tutorials extends User {
                 document.getElementById('ongoing_tutorials_header').innerText = "ONGOING TUTORIALS";
                 document.getElementById('ongoing_badge').innerText = this.total_ongoing_tutorials;
             }
-            
-            if(document.getElementById('ongoing') !== null && active_segment === "Ongoing" && this.ongoing_tutorials_length !== 3) {
+
+            if (document.getElementById('ongoing') !== null && this.ongoing_tutorials_length !== 3) {
                 list.after(el, list.previousSibling);
+                this.ongoing_tutorials_length++;
             }
             //}
         } else {
@@ -178,9 +220,10 @@ class Tutorials extends User {
                 document.getElementById('done_tutorials_header').innerText = "DONE TUTORIALS";
                 document.getElementById('done_badge').innerText = this.total_done_tutorials;
             }
-            
-            if(document.getElementById('done') !== null && active_segment === "Done" && this.done_tutorials_length !== 3) {
+
+            if (document.getElementById('done') !== null && this.done_tutorials_length !== 3) {
                 list.after(el, list.previousSibling);
+                this.done_tutorials_length++;
             }
             //}
         }
@@ -342,7 +385,7 @@ class Tutorials extends User {
         } else if (segment == "Ongoing") {
             container = document.getElementById('ongoing');
             total_tutorials = this.total_ongoing_tutorials;
-            
+
             if (container) {
                 if (total_tutorials > 0) {
                     tutorial_id = response.updated_tutorial._id;
@@ -367,7 +410,7 @@ class Tutorials extends User {
         } else {
             container = document.getElementById('tutor_tutorials_done');
             total_tutorials = this.total_done_tutorials;
-            
+
             if (container) {
                 if (total_tutorials > 0) {
                     tutorial_id = response.updated_tutorial._id;

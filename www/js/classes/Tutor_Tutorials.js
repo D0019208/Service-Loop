@@ -35,6 +35,33 @@ class Tutor_Tutorials extends User {
         console.log(this.all_tutor_tutorials);
     }
 
+    refresh_tutor_tutorials(tutor_tutorials, active_tutor_segment) {
+        this.add_refreshed_tutor_tutorials(tutor_tutorials.response, active_tutor_segment);
+
+        this.all_tutor_tutorials = tutor_tutorials.response;
+
+        this.total_tutor_tutorials = this.all_tutor_tutorials.length;
+
+        this.pending_tutor_tutorials = groupBy(this.all_tutor_tutorials, "In negotiation");
+        this.ongoing_tutor_tutorials = groupBy(this.all_tutor_tutorials, "Ongoing");
+        this.done_tutor_tutorials = groupBy(this.all_tutor_tutorials, "Done");
+
+        this.total_tutor_pending_tutorials = this.pending_tutor_tutorials.length;
+        this.total_tutor_ongoing_tutorials = this.ongoing_tutor_tutorials.length;
+        this.total_tutor_done_tutorials = this.done_tutor_tutorials.length;
+    }
+
+    add_refreshed_tutor_tutorials(tutor_tutorials, active_tutor_segment) {
+        let context = this;
+
+        //Get all new notifications
+        let new_tutor_tutorials = tutor_tutorials.filter(new_post => context.all_tutor_tutorials.map(old_post => old_post._id).indexOf(new_post._id) === -1);
+
+        new_tutor_tutorials.filter((tutorial) => {
+            context.add_tutorial_to_DOM(active_tutor_segment, tutorial, true);
+        });
+    }
+
     //GETTERS
     get_all_tutor_tutorials() {
         return this.all_tutor_tutorials;
@@ -101,7 +128,7 @@ class Tutor_Tutorials extends User {
 //            }
 
                 el.classList.add('ion-activatable', 'ripple', "not_read");
-
+                el.setAttribute('onClick', 'device_feedback()');
                 el.innerHTML = `
                 <ion-card class="test post" post_id="${tutorial._id}" post_modules="${tutorial.post_modules.join(', ')}" post_status="${tutorial.post_status}">
                         <ion-item lines="full">
@@ -255,7 +282,7 @@ class Tutor_Tutorials extends User {
                     if (total_tutorials == 1) {
                         document.getElementById('ongoing_tutor_tutorials_header').innerText = "NO ONGOING TUTORIALS";
                     }
-                    
+
                     this.total_tutor_ongoing_tutorials--;
 
                     document.getElementById("ongoing_tutorials_badge").innerText = this.total_tutor_ongoing_tutorials;
@@ -303,7 +330,7 @@ class Tutor_Tutorials extends User {
         }
     }
 
-    add_tutorial_to_DOM(segment, this_tutorial) {
+    add_tutorial_to_DOM(segment, this_tutorial, refresh = false) {
         let container;
         let append_to;
         let total_tutorials;
@@ -311,7 +338,7 @@ class Tutor_Tutorials extends User {
         tutorial.className = "ion-activatable ripple";
 
         tutorial.classList.add('ion-activatable', 'ripple', "not_read");
-
+        tutorial.setAttribute('onClick', 'device_feedback()');
         tutorial.innerHTML = `
                 <ion-card class="test post" post_id="${this_tutorial._id}" post_modules="${this_tutorial.post_modules.join(', ')}" post_status="${this_tutorial.post_status}">
                         <ion-item lines="full">
@@ -362,7 +389,7 @@ class Tutor_Tutorials extends User {
                 //}
             }
 
-            if (document.getElementById('tutor_tutorials_peding') !== null && this.pending_tutor_tutorials_length !== 3) {
+            if (document.getElementById('tutor_tutorials_peding') !== null && this.pending_tutor_tutorials_length !== 3 || refresh) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
                 this.pending_tutor_tutorials_length++;
             }
@@ -413,7 +440,7 @@ class Tutor_Tutorials extends User {
                 }
             }
 
-            if (document.getElementById('tutor_tutorials_ongoing') !== null && this.ongoing_tutor_tutorials_length !== 3) {
+            if (document.getElementById('tutor_tutorials_ongoing') !== null && this.ongoing_tutor_tutorials_length !== 3 || refresh) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
                 this.ongoing_tutor_tutorials_length++;
             }
@@ -441,7 +468,7 @@ class Tutor_Tutorials extends User {
                         document.getElementById('done_tutor_tutorials_header').innerText = "DONE TUTORIALS";
                         document.getElementById("done_tutorials_badge").innerText = this.total_tutor_done_tutorials;
                     }
-                    
+
                     this.done_tutor_tutorials.push(this_tutorial);
                 }
             } else {
@@ -450,8 +477,8 @@ class Tutor_Tutorials extends User {
                     this.done_tutor_tutorials.push(this_tutorial);
                 }
             }
-
-            if (document.getElementById('tutor_tutorials_done') !== null && this.done_tutor_tutorials_length !== 3) {
+            
+            if (document.getElementById('tutor_tutorials_done') !== null && this.done_tutor_tutorials_length !== 3 || refresh) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
                 this.done_tutor_tutorials_length++;
             }
@@ -469,13 +496,13 @@ class Tutor_Tutorials extends User {
                     this.pending_tutor_tutorials[i] = updated_tutorial;
                 }
             }
-        } else if(segment === "Ongoing") {
+        } else if (segment === "Ongoing") {
             for (let i = 0; i < this.ongoing_tutor_tutorials.length; i++) {
                 if (this.ongoing_tutor_tutorials[i]._id === updated_tutorial._id) {
                     this.ongoing_tutor_tutorials[i] = updated_tutorial;
                 }
             }
-        } else if(segment === "Done") {
+        } else if (segment === "Done") {
             for (let i = 0; i < this.done_tutor_tutorials.length; i++) {
                 if (this.done_tutor_tutorials[i]._id === updated_tutorial._id) {
                     this.done_tutor_tutorials[i] = updated_tutorial;

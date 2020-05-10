@@ -104,6 +104,9 @@ async function access_route(data, route, show_loading = true) {
         if (show_loading) {
             loading.dismiss();
         }
+        
+        console.log("Responsose")
+        console.log(response)
 
         return response;
 
@@ -113,7 +116,7 @@ async function access_route(data, route, show_loading = true) {
         }
 
         return {error: true, response: ex};
-}
+    }
 }
 
 /*
@@ -468,6 +471,7 @@ function drawing_pad() {
     var cancelButton = document.getElementById('clear');
 
     undoButton.addEventListener('click', () => {
+        device_feedback();
         var data = signaturePad.toData();
         if (data) {
             data.pop(); // remove the last dot or line
@@ -476,6 +480,7 @@ function drawing_pad() {
     });
 
     cancelButton.addEventListener('click', function (event) {
+        device_feedback();
         signaturePad.clear();
     });
 }
@@ -1739,7 +1744,7 @@ async function accept_agreement(nav_controller, this_tutorial, previous_view) {
         nav_controller.popTo(0);
     } else {
         nav_controller.popTo(1);
-    } 
+    }
 }
 
 async function reject_this_agreement(nav_controller, this_tutorial) {
@@ -1942,7 +1947,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     let finish_tutorial;
     let finish_tutorial_handler = async function () {
         let previous = await nav_controller.getPrevious();
-        
+
         console.log("prev");
         console.log(previous);
 
@@ -2890,7 +2895,6 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                         total_tutorials = tutorials.total_ongoing_tutorials;
 
                         if (total_tutorials > 0) {
-                            alert("Subtract 1")
                             tutorials.total_ongoing_tutorials--;
                             tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
                         }
@@ -2913,7 +2917,6 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
                         total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
 
                         if (total_tutorials > 0) {
-                            alert("4")
                             tutor_tutorials.total_tutor_ongoing_tutorials--;
                             tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
                         }

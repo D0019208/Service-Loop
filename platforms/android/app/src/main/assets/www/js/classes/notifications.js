@@ -23,6 +23,31 @@ class Notifications extends User {
         console.log(this.all_notifications);
     }
 
+    update_with_new_notifications(all_notifications) {
+        this.append_unique_notifications(all_notifications);
+
+        this.all_notifications = all_notifications;
+
+        if (typeof all_notifications !== "string") {
+            let unopened_notifications_counter = 0;
+            for (let i = 0; i < this.all_notifications.length; i++) {
+                if (!this.all_notifications[i]["notification_opened"]) {
+                    unopened_notifications_counter++;
+                }
+            }
+
+            this.total_notifications = this.all_notifications.length;
+            this.unread_notifications = unopened_notifications_counter;
+        } else {
+            this.total_notifications = 0;
+            this.unread_notifications = 0;
+        }
+
+        this.notifications_length = 0;
+
+        this.addUnreadNotificationsToBadge(this.unread_notifications);
+    }
+
     find_unopened_notifications_number() {
         if (typeof notifications !== "string") {
             let unopened_notifications_counter = 0;
@@ -36,6 +61,19 @@ class Notifications extends User {
         } else {
             return 0;
         }
+    }
+
+    append_unique_notifications(all_notifications) {
+        console.log("?D?D?D??D?D?D")
+        console.log(all_notifications);
+        let context = this;
+
+        //Get all new notifications
+        let new_notifications = all_notifications.filter(new_notification => context.all_notifications.map(old_notification => old_notification._id).indexOf(new_notification._id) === -1);
+
+        new_notifications.filter((notification) => {
+            context.addToNotifications(notification);
+        });
     }
 
     addToTotalNotifications() {
@@ -173,7 +211,7 @@ class Notifications extends User {
 
             notification_badge.appendAfter(notifications_icon);
         } else {
-            return "No new notifications!"
+            return "No new notifications!";
         }
     }
 
@@ -229,7 +267,7 @@ class Notifications extends User {
     sendTutorialCanceledNotification(notification, post) {
         this.socket.emit('cancel_tutorial', {the_notification: notification, the_post: post});
     }
-    
+
     removeOpenPost(post) {
         this.socket.emit('remove_open_post', {the_post: post});
     }
@@ -269,7 +307,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -303,7 +341,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -339,12 +377,12 @@ class Notifications extends User {
 
     waitForNewNotifications() {
         let socket = this.socket;
-        
+
         socket.on('remove_open_post', (data) => {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             new_message_ping.play();
             posts.removePostById(data.post._id, true);
             posts.removeNotificationPostByPostId(data.post._id);
@@ -362,7 +400,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             new_message_ping.play();
             posts.replace_notification_posts(data.post);
 
@@ -382,7 +420,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -422,7 +460,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -458,7 +496,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -488,7 +526,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let toast_buttons = [
                 {
                     side: 'end',
@@ -516,7 +554,7 @@ class Notifications extends User {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            
+
             let status = data.post.post_status;
 
             if (status == "In negotiation") {

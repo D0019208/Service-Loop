@@ -64,7 +64,7 @@ async function login_user(user_email, user_password) {
 async function decrypt_fingerprint() {
     try {
         let token = await get_secure_storage("service_loop_fingerprint_token")
-        let email = await get_secure_storage("users_email");
+        let email = localStorage.getItem("fingerprint_user");
 
         var decryptConfig = {
             clientId: "Service Loop User",
