@@ -182,7 +182,6 @@ class User {
             }
 
         } catch (ex) {
-            console.log(ex);
             window.location.href = "login.html";
             return;
         }
@@ -219,14 +218,11 @@ class User {
             this.tutored_done_tutorials = content.tutorials_count.my_tutored_tutorials.done_count;
 
         } catch (ex) {
-            console.log(ex);
             return;
         }
     }
 
     createWebSocketConnection() {
-        //HTTPS
-        //const socket = io.connect("https://my.website.com:3002", { secure: true, reconnection: true, rejectUnauthorized: false });
         let modules = encodeURIComponent(JSON.stringify(this.modules));
         let socket;
         
@@ -237,8 +233,6 @@ class User {
         }
 
         this.socket = socket;
-
-        console.log(socket);
     }
 
     async ascendToTutor(user_notifications, user_modules, handler) {
@@ -284,7 +278,6 @@ class User {
 
         //get reference to element that we want to replace
         let tutor_application_button = document.getElementById('home_tutor_application');
-        console.log(apply_to_be_tutor);
         tutor_application_button.removeEventListener("click", handler, false);
 
 

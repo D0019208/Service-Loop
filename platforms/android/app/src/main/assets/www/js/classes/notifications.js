@@ -20,12 +20,9 @@ class Notifications extends User {
         }
 
         this.notifications_length = 0;
-        console.log(this.all_notifications);
     }
 
     update_with_new_notifications(all_notifications) {
-        this.append_unique_notifications(all_notifications);
-
         this.all_notifications = all_notifications;
 
         if (typeof all_notifications !== "string") {
@@ -38,13 +35,27 @@ class Notifications extends User {
 
             this.total_notifications = this.all_notifications.length;
             this.unread_notifications = unopened_notifications_counter;
+            
+            document.getElementById('notifications_header').innerText = "NOTIFICATIONS";
+            
+            if(!document.getElementById('new_notifications')) {
+                this.addUnreadNotificationsToDOM();
+            }
         } else {
             this.total_notifications = 0;
             this.unread_notifications = 0;
         }
 
         this.notifications_length = 0;
-
+        
+        document.getElementById('list').innerHTML = "";
+        
+        if(this.total_notifications > 3) {
+            this.appendNotifications(3, document.getElementById('list'));
+        } else {
+            this.appendNotifications(this.total_notifications, document.getElementById('list'));
+        }
+        
         this.addUnreadNotificationsToBadge(this.unread_notifications);
     }
 
@@ -64,8 +75,6 @@ class Notifications extends User {
     }
 
     append_unique_notifications(all_notifications) {
-        console.log("?D?D?D??D?D?D")
-        console.log(all_notifications);
         let context = this;
 
         //Get all new notifications
@@ -77,9 +86,7 @@ class Notifications extends User {
     }
 
     addToTotalNotifications() {
-        console.log("Total nots = " + this.total_notifications)
         this.total_notifications++;
-        console.log("Total nots after add = " + this.total_notifications)
     }
 
     setTotalNotifications(total_notifications) {
@@ -133,11 +140,8 @@ class Notifications extends User {
     }
 
     getNotificationDetailsById(id) {
-        console.log(id)
-        console.log(this.all_notifications)
         for (let i = 0; i < this.all_notifications.length; i++) {
             if (this.all_notifications[i]._id == id) {
-                console.log(this.all_notifications[i])
                 return this.all_notifications[i];
             }
         }
@@ -158,9 +162,6 @@ class Notifications extends User {
     }
 
     addToNotifications(notification) {
-        console.log("A notification")
-        console.log(notification);
-
         if (this.all_notifications == "There are no notifications to display!") {
             this.all_notifications = [notification];
         } else {
@@ -224,11 +225,9 @@ class Notifications extends User {
     //Add the notifications 
     appendNotifications(number, list) {
         let notifications = this.getAllNotifications();
-
-        console.log('length is', this.notifications_length);
         const originalLength = this.notifications_length;
         let read_class;
-        console.log(notifications)
+        
         for (var i = 0; i < number; i++) {
             const el = document.createElement('ion-list');
 
@@ -333,8 +332,6 @@ class Notifications extends User {
             }
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
 
         socket.on('agreement_accepted_tutor', (data) => {
@@ -370,8 +367,6 @@ class Notifications extends User {
             }
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
     }
 
@@ -384,7 +379,7 @@ class Notifications extends User {
             }
 
             new_message_ping.play();
-            posts.removePostById(data.post._id, true);
+            posts.removePostById(data.post._id);
             posts.removeNotificationPostByPostId(data.post._id);
 
             if (typeof notification_posts !== 'undefined') {
@@ -392,8 +387,6 @@ class Notifications extends User {
                     return obj._id !== data.post._id;
                 });
             }
-
-            console.log(data);
         });
 
         socket.on('new_notification', (data) => {
@@ -413,7 +406,6 @@ class Notifications extends User {
             }
 
             this.addToNotifications(data.response);
-            console.log(data);
         });
 
         socket.on('tutorial_has_finished', (data) => {
@@ -452,8 +444,6 @@ class Notifications extends User {
             }
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
 
         socket.on('tutorial_has_begun', (data) => {
@@ -488,8 +478,6 @@ class Notifications extends User {
             }
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
 
         socket.on('add_tutorial_request_accepted_notification', (data) => {
@@ -510,16 +498,11 @@ class Notifications extends User {
 
             create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
             new_message_ping.play();
-
             posts.replace_notification_posts(data.post);
-
             tutorials.remove_tutorial_from_DOM("Open", {updated_tutorial: {_id: data.post._id}}, data.post);
-
             tutorials.add_post_to_segment("Pending", document.getElementById('pending_tutorials_header'), data.post);
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
 
         socket.on('add_agreement_created_notification', (data) => {
@@ -546,8 +529,6 @@ class Notifications extends User {
             tutorials.update_my_tutorial("Pending", data.post);
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
 
         socket.on('tutorial_has_been_canceled', (data) => {
@@ -590,17 +571,13 @@ class Notifications extends User {
             }
 
             this.addToNotifications(data.response);
-
-            console.log(data);
         });
 
         socket.on('tutor_update_rating', (data) => {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
-            console.log("Tutor rated!")
-            console.log(data);
-            console.log(tutor_tutorials.done_tutor_tutorials)
+
             new_message_ping.play();
             posts.replace_notification_posts(data.post);
             tutor_tutorials.update_tutorial("Done", data.post);

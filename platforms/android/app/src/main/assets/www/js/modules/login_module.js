@@ -49,10 +49,7 @@ async function login_user(user_email, user_password) {
             create_ionic_alert("Login failed", content.error, ["OK"]);
             document.getElementById('login').disabled = false;
         }
-
-        console.log(content);
     } catch (ex) {
-        console.log(ex)
         loading.dismiss();
         create_ionic_alert("Login failed", ex, ["OK"]);
         document.getElementById('login').disabled = false;
@@ -75,11 +72,6 @@ async function decrypt_fingerprint() {
         FingerprintAuth.decrypt(decryptConfig, successCallback, errorCallback);
 
         function successCallback(result) {
-            console.log("successCallback(): " + JSON.stringify(result));
-            /* Once we decrypted the token, we take the decrypted 
-             * password and email and login the user creating a
-             * JWT session.
-             */
             if (result.password) {
                 login_user(email, result.password)
             }

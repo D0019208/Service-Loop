@@ -31,35 +31,119 @@ class Tutor_Tutorials extends User {
         this.pending_tutor_tutorials_length = 0;
         this.ongoing_tutor_tutorials_length = 0;
         this.done_tutor_tutorials_length = 0;
-
-        console.log(this.all_tutor_tutorials);
     }
 
-    refresh_tutor_tutorials(tutor_tutorials, active_tutor_segment) {
-        this.add_refreshed_tutor_tutorials(tutor_tutorials.response, active_tutor_segment);
+    refresh_tutor_tutorials(tutor_tutorials) {
+        if (typeof tutorials.response !== "string") {
+            this.all_tutor_tutorials = tutor_tutorials.response;
 
-        this.all_tutor_tutorials = tutor_tutorials.response;
+            this.total_tutor_tutorials = this.all_tutor_tutorials.length;
 
-        this.total_tutor_tutorials = this.all_tutor_tutorials.length;
+            this.pending_tutor_tutorials = groupBy(this.all_tutor_tutorials, "In negotiation");
+            this.ongoing_tutor_tutorials = groupBy(this.all_tutor_tutorials, "Ongoing");
+            this.done_tutor_tutorials = groupBy(this.all_tutor_tutorials, "Done");
 
-        this.pending_tutor_tutorials = groupBy(this.all_tutor_tutorials, "In negotiation");
-        this.ongoing_tutor_tutorials = groupBy(this.all_tutor_tutorials, "Ongoing");
-        this.done_tutor_tutorials = groupBy(this.all_tutor_tutorials, "Done");
+            this.total_tutor_pending_tutorials = this.pending_tutor_tutorials.length;
+            this.total_tutor_ongoing_tutorials = this.ongoing_tutor_tutorials.length;
+            this.total_tutor_done_tutorials = this.done_tutor_tutorials.length;
 
-        this.total_tutor_pending_tutorials = this.pending_tutor_tutorials.length;
-        this.total_tutor_ongoing_tutorials = this.ongoing_tutor_tutorials.length;
-        this.total_tutor_done_tutorials = this.done_tutor_tutorials.length;
+            this.pending_tutor_tutorials_length = 0;
+            this.ongoing_tutor_tutorials_length = 0;
+            this.done_tutor_tutorials_length = 0;
+
+            user.setPendingTutoredTutorials(this.total_tutor_pending_tutorials);
+            user.setOngoingTutoredTutorials(this.total_tutor_ongoing_tutorials);
+            user.setDoneTutoredTutorials(this.done_tutor_tutorials_length);
+
+            this.add_refreshed_tutor_tutorials();
+        } else {
+            this.all_tutor_tutorials = tutor_tutorials.response;
+
+            this.total_tutor_tutorials = 0;
+
+            this.pending_tutor_tutorials = [];
+            this.ongoing_tutor_tutorials = [];
+            this.done_tutor_tutorials = [];
+
+            this.total_tutor_pending_tutorials = 0;
+            this.total_tutor_ongoing_tutorials = 0;
+            this.total_tutor_done_tutorials = 0;
+
+            this.pending_tutor_tutorials_length = 0;
+            this.ongoing_tutor_tutorials_length = 0;
+            this.done_tutor_tutorials_length = 0;
+
+            user.setPendingTutoredTutorials(0);
+            user.setOngoingTutoredTutorials(0);
+            user.setDoneTutoredTutorials(0);
+
+            this.clear_tutored_segments();
+        }
     }
 
-    add_refreshed_tutor_tutorials(tutor_tutorials, active_tutor_segment) {
-        let context = this;
+    clear_tutored_segments() {
+        let all_pending_elements = [].slice.call(document.getElementById('tutor_tutorials_pending').getElementsByTagName("ion-list"));
+        let all_ongoing_elements = [].slice.call(document.getElementById('tutor_tutorials_ongoing').getElementsByTagName("ion-list"));
+        let all_done_elements = [].slice.call(document.getElementById('tutor_tutorials_done').getElementsByTagName("ion-list"));
 
-        //Get all new notifications
-        let new_tutor_tutorials = tutor_tutorials.filter(new_post => context.all_tutor_tutorials.map(old_post => old_post._id).indexOf(new_post._id) === -1);
+        tutor_tutorials_pending_loaded = true;
+        tutor_tutorials_ongoing_loaded = true;
+        tutor_tutorials_done_loaded = true;
 
-        new_tutor_tutorials.filter((tutorial) => {
-            context.add_tutorial_to_DOM(active_tutor_segment, tutorial, true);
-        });
+        for (let i = 0; i < all_pending_elements.length; i++) {
+            all_pending_elements[i].remove();
+        }
+
+        for (let i = 0; i < all_ongoing_elements.length; i++) {
+            all_ongoing_elements[i].remove();
+        }
+
+        for (let i = 0; i < all_done_elements.length; i++) {
+            all_done_elements[i].remove();
+        }
+
+        document.getElementById('pending_tutorials_badge').innerText = this.get_pending_tutor_tutorials().length;
+        if (this.get_pending_tutor_tutorials().length > 0) {
+            document.getElementById('pending_tutor_tutorials_header').innerText = "PENDING TUTORIALS";
+        } else {
+            document.getElementById('pending_tutor_tutorials_header').innerText = "NO PENDING TUTORIALS";
+        }
+
+        document.getElementById('ongoing_tutorials_badge').innerText = this.get_ongoing_tutor_tutorials().length;
+        if (this.get_ongoing_tutor_tutorials().length > 0) {
+            document.getElementById('ongoing_tutor_tutorials_header').innerText = "ONGOING TUTORIALS";
+        } else {
+            document.getElementById('ongoing_tutor_tutorials_header').innerText = "NO ONGOING TUTORIALS";
+        }
+
+        document.getElementById('done_tutorials_badge').innerText = this.get_done_tutor_tutorials().length;
+        if (this.get_done_tutor_tutorials().length > 0) {
+            document.getElementById('done_tutor_tutorials_header').innerText = "DONE TUTORIALS";
+        } else {
+            document.getElementById('done_tutor_tutorials_header').innerText = "NO DONE TUTORIALS";
+        }
+    }
+
+    add_refreshed_tutor_tutorials() {
+        this.clear_tutored_segments();
+
+        if (this.get_pending_tutor_tutorials().length <= 7) {
+            this.pending_tutor_tutorials_length = this.appendPosts(this.get_pending_tutor_tutorials().length, document.getElementById('pending-tutorials-infinite-scroll'), this.pending_tutor_tutorials, this.pending_tutor_tutorials_length);
+        } else {
+            this.pending_tutor_tutorials_length = this.appendPosts(7, document.getElementById('pending-tutorials-infinite-scroll'), this.pending_tutor_tutorials, this.pending_tutor_tutorials_length);
+        }
+
+        if (this.get_ongoing_tutor_tutorials().length <= 7) {
+            this.ongoing_tutor_tutorials_length = this.appendPosts(this.get_ongoing_tutor_tutorials().length, document.getElementById('ongoing-tutorials-infinite-scroll'), this.ongoing_tutor_tutorials, this.ongoing_tutor_tutorials_length);
+        } else {
+            this.ongoing_tutor_tutorials_length = this.appendPosts(7, document.getElementById('ongoing-tutorials-infinite-scroll'), this.ongoing_tutor_tutorials, this.ongoing_tutor_tutorials_length);
+        }
+
+        if (this.get_done_tutor_tutorials().length <= 7) {
+            this.done_tutor_tutorials_length = this.appendPosts(this.get_done_tutor_tutorials().length, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutor_tutorials, this.done_tutor_tutorials_length);
+        } else {
+            this.done_tutor_tutorials_length = this.appendPosts(7, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutor_tutorials, this.done_tutor_tutorials_length);
+        }
     }
 
     //GETTERS
@@ -154,9 +238,8 @@ class Tutor_Tutorials extends User {
                     </ion-card> 
             
                 `;
-                console.log("pending_tutor_tutorials_length PRE update = " + this.pending_tutor_tutorials_length);
+
                 this.pending_tutor_tutorials_length++;
-                console.log("pending_tutor_tutorials_length POST update = " + this.pending_tutor_tutorials_length);
                 document.getElementById('pending-tutorials-infinite-scroll').parentNode.insertBefore(el, document.getElementById('pending-tutorials-infinite-scroll').nextSibling);
             }
         }
@@ -164,19 +247,11 @@ class Tutor_Tutorials extends User {
 
     appendPosts(number, list, tutorials_array, tutorials_length) {
         let tutorials = tutorials_array;
-        console.log(tutorials)
         const originalLength = tutorials_length;
 
         for (var i = 0; i < number; i++) {
             const el = document.createElement('ion-list');
             el.className = "ion-activatable ripple";
-
-//            if (posts[i + originalLength].notification_opened) {
-//                read_class = "read";
-//            } else {
-//                read_class = "not_read";
-//            }
-
             el.classList.add('ion-activatable', 'ripple', "not_read");
             el.setAttribute('onClick', 'device_feedback()');
             el.innerHTML = `
@@ -204,9 +279,7 @@ class Tutor_Tutorials extends User {
                     </ion-card> 
             
         `;
-            console.log(list)
             list.parentNode.insertBefore(el, list.previousSibling);
-            //list.appendChild(el);
 
             tutorials_length += 1;
         }
@@ -323,8 +396,6 @@ class Tutor_Tutorials extends User {
             }
         }
 
-        console.log(tutorial);
-
         if (typeof tutorial !== 'undefined' && tutorial !== null) {
             tutorial.parentNode.remove();
         }
@@ -389,7 +460,7 @@ class Tutor_Tutorials extends User {
                 //}
             }
 
-            if (document.getElementById('tutor_tutorials_peding') !== null && this.pending_tutor_tutorials_length !== 3 || refresh) {
+            if (document.getElementById('tutor_tutorials_peding') !== null && this.pending_tutor_tutorials_length !== 7 || refresh) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
                 this.pending_tutor_tutorials_length++;
             }
@@ -434,13 +505,10 @@ class Tutor_Tutorials extends User {
                     }
 
                     this.ongoing_tutor_tutorials.push(this_tutorial);
-
-                    console.log("Ongoing tutorials <>")
-                    console.log(this.ongoing_tutor_tutorials)
                 }
             }
 
-            if (document.getElementById('tutor_tutorials_ongoing') !== null && this.ongoing_tutor_tutorials_length !== 3 || refresh) {
+            if (document.getElementById('tutor_tutorials_ongoing') !== null && this.ongoing_tutor_tutorials_length !== 7 || refresh) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
                 this.ongoing_tutor_tutorials_length++;
             }
@@ -477,19 +545,15 @@ class Tutor_Tutorials extends User {
                     this.done_tutor_tutorials.push(this_tutorial);
                 }
             }
-            
-            if (document.getElementById('tutor_tutorials_done') !== null && this.done_tutor_tutorials_length !== 3 || refresh) {
+
+            if (document.getElementById('tutor_tutorials_done') !== null && this.done_tutor_tutorials_length !== 7 || refresh) {
                 append_to.parentNode.insertBefore(tutorial, append_to.previousSibling);
                 this.done_tutor_tutorials_length++;
             }
-        }
+    }
     }
 
     update_tutorial(segment, updated_tutorial) {
-        console.log("Updating...");
-        console.log(this.pending_tutor_tutorials);
-        console.log(updated_tutorial)
-
         if (segment === "Pending") {
             for (let i = 0; i < this.pending_tutor_tutorials.length; i++) {
                 if (this.pending_tutor_tutorials[i]._id === updated_tutorial._id) {
@@ -509,12 +573,9 @@ class Tutor_Tutorials extends User {
                 }
             }
         }
-
-        console.log(this.pending_tutor_tutorials)
     }
 
     remove_tutorial(segment, tutorial) {
-        console.log("Removing")
         if (segment === "Pending") {
             this.pending_tutor_tutorials.filter(function (e) {
                 return e !== 'seven'
