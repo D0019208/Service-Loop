@@ -70,7 +70,40 @@
         var u_email;
         var localhost = false;
 
-        document.addEventListener("DOMContentLoaded", function () {
+        async function delete_fingerprint(email) {
+            let fingerprint_available = await is_fingerprint_available();
+
+            if (fingerprint_available) {
+                try {
+                    FingerprintAuth.delete({
+                        clientId: "Service Loop User",
+                        username: email
+                    }, successCallback, errorCallback);
+
+                    async function successCallback(result) {
+                        if (!localhost) {
+                            await remove_secure_storage("service_loop_fingerprint_token");
+                        }
+
+                        document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "false");
+                        document.getElementById('fingerprint_message').innerText = "Turn on fingerprint login";
+                        localStorage.removeItem("fingerprint_setup");
+                        localStorage.removeItem("fingerprint_user");
+                    }
+
+                    function errorCallback(error) {
+                        create_ionic_alert("Fingerprint removal failed", error, ["OK"]);
+                    }
+                } catch (ex) {
+                    create_ionic_alert("Fingerprint removal failed", ex, ["OK"]);
+                }
+
+            } else {
+                create_ionic_alert("Fingerprint", "Your device does not support fingerprint authentication", ["OK"]);
+            }
+        }
+
+        document.addEventListener("deviceready", function () {
             customElements.define('nav-forgot', class NavForgot extends HTMLElement {
                 connectedCallback() {
                     this.innerHTML = `
@@ -98,8 +131,8 @@
           </ion-item>
 
         <div class="ion-padding-top">
-          <ion-button expand="block" type="button" class="ion-no-margin" id="reset_password">Reset Password</ion-button>
-          <h6><a href="index.html">Login</a></h6>
+          <ion-button expand="block" type="button" class="ion-no-margin" id="reset_password" onclick="device_feedback();">Reset Password</ion-button>
+          <h6><a href="login.html" onclick="device_feedback();">Login</a></h6>
         </div>
           </ion-content>
         `;
@@ -165,7 +198,7 @@
               </ion-buttons>
             </ion-toolbar>
           </ion-header>
-          <ion-content>
+          <ion-content id="resend">
               <ion-list class="fields" style="text-align:center;">
             <p><strong>Verify your identity with SMS</strong></p>
             <p>Please input your 4 digit code sent by SMS. If you did not receive one then please request a new code or request a resend.</p>
@@ -182,9 +215,9 @@
           </ion-item>
 
         <div class="ion-padding-top">
-          <ion-button expand="block" type="button" class="ion-no-margin" id="verify_submit">Verify me</ion-button>
+          <ion-button expand="block" type="button" class="ion-no-margin" id="verify_submit" onclick="device_feedback();">Verify me</ion-button>
         <h6>
-            <a href="#" id="resend_sms">Resend Code</a>
+            <a href="#" id="resend_sms" onclick="device_feedback();">Resend Code</a>
         </h6> 
         </div>
             <p style="text-align: center; color: gray; font-size: 0.85em;">This is a security precaution to safeguard you from malicious users. We appreciate your patience and cooperation.</p>
@@ -195,6 +228,28 @@
                         console.log(token);
                         console.log(phone);
                         showPass("Reset Password", token, phone);
+                    });
+
+                    document.getElementById("resend_sms").addEventListener('click', async () => {
+                        //We pass in a different route to resend code
+
+                        let phone_field = document.createElement("input");
+                        phone_field.setAttribute("type", "hidden");
+                        phone_field.setAttribute("id", "users_phone_number");
+                        phone_field.setAttribute("value", phone);
+
+                        document.getElementById("resend").appendChild(phone_field);
+
+                        sms_response = await send_verification_sms("send_sms_verification");
+
+                        if (sms_response.status !== "SUCCESS") {
+                            sms_verification_errors(sms_response);
+                        } else {
+                            token = sms_response.token;
+                            phone = sms_response.phone;
+                        }
+
+                        document.getElementById('users_phone_number').remove();
                     });
                 }
             });
@@ -233,23 +288,28 @@
           </ion-item>
 
         <div class="ion-padding-top">
-          <ion-button expand="block" type="button" class="ion-no-margin" id="f_change_pass">Change Password</ion-button>
+          <ion-button expand="block" type="button" class="ion-no-margin" id="f_change_pass" onclick="device_feedback();">Change Password</ion-button>
         </div>
           </ion-content> 
         `;
                     document.getElementById("f_change_pass").addEventListener('click', async () => {
                         let reset_password;
-                        reset_password = await access_route({new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: u_email}, "forgot_password");
-                        console.log(reset_password);
-                        //create_ionic_alert("Forgot Password", reset_password, ["OK"]);
-                        //window.location.href = 'login.html';
-                        create_ionic_alert("Forgot Password", reset_password, [
-                        {
-                            text: 'OK',
-                            handler: async () => {
+
+                        if (document.getElementById('new_password').value !== "" && document.getElementById('conf_new_password').value !== "") {
+                            reset_password = await access_route({new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: u_email}, "forgot_password");
+
+                            if (reset_password !== "Password changed") {
+                                create_ionic_alert("Forgot Password", reset_password, ["OK"]);
+                            } else {
+                                localStorage.removeItem("fingerprint_setup")
+                                delete_fingerprint(u_email);
+
+                                sessionStorage.setItem("pass_reset", "true");
                                 window.location.href = 'login.html';
                             }
-                        }]);
+                        } else {
+                            create_ionic_alert("Forgot Password", "Please fill in all required fields to continue", ["OK"]);
+                        }
                     });
                 }
             });

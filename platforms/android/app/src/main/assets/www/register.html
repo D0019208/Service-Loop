@@ -113,13 +113,13 @@
                         <ion-input align="center" placeholder="********" id="users_password_confirm" type="password" ></ion-input>
                     </ion-item>
 
-                    <p class="terms">
+                    <p class="terms" onclick="device_feedback();">
                         <input type="checkbox" name="terms_and_conditions" value="check" id="terms_and_conditions"/>
                         <label for="terms_and_conditions">I have read and agree to the</label> 
-                        <a href="#">Terms and Conditions</a>
+                        <a href="#" onclick="show_terms_conditions();">Terms and Conditions</a>
                     </p>
                     <div>
-                        <ion-button id="registration_button" disabled expand="block" type="submit" class="ion-no-margin">Register</ion-button>
+                        <ion-button id="registration_button" disabled expand="block" type="submit" class="ion-no-margin" onclick="device_feedback();">Register</ion-button>
                         <h6>
                             <a href="login.html">Login</a>
                         </h6> 

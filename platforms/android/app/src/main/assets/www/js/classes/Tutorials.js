@@ -1,10 +1,6 @@
 class Tutorials extends User {
     constructor(id, tutorials, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
         super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, 0, socket);
-        console.log(tutorials.response)
-        console.log(tutorials)
-        console.log("debug")
-
         this.all_tutorials = tutorials.response;
 
         //Check to see if there are any posts (If empty, there will be a string)
@@ -39,13 +35,9 @@ class Tutorials extends User {
         this.pending_tutorials_length = 0;
         this.ongoing_tutorials_length = 0;
         this.done_tutorials_length = 0;
-
-        console.log(this.all_tutorials);
     }
 
     refresh_tutorials(tutorials, active_segment) {
-        this.add_refreshed_tutorials(tutorials.response, active_segment);
-
         this.all_tutorials = tutorials.response;
 
         this.total_tutorials = this.all_tutorials.length;
@@ -59,29 +51,111 @@ class Tutorials extends User {
         this.total_pending_tutorials = this.pending_tutorials.length;
         this.total_ongoing_tutorials = this.ongoing_tutorials.length;
         this.total_done_tutorials = this.done_tutorials.length;
+
+        this.open_tutorials_length = 0;
+        this.pending_tutorials_length = 0;
+        this.ongoing_tutorials_length = 0;
+        this.done_tutorials_length = 0;
+
+        this.add_refreshed_tutorials(active_segment);
     }
 
-    add_refreshed_tutorials(tutorials, active_segment) {
-        let context = this;
+    add_refreshed_tutorials() {
+        let all_open_elements = [].slice.call(document.getElementById('open').getElementsByTagName("ion-list"));
+        let all_pending_elements = [].slice.call(document.getElementById('pending').getElementsByTagName("ion-list"));
+        let all_ongoing_elements = [].slice.call(document.getElementById('ongoing').getElementsByTagName("ion-list"));
+        let all_done_elements = [].slice.call(document.getElementById('done').getElementsByTagName("ion-list"));
+        
+        my_requested_posts_open_loaded = true;
+        my_requested_posts_pending_loaded = true;
+        my_requested_posts_ongoing_loaded = true;
+        my_requested_posts_done_loaded = true;
 
-        //Get all new notifications
-        let new_tutorials = tutorials.filter(new_post => context.all_tutorials.map(old_post => old_post._id).indexOf(new_post._id) === -1);
+        for (let i = 0; i < all_open_elements.length; i++) {
+            all_open_elements[i].remove();
+        }
 
-        new_tutorials.filter((tutorial) => {
-            let list;
-            
-            if(active_segment === "Open") {
-                list = document.getElementById('open_tutorials_header');
-            } else if(active_segment === "Pending") {
-                list = document.getElementById('pending_tutorials_header');
-            } else if(active_segment === "Ongoing") {
-                list = document.getElementById('onoing_tutorials_header');
-            } else if(active_segment === "Done") {
-                list = document.getElementById('done_tutorials_header');
+        for (let i = 0; i < all_pending_elements.length; i++) {
+            all_pending_elements[i].remove();
+        }
+
+        for (let i = 0; i < all_ongoing_elements.length; i++) {
+            all_ongoing_elements[i].remove();
+        }
+
+        for (let i = 0; i < all_done_elements.length; i++) {
+            all_done_elements[i].remove();
+        }
+
+        document.getElementById('open_badge').innerText = this.get_open_tutorials().length;
+        if(this.get_open_tutorials().length > 0) {
+            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
+        } else {
+            document.getElementById('open_tutorials_header').innerText = "NO OPEN TUTORIALS";
+        }
+        
+        if (this.get_open_tutorials().length <= 4) {
+            this.open_tutorials_length = this.appendPosts(this.get_open_tutorials().length, document.getElementById('open-tutorials-infinite-scroll'), this.open_tutorials, this.open_tutorials_length);
+        } else {
+            this.open_tutorials_length = this.appendPosts(4, document.getElementById('open-tutorials-infinite-scroll'), this.open_tutorials, this.open_tutorials_length);
+        }
+
+        document.getElementById('pending_badge').innerText = this.get_pending_tutorials().length;
+        if(this.get_pending_tutorials().length > 0) {
+            document.getElementById('pending_tutorials_header').innerText = "PENDING TUTORIALS";
+        } else {
+            document.getElementById('pending_tutorials_header').innerText = "NO PENDING TUTORIALS";
+        }
+        
+        if (this.get_pending_tutorials().length <= 4) {
+            this.pending_tutorials_length = tutorials.appendPosts(tutorials.get_pending_tutorials().length, document.getElementById('pending-tutorials-infinite-scroll'), tutorials.pending_tutorials, tutorials.pending_tutorials_length);
+        } else if (document.getElementById('pending').childElementCount <= 4) {
+            if (this.total_done_tutorials >= 4) {
+                this.pending_tutorials_length = this.appendPosts(4, document.getElementById('pending-tutorials-infinite-scroll'), this.pending_tutorials, 0);
+            } else {
+                this.pending_tutorials_length = this.appendPosts(this.total_pending_tutorials, document.getElementById('pending-tutorials-infinite-scroll'), this.pending_tutorials, 0);
             }
-            
-            context.add_post_to_segment(active_segment, list, tutorial);
-        });
+        } else {
+            this.pending_tutorials_length = this.appendPosts(4, document.getElementById('pending-tutorials-infinite-scroll'), this.pending_tutorials, this.pending_tutorials_length);
+        }
+
+        document.getElementById('ongoing_badge').innerText = this.get_ongoing_tutorials().length;
+        if(this.get_ongoing_tutorials().length > 0) {
+            document.getElementById('ongoing_tutorials_header').innerText = "ONGOING TUTORIALS";
+        } else {
+            document.getElementById('ongoing_tutorials_header').innerText = "NO ONGOING TUTORIALS";
+        }
+        
+        if (this.get_ongoing_tutorials().length <= 4) {
+            this.ongoing_tutorials_length = tutorials.appendPosts(this.get_ongoing_tutorials().length, document.getElementById('ongoing-tutorials-infinite-scroll'), this.ongoing_tutorials, this.ongoing_tutorials_length);
+        } else if (document.getElementById('ongoing').childElementCount <= 4) {
+            if (this.total_done_tutorials >= 4) {
+                this.ongoing_tutorials_length = this.appendPosts(4, document.getElementById('ongoing-tutorials-infinite-scroll'), this.ongoing_tutorials, 0);
+            } else {
+                this.ongoing_tutorials_length = this.appendPosts(this.total_ongoing_tutorials, document.getElementById('ongoing-tutorials-infinite-scroll'), this.ongoing_tutorials, 0);
+            }
+        } else {
+            this.ongoing_tutorials_length = this.appendPosts(4, document.getElementById('ongoing-tutorials-infinite-scroll'), this.ongoing_tutorials, this.ongoing_tutorials_length);
+        }
+        
+        document.getElementById('done_badge').innerText = this.get_done_tutorials().length;
+        if(this.get_done_tutorials().length > 0) {
+            document.getElementById('done_tutorials_header').innerText = "DONE TUTORIALS";
+        } else {
+            document.getElementById('done_tutorials_header').innerText = "NO DONE TUTORIALS";
+        }
+        
+        if (this.get_done_tutorials().length <= 4 && document.getElementById('done').childElementCount > 4) {
+            this.done_tutorials_length = this.appendPosts(this.get_done_tutorials().length, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutorials, this.done_tutorials_length);
+        } else if (document.getElementById('done').childElementCount <= 4) {
+            if (this.total_done_tutorials >= 4) {
+                this.done_tutorials_length = this.appendPosts(4, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutorials, 0);
+            } else {
+                this.done_tutorials_length = this.appendPosts(this.total_done_tutorials, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutorials, 0);
+            }
+        } else {
+            this.done_tutorials_length = this.appendPosts(4, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutorials, this.done_tutorials_length);
+        }
     }
 
     //GETTERS
@@ -140,7 +214,6 @@ class Tutorials extends User {
     }
 
     add_post_to_segment(segment, list, tutorial) {
-        console.log(list)
         const el = document.createElement('ion-list');
         el.className = "ion-activatable ripple";
         el.classList.add('ion-activatable', 'ripple', "not_read");
@@ -191,7 +264,7 @@ class Tutorials extends User {
                 document.getElementById('pending_badge').innerText = this.total_pending_tutorials;
             }
 
-            if (document.getElementById('pending') !== null && this.pending_tutorials_length !== 3) {
+            if (document.getElementById('pending') !== null && this.pending_tutorials_length !== 4) {
                 list.after(el, list.previousSibling);
                 this.pending_tutorials_length++;
             }
@@ -206,7 +279,7 @@ class Tutorials extends User {
                 document.getElementById('ongoing_badge').innerText = this.total_ongoing_tutorials;
             }
 
-            if (document.getElementById('ongoing') !== null && this.ongoing_tutorials_length !== 3) {
+            if (document.getElementById('ongoing') !== null && this.ongoing_tutorials_length !== 4) {
                 list.after(el, list.previousSibling);
                 this.ongoing_tutorials_length++;
             }
@@ -221,7 +294,7 @@ class Tutorials extends User {
                 document.getElementById('done_badge').innerText = this.total_done_tutorials;
             }
 
-            if (document.getElementById('done') !== null && this.done_tutorials_length !== 3) {
+            if (document.getElementById('done') !== null && this.done_tutorials_length !== 4) {
                 list.after(el, list.previousSibling);
                 this.done_tutorials_length++;
             }
@@ -236,8 +309,6 @@ class Tutorials extends User {
     }
 
     appendPosts(number, list, tutorials_array, tutorials_length) {
-        console.log("=============")
-        console.log(tutorials_array)
         let tutorials = tutorials_array;
 
         const originalLength = tutorials_length;
@@ -434,57 +505,37 @@ class Tutorials extends User {
             }
         }
 
-        console.log(tutorial);
-        console.log(typeof tutorial)
         if (typeof tutorial !== 'undefined' && tutorial !== null) {
             tutorial.parentNode.remove();
         }
     }
 
     update_my_tutorial(segment, updated_tutorial) {
-        console.log("Updating...");
-        console.log(updated_tutorial);
-
         if (segment === "Open") {
-            console.log(this.open_tutorials);
-
             for (let i = 0; i < this.open_tutorials.length; i++) {
                 if (this.open_tutorials[i]._id === updated_tutorial._id) {
                     this.open_tutorials[i] = updated_tutorial;
                 }
             }
 
-            console.log(this.open_tutorials);
         } else if (segment === "Pending") {
-            console.log(this.pending_tutorials);
-
             for (let i = 0; i < this.pending_tutorials.length; i++) {
                 if (this.pending_tutorials[i]._id === updated_tutorial._id) {
                     this.pending_tutorials[i] = updated_tutorial;
                 }
             }
-
-            console.log(this.pending_tutorials);
         } else if (segment === "Ongoing") {
-            console.log(this.ongoing_tutorials);
-
             for (let i = 0; i < this.ongoing_tutorials.length; i++) {
                 if (this.ongoing_tutorials[i]._id === updated_tutorial._id) {
                     this.ongoing_tutorials[i] = updated_tutorial;
                 }
             }
-
-            console.log(this.ongoing_tutorials);
         } else if (segment === "Done") {
-            console.log(this.done_tutorials);
-
             for (let i = 0; i < this.done_tutorials.length; i++) {
                 if (this.done_tutorials[i]._id === updated_tutorial._id) {
                     this.done_tutorials[i] = updated_tutorial;
                 }
             }
-
-            console.log(this.done_tutorials);
         }
     }
 }

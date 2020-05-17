@@ -11,7 +11,6 @@ let posts_loaded = false;
 async function all_tutorials(nav) {
     //Check to see if we have already quereyd the database for posts, if not, we query
     if (!posts_loaded) {
-        console.log("dsfds")
         posts_response = await access_route({email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
         posts.addPosts(posts_response.response);
     }
@@ -88,7 +87,7 @@ async function all_tutorials(nav) {
             let number_of_posts_to_add;
 
             //If there are no tutorial requests we display a message
-            if (posts.getTotalPosts() === 0) {
+            if (posts.getTotalPosts() === 0 || posts.all_posts.length === 0) {
                 document.getElementById("posts_header").innerText = "THERE ARE NO TUTORIAL REQUESTS!";
             } else {
                 /*
@@ -96,34 +95,27 @@ async function all_tutorials(nav) {
                  * the bottom, it appends new elements
                  */
                 infiniteScroll.addEventListener('ionInfinite', async function () {
-                    console.log(posts.posts_length)
-                    console.log(posts.getAllPosts().length);
-
                     if (posts.posts_length < posts.getAllPosts().length - 1) {
-                        console.log('Loading data...');
                         await wait(500);
                         infiniteScroll.complete();
 
                         number_of_posts_to_add = posts.getAllPosts().length - posts.posts_length;
 
                         posts.appendPosts(number_of_posts_to_add, list);
-                        console.log('Done');
 
                         if (posts.posts_length > posts.getAllPosts().length - 1) {
-                            console.log('No More Data');
                             infiniteScroll.disabled = true;
                         }
                     } else {
-                        console.log('No More Data');
                         infiniteScroll.disabled = true;
                     }
                 });
 
                 //If we have less than 7 tutorial requests we display all of them otherwise we display only 7
-                if (posts.getAllPosts().length <= 3) {
+                if (posts.getAllPosts().length <= 4) {
                     posts.appendPosts(posts.getAllPosts().length, list);
                 } else {
-                    posts.appendPosts(3, list);
+                    posts.appendPosts(4, list);
                 }
             }
 
@@ -137,14 +129,8 @@ async function all_tutorials(nav) {
                 document.querySelector('body').addEventListener('click', async function (event) {
                     //Get closest element with specified class
                     let post = getClosest(event.target, '.post');
-                    //let notification_tags = [];
-
-                    //If there exists an element with the specified target near the clicked 
-                    //if (notification !== null) {
-                    //    notification_tags.push(notification.getAttribute('notification_tags'));
-                    //}
                     let active_component = await nav.getActive();
-                    console.log(post);
+                    
                     //If we clicked on a post
                     //NEEDS TO BE CHANGED!!!!!!!
                     if (post && active_component.component == "nav-all-tutorials") {

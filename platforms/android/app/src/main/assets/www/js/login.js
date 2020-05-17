@@ -22,6 +22,23 @@ document.addEventListener("deviceready", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    let pass_reset = (sessionStorage.getItem("pass_reset") === "true");
+
+    if (pass_reset) {
+        sessionStorage.removeItem("pass_reset");
+        
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+        create_toast("Password has been reset", "dark", 2000, toast_buttons);
+    }
 
     let fingerprint_active = false;
 

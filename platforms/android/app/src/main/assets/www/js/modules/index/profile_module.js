@@ -179,9 +179,9 @@ function load_profile_page(nav_controller) {
 <ion-alert-controller></ion-alert-controller>
         `;
             }
-            
+
             //Add rating
-            for(let i = 1; i <= user.get_tutor_rating(); i++) {
+            for (let i = 1; i <= user.get_tutor_rating(); i++) {
                 document.querySelector(`#rating_container > span:nth-child(${i})`).classList.add('checked');
             }
 
@@ -283,7 +283,7 @@ function load_profile_page(nav_controller) {
                 <ion-content fullscreen> 
                       <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                     <ion-item>
-                        <ion-select class="my-select" multiple="true" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
+                        <ion-select class="my-select" multiple="true" onclick="device_feedback()" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
                             <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
                             <ion-select-option value="CSS">CSS</ion-select-option>
                             <ion-select-option value="Databases">Databases</ion-select-option>
@@ -310,7 +310,6 @@ function load_profile_page(nav_controller) {
 
                     //Function that adds skill to the page
                     function addItem() {
-                        device_feedback();
                         var textInput = document.getElementById("profile_tutorial_modules");  //getting text input
                         var skill = textInput.value;   //getting value of text input element
                         var p = document.getElementById("p");  //getting element <ul> to add element to
@@ -345,10 +344,7 @@ function load_profile_page(nav_controller) {
                                 }
                             }
                         ];
-                        //USE THIS TO REMOVE ELEMENT FROM MAIN PROFILE PAGE ON SAVE
-                        //console.log(document.getElementById('profile_skills').children);
 
-                        console.log(document.getElementById('p').children);
                         let skills_array = [];
                         let skills_list = document.getElementById('p').children;
 
@@ -356,19 +352,22 @@ function load_profile_page(nav_controller) {
                             skills_array.push(skills_list[i].innerText);
                         }
 
-                        console.log(skills_array);
+                        if (skills_array.length >= 1) {
 
-                        access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
-                        set_secure_storage("user_modules", skills_array);
-                        user.setModules(skills_array);
+                            access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
+                            set_secure_storage("user_modules", skills_array);
+                            user.setModules(skills_array);
 
-                        create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons);
+                            create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons);
 
-                        currentModal = dismissModal(currentModal);
+                            currentModal = dismissModal(currentModal);
 
-                        document.getElementById("profile_skills").innerHTML = "";  //update skills
-                        for (var i = 0; i < user.modules.length; i++) {
-                            document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
+                            document.getElementById("profile_skills").innerHTML = "";  //update skills
+                            for (var i = 0; i < user.modules.length; i++) {
+                                document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
+                            }
+                        } else {
+                            create_ionic_alert("Change subjects", "You must offer to tutor at least 1 subject.", ["OK"]);
                         }
                     });
 

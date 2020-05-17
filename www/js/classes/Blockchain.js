@@ -10,12 +10,9 @@ class Blockchain {
             
             this.blockchain_content = [{post_id: post_id, content: blockchain_content.response.payload}];
 
-            console.log(this.blockchain_content);
-            console.log(blockchain_content);
-
             this.append_blockchain_content(post_id);
         } else {
-            alert("Blockchain failed");
+            console.log(blockchain_content.error)
         }
     }
 
@@ -25,15 +22,13 @@ class Blockchain {
                 return content;
             }
         });
-        
-        console.log(content_to_append)
 
         content_to_append.forEach(function (content) { 
             content.content.forEach(function (content) {
                 let block = document.createElement('block');
                 let timestamp = content.Timestamp.seconds.low;
                 let date_created = new Date(timestamp * 1000);
-                console.log(date_created)
+
                 let date = convertDate(date_created);
                 let time = conver_to_time(date_created);
 

@@ -55,14 +55,14 @@ document.addEventListener(start, async function () {
 
     if (localhost) {
         //Set status of user to tutor
-//        user.setName("John Doe".replace(/\s+$/, ''));
-//        user.setStatus("Student");
-//        user.setEmail("D00192082@student.dkit.ie");
+        user.setName("John Doe".replace(/\s+$/, ''));
+        user.setStatus("Student");
+        user.setEmail("D00192082@student.dkit.ie");
 
         //Set status of user to tutor
-        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-        user.setStatus("Tutor");
-        user.setEmail("nikito888@gmail.com");
+//        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+//        user.setStatus("Tutor");
+//        user.setEmail("nikito888@gmail.com");
     }
 
     if (!localhost) {
@@ -71,10 +71,7 @@ document.addEventListener(start, async function () {
     } else {
         await user.check_session_local(user.getEmail())
     }
-    //If a user is a tutor, then he has modules he can offer and thus he can view the forum
-    //and he cannot apply to become a tutor again
-
-    console.log(notifications_response);
+    
     //Define our Navigation controller for the home tab
     nav = document.getElementById('nav-home');
 
@@ -572,8 +569,6 @@ document.addEventListener(start, async function () {
     });
 
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        console.log("Which tab clicked?")
-        console.log(event)
         if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
             device_feedback();
 

@@ -162,11 +162,6 @@ document.getElementById("slides").addEventListener('click', () => {
 
 async function encrypt_fingerprint(currentModal, email, password, ionic_loading) {
     try {
-//        FingerprintAuth.delete({
-//            clientId: "Service Loop User",
-//            username: email
-//        }, result => console.log(result), error => console.log(error));
-
         let encryptConfig = {
             clientId: "Service Loop User",
             username: email,
@@ -179,7 +174,6 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
         async function successCallback(result) {
             ionic_loading = await create_ionic_loading();
 
-            console.log("successCallback(): " + JSON.stringify(result));
             let set_token_result = await set_secure_storage("service_loop_fingerprint_token", result.token);
 
             if (set_token_result === "Successfully stored string!") {
@@ -260,6 +254,39 @@ async function encrypt_fingerprint(currentModal, email, password, ionic_loading)
         currentModal = dismissModal(currentModal);
     }
 
+}
+
+async function delete_fingerprint(email) {
+    let fingerprint_available = await is_fingerprint_available();
+
+    if (fingerprint_available) {
+        try {
+            FingerprintAuth.delete({
+                clientId: "Service Loop User",
+                username: email
+            }, successCallback, errorCallback);
+
+            async function successCallback(result) {
+                if (!localhost) {
+                    await remove_secure_storage("service_loop_fingerprint_token");
+                }
+
+                document.querySelector('ion-toggle[name="fingerprint_toggle"]').setAttribute("checked", "false");
+                document.getElementById('fingerprint_message').innerText = "Turn on fingerprint login";
+                localStorage.removeItem("fingerprint_setup");
+                localStorage.removeItem("fingerprint_user");
+            }
+
+            function errorCallback(error) {
+                create_ionic_alert("Fingerprint removal failed", error, ["OK"]);
+            }
+        } catch (ex) {
+            create_ionic_alert("Fingerprint removal failed", ex, ["OK"]);
+        }
+
+    } else {
+        create_ionic_alert("Fingerprint", "Your device does not support fingerprint authentication", ["OK"]);
+    }
 }
 
 async function remove_fingerprint(currentModal, email) {
@@ -343,18 +370,8 @@ async function remove_fingerprint(currentModal, email) {
     } else {
         ionic_loading.dismiss();
 
-        let toast_buttons = [
-            {
-                side: 'end',
-                text: 'Close',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel clicked');
-                }
-            }
-        ];
+        create_ionic_alert("Fingerprint", "Your device does not support fingerprint authentication", ["OK"]);
 
-        create_toast("Your device does not support fingerprint authentication", "dark", 2000, toast_buttons);
         currentModal = dismissModal(currentModal);
     }
 }
@@ -640,7 +657,7 @@ document.getElementById('personal_info').addEventListener('click', async () => {
         <div class="ion-padding-top">
           <ion-button expand="block" type="button" class="ion-no-margin" id="update_info">Update Information</ion-button>
         </div>
-            <p style="text-align: center; color: gray;">Make sure information is correct!</p>
+            <p style="text-align: center; color: gray;">The value you enter will be used in case you forget your password. Make sure it's correct!</p>
 
           </ion-content>
         `;
@@ -654,7 +671,7 @@ document.getElementById('personal_info').addEventListener('click', async () => {
             dismissModal(currentModal);
         });
         document.getElementById("update_info").addEventListener('click', () => {
-            update_info();
+            update_info(currentModal);
         });
     });
 });
@@ -712,153 +729,16 @@ document.getElementById('change_pass').addEventListener('click', async () => {
             dismissModal(currentModal);
         });
         document.getElementById("change_password").addEventListener('click', () => {
-            change_pass();
+            device_feedback();
+            change_pass(modal_created);
         });
     });
 });
 
 document.getElementById('terms_and_conditons').addEventListener('click', async () => {
     device_feedback();
-    let modal_text;
 
-    modal_text = `
-          <ion-header translucent>
-                            <ion-toolbar>
-                                <ion-title>Terms & conditions</ion-title>
-                                <ion-buttons onclick="device_feedback()" slot="end">
-                <ion-button id="modal_close">Close</ion-button>
-              </ion-buttons>
-                            </ion-toolbar>
-                        </ion-header>
-                
-                        <ion-content fullscreen>
-                            <ion-list class="terms">
-                        <p><strong style="opacity: 0.7;">Last Updated&nbsp;30&nbsp;January&nbsp;&nbsp;2020&nbsp;</strong>&nbsp;</p>
-                        <p><strong>1. Agreement to Terms</strong>&nbsp;&nbsp;</p>
-                        <p><strong>1.1 &nbsp;These Terms and Conditions</strong> constitute a legally binding agreement made between you, whether personally or on behalf of an entity (you), and&nbsp;Service Loop,&nbsp;located at&nbsp;Dundalk,&nbsp;Louth,&nbsp;Ireland&nbsp;(we,&nbsp;us), concerning your access to and use of the&nbsp;Service Loop&nbsp;website as well as any related applications (the&nbsp;Site).&nbsp;&nbsp;</p>
-                        <p>The Site provides the following services:&nbsp;App that helps students to book tutorials&nbsp;(Services). You agree that by accessing the Site and/or Services, you have read, understood, and agree to be bound by all of these Terms and Conditions.&nbsp;&nbsp;</p>
-                        <p>If you do not agree with all of these Terms and Conditions, then you are prohibited from using the Site and Services and you must discontinue use immediately. We recommend that you print a copy of these Terms and Conditions for future reference.&nbsp;&nbsp;</p>
-                        <p><strong>1.2 &nbsp;The supplemental policies</strong> set out in Section 1.7 below, as well as any supplemental terms and condition or documents that may be posted on the Site from time to time, are expressly incorporated by reference.&nbsp;&nbsp;</p>
-                        <p><strong>1.3 &nbsp;We may make changes</strong> to these Terms and Conditions at any time. The updated version of these Terms and Conditions will be indicated by an updated &ldquo;Revised&rdquo; date and the updated version will be effective as soon as it is accessible. You are responsible for reviewing these Terms and Conditions to stay informed of updates. Your continued use of the Site represents that you have accepted such changes.&nbsp;&nbsp;</p>
-                        <p><strong>1.4 &nbsp;We may update or change</strong> the Site from time to time to reflect changes to our products, our users' needs and/or our business priorities.&nbsp;&nbsp;</p>
-                        <p><strong>1.5 &nbsp;Our site</strong> is directed to people residing in&nbsp;England. The information provided on the Site is not intended for distribution to or use by any person or entity in any jurisdiction or country where such distribution or use would be contrary to law or regulation or which would subject us to any registration requirement within such jurisdiction or country. &nbsp;&nbsp;</p>
-                        <p><strong>1.6 &nbsp;The Site</strong> is intended for users who are at least 18 years old. &nbsp;If you are under the age of 18, you are not permitted to register for the Site or use the Services without parental permission.&nbsp;</p>
-                        <p><strong>1.7 &nbsp;Additional policies</strong> which also apply to your use of the Site include:&nbsp;&nbsp;&nbsp;</p>
-
-                        <p><strong>2. Acceptable Use</strong>&nbsp;&nbsp;</p>
-                        <p><strong>2.1 &nbsp;You may not</strong> access or use the Site for any purpose other than that for which we make the site and our services available. The Site may not be used in connection with any commercial endeavors except those that are specifically endorsed or approved by us.&nbsp;&nbsp;</p>
-                        <p><strong>2.2 &nbsp;As a user</strong> of this Site, you agree not to:&nbsp;&nbsp;</p>
-                        <ul>
-                        <li>Systematically retrieve data or other content from the Site to a compile database or directory without written permission from us&nbsp;</li>
-                        <li>Make any unauthorized use of the Site, including collecting usernames and/or email addresses of users to send unsolicited email or creating user accounts under false pretenses&nbsp;</li>
-                        <li>Engage in unauthorized framing of or linking to the Site&nbsp;</li>
-                        <li>Trick, defraud, or mislead us and other users, especially in any attempt to learn sensitive account information such as user passwords&nbsp;</li>
-                        <li>Make improper use of our support services, or submit false reports of abuse or misconduct&nbsp;</li>
-                        <li>Engage in any automated use of the system, such as using scripts to send comments or messages, or using any data mining, robots, or similar data gathering and extraction tools&nbsp;</li>
-                        <li>Attempt to impersonate another user or person, or use the username of another user&nbsp;</li>
-                        <li>Interfere with, disrupt, or create an undue burden on the Site or the networks and services connected to the Site&nbsp;</li>
-                        <li>Sell or otherwise transfer your profile&nbsp;</li>
-                        <li>Use any information obtained from the Site in order to harass, abuse, or harm another person&nbsp;</li>
-                        <li>Use the Site or our content as part of any effort to compete with us or to create a revenue-generating endeavor or commercial enterprise&nbsp;</li>
-                        <li>Decipher, decompile, disassemble, or reverse engineer any of the software comprising or in any way making up a part of the Site&nbsp;</li>
-                        <li>Attempt to access any portions of the Site that you are restricted from accessing&nbsp;</li>
-                        <li>Harass, annoy, intimidate, or threaten any of our employees, agents, or other users&nbsp;</li>
-                        <li>Delete the copyright or other proprietary rights notice from any of the content&nbsp;</li>
-                        <li>Copy or adapt the Site&rsquo;s software, including but not limited to Flash, PHP, HTML, JavaScript, or other code&nbsp;</li>
-                        <li>Upload or transmit (or attempt to upload or to transmit) viruses, Trojan horses, or other material that interferes with any party&rsquo;s uninterrupted use and enjoyment of the Site, or any material that acts as a passive or active information collection or transmission mechanism&nbsp;</li>
-                        <li>Use, launch, or engage in any automated use of the system, such as using scripts to send comments or messages, robots, scrapers, offline readers, or similar data gathering and extraction tools&nbsp;</li>
-                        <li>Disparage, tarnish, or otherwise harm, in our opinion, us and/or the Site&nbsp;</li>
-                        <li>Use the Site in a manner inconsistent with any applicable laws or regulations&nbsp;</li>
-                        <li>Threaten users with negative feedback or offering services solely to give positive feedback to users&nbsp;</li>
-                        <li>Misrepresent experience, skills, or information about a User&nbsp;</li>
-                        <li>Advertise products or services not intended by us</li>
-                        <li>Falsely imply a relationship with us or another company with whom you do not have a relationship&nbsp;</li>
-                        </ul>
-                        <p><strong>3. Information you provide to us</strong></p>
-                        <p><strong>3.1 &nbsp;You represent and warrant that:</strong> (a) all registration information you submit will be true, accurate, current, and complete and relate to you and not a third party; (b) you will maintain the accuracy of such information and promptly update such information as necessary; (c) you will keep your password confidential and will be responsible for all use of your password and account; (d) you have the legal capacity and you agree to comply with these Terms and Conditions; and (e) you are not a minor in the jurisdiction in which you reside, or if a minor, you have received parental permission to use the Site.&nbsp;&nbsp;</p>
-                        <p>If you know or suspect that anyone other than you knows your user information (such as an identification code or user name) and/or password you must promptly notify us at&nbsp;info@serviceloop.com.</p>
-                        <p><strong>3.2 &nbsp;If you provide</strong> any information that is untrue, inaccurate, not current or incomplete, we may suspend or terminate your account. We may remove or change a user name you select if we determine that such user name is inappropriate.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                        <p><strong>4. Our content&nbsp;</strong></p>
-                        <p><strong>4.1 &nbsp;Unless otherwise indicated</strong>, the Site and Services including source code, databases, functionality, software, website designs, audio, video, text, photographs, and graphics on the Site (<strong>Our Content</strong>) are owned or licensed to us, and are protected by copyright and trade mark laws. &nbsp;&nbsp;</p>
-                        <p><strong>4.2 &nbsp;Except</strong> as expressly provided in these Terms and Conditions, no part of the Site, Services or Our Content may be copied, reproduced, aggregated, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted, distributed, sold, licensed, or otherwise exploited for any commercial purpose whatsoever, without our express prior written permission.&nbsp;</p>
-                        <p><strong>4.3 &nbsp;Provided that you</strong> are eligible to use the Site, you are granted a limited licence to access and use the Site and Our Content and to download or print a copy of any portion of the Content to which you have properly gained access solely for your personal, non-commercial use. &nbsp;&nbsp;</p>
-                        <p><strong>4.4 &nbsp;You shall not</strong> (a) try to gain unauthorised access to the Site or any networks, servers or computer systems connected to the Site; and/or (b) make for any purpose including error correction, any modifications, adaptions, additions or enhancements to the Site or Our Content, including the modification of the paper or digital copies you may have downloaded.&nbsp;</p>
-                        <p><strong>4.5 &nbsp;We shall</strong> (a) prepare the Site and Our Content with reasonable skill and care; and (b) use industry standard virus detection software to try to block the uploading of content to the Site that contains viruses.&nbsp;&nbsp;</p>
-                        <p><strong>4.6 &nbsp;The content on the Site</strong> is provided for general information only. It is not intended to amount to advice on which you should rely. You must obtain professional or specialist advice before taking, or refraining from taking, any action on the basis of the content on the Site.&nbsp;&nbsp;</p>
-                        <p><strong>4.7 &nbsp;Although</strong> we make reasonable efforts to update the information on our site, we make no representations, warranties or guarantees, whether express or implied, that Our Content on the Site is accurate, complete or up to date.&nbsp;</p>
-                        <p><strong>5. Site Management &nbsp;</strong>&nbsp; &nbsp;</p>
-                        <p><strong>5.1&nbsp;&nbsp;We reserve the right</strong> at our sole discretion, to (1) monitor the Site for breaches of these Terms and Conditions; (2) take appropriate legal action against anyone in breach of applicable laws or these Terms and Conditions;&nbsp;(3) remove from the Site or otherwise disable all files and content that are excessive in size or are in any way a burden to our systems; and (4) otherwise manage the Site in a manner designed to protect our rights and property and to facilitate the proper functioning of the Site and Services.&nbsp;&nbsp;</p>
-                        <p><strong>5.2 &nbsp;We do not guarantee</strong> that the Site will be secure or free from bugs or viruses.&nbsp;</p>
-                        <p><strong>5.3 &nbsp;You are responsible</strong> for configuring your information technology, computer programs and platform to access the Site and you should use your own virus protection software.&nbsp;&nbsp;</p>
-                        <p><strong>6. Modifications to and availability of the Site &nbsp;</strong>&nbsp; &nbsp;</p>
-                        <p><strong>6.1 &nbsp;We reserve the right</strong> to change, modify, or remove the contents of the Site at any time or for any reason at our sole discretion without notice. We also reserve the right to modify or discontinue all or part of the Services without notice at any time.&nbsp; &nbsp;</p>
-                        <p><strong>6.2 &nbsp;We cannot guarantee</strong> the Site and Services will be available at all times. We may experience hardware, software, or other problems or need to perform maintenance related to the Site, resulting in interruptions, delays, or errors. You agree that we have no liability whatsoever for any loss, damage, or inconvenience caused by your inability to access or use the Site or Services during any downtime or discontinuance of the Site or Services.We are not obliged to maintain and support the Site or Services or to supply any corrections, updates, or releases.&nbsp;</p>
-                        <p><strong>6.3 &nbsp;There may be information</strong> on the Site that contains typographical errors, inaccuracies, or omissions that may relate to the Services, including descriptions, pricing, availability, and various other information. We reserve the right to correct any errors, inaccuracies, or omissions and to change or update the information at any time, without prior notice.&nbsp;&nbsp;</p>
-                        <p><strong>7. Disclaimer/Limitation of Liability &nbsp;</strong>&nbsp; &nbsp;</p>
-                        <p><strong>7.1&nbsp;&nbsp;The Site and Services</strong> are provided on an as-is and as-available basis. You agree that your use of the Site and/or Services will be at your sole risk except as expressly set out in these Terms and Conditions. All warranties, terms, conditions and undertakings, express or implied (including by statute, custom or usage, a course of dealing, or common law) in connection with the Site and Services and your use thereof including, without limitation, the implied warranties of satisfactory quality, fitness for a particular purpose and non-infringement are excluded to the fullest extent permitted by applicable law.&nbsp;&nbsp;</p>
-                        <p>We make no warranties or representations about the accuracy or completeness of the Site&rsquo;s content and are not liable for any (1) errors or omissions in content: (2) any unauthorized access to or use of our servers and/or any and all personal information and/or financial information stored on our server; (3) any interruption or cessation of transmission to or from the site or services; and/or (4) any bugs, viruses, trojan horses, or the like which may be transmitted to or through the site by any third party. We will not be responsible for any delay or failure to comply with our obligations under these Terms and Conditions if such delay or failure is caused by an event beyond our reasonable control.</p>
-                        <p><strong>7.2&nbsp;&nbsp;Our responsibility</strong> for loss or damage suffered by you:&nbsp;</p>
-                        <p><strong>Whether you are a consumer or a business user:</strong>&nbsp;</p>
-                        <ul>
-                        <li>We do not exclude or limit in any way our liability to you where it would be unlawful to do so. This includes liability for death or personal injury caused by our negligence or the negligence of our employees, agents or subcontractors and for fraud or fraudulent misrepresentation.&nbsp;</li>
-                        </ul>
-                        <ul>
-                        <li>If we fail to comply with these Terms and Conditions, we will be responsible for loss or damage you suffer that is a foreseeable result of our breach of these Terms and Conditions, but we would not be responsible for any loss or damage that were not foreseeable at the time you started using the Site/Services.&nbsp;</li>
-                        </ul>
-                        <p>Notwithstanding anything to the contrary contained in the Disclaimer/Limitation of Liability section, our liability to you for any cause whatsoever and regardless of the form of the action, will at all times be limited to a total aggregate amount equal to the greater of (a) the sum of &pound;5000 or (b) the amount paid, if any, by you to us for the Services/Site during the six (6) month period prior to any cause of action arising.&nbsp;&nbsp;&nbsp;</p>
-                        <p><strong>If you are a consumer user:</strong>&nbsp;</p>
-                        <ul>
-                        <li>Please note that we only provide our Site for domestic and private use. You agree not to use our Site for any commercial or business purposes, and we have no liability to you for any loss of profit, loss of business, business interruption, or loss of business opportunity.</li>
-                        </ul>
-                        <ul>
-                        <li>If defective digital content that we have supplied, damages a device or digital content belonging to you and this is caused by our failure to use reasonable care and skill, we will either repair the damage or pay you compensation.&nbsp;&nbsp;</li>
-                        </ul>
-                        <ul>
-                        <li>You have legal rights in relation to goods that are faulty or not as described. Advice about your legal rights is available from your local Citizens' Advice Bureau or Trading Standards office. Nothing in these Terms and Conditions will affect these legal rights.&nbsp; &nbsp;&nbsp;</li>
-                        </ul>
-                        <p><strong>8. Term and Termination &nbsp;</strong>&nbsp; &nbsp;</p>
-                        <p><strong>8.1 &nbsp;These Terms and Conditions</strong> shall remain in full force and effect while you use the Site or Services or are otherwise a user of the Site, as applicable. You may terminate your use or participation at any time, for any reason, by following the instructions for terminating user accounts in your account settings, if available, or by contacting us at&nbsp;info@serviceloop.com.&nbsp;&nbsp;</p>
-                        <p><strong>8.2 &nbsp;Without limiting</strong> any other provision of these Terms and Conditions, we reserve the right to, in our sole discretion and without notice or liability, deny access to and use of the Site and the Services (including blocking certain IP addresses), to any person for any reason including without limitation for breach of any representation, warranty or covenant contained in these Terms and Conditions or of any applicable law or regulation.&nbsp;&nbsp;</p>
-                        <p>If we determine, in our sole discretion, that your use of the Site/Services is in breach of these Terms and Conditions or of any applicable law or regulation, we may terminate your use or participation in the Site and the Services or delete&nbsp;your profile and&nbsp;any content or information that you posted at any time, without warning, in our sole discretion.&nbsp;&nbsp;</p>
-                        <p><strong>8.3 &nbsp;If we terminate</strong> or suspend your account for any reason set out in this Section 9, you are prohibited from registering and creating a new account under your name, a fake or borrowed name, or the name of any third party, even if you may be acting on behalf of the third party. In addition to terminating or suspending your account, we reserve the right to take appropriate legal action, including without limitation pursuing civil, criminal, and injunctive redress.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                        <p><strong>9. Mobile Application &nbsp;&nbsp;</strong>&nbsp;&nbsp;</p>
-                        <p><strong>9.1 &nbsp;If you access</strong> the Services via a mobile application, then we grant you a revocable, non-exclusive, non-transferable, limited right to install and use the mobile application on wireless electronic devices owned or controlled by you, and to access and use the mobile application on such devices strictly in accordance with the terms and conditions of this license.&nbsp;&nbsp;</p>
-                        <p><strong>9.2 &nbsp;The following terms</strong> apply when you use a mobile application obtained from either the Apple Store or Google Play (each an App Distributor) to access the Services:&nbsp;</p>
-                        <p><strong>(a)</strong> The licence granted to you for our mobile application is limited to a non-transferable licence to use the application on a device that utilizes the Apple iOS or Android operating system, as applicable, and in accordance with the usage rules set forth in the applicable App Distributor terms of service;&nbsp;</p>
-                        <p><strong>(b)</strong> We are responsible for providing any maintenance and support services with respect to the mobile application as specified in these Terms and Conditions or as otherwise required under applicable law. You acknowledge that each App Distributor has no obligation whatsoever to furnish any maintenance and support services with respect to the mobile application;&nbsp;</p>
-                        <p><strong>(c)</strong> In the event of any failure of the mobile application to conform to any applicable warranty, you may notify an App Distributor, and the App Distributor, in accordance with its terms and policies, may refund the purchase price, if any, paid for the mobile application, and to the maximum extent permitted by applicable law, an App Distributor will have no other warranty obligation whatsoever with respect to the mobile application;&nbsp;</p>
-                        <p><strong>(d)</strong> You represent and warrant that (i) you are not located in a country that is subject to a U.S. government embargo, or that has been designated by the U.S. government as a &ldquo;terrorist supporting&rdquo; country; and (ii) you are not listed on any U.S. government list of prohibited or restricted parties;&nbsp;</p>
-                        <p><strong>(e)</strong> You must comply with applicable third party terms of agreement when using the mobile application, e.g., if you have a VoIP application, then you must not be in breach of their wireless data service agreement when using the mobile application; and&nbsp;</p>
-                        <p><strong>(f)</strong> You acknowledge and agree that the App Distributors are third party beneficiaries of these Terms and Conditions, and that each App Distributor will have the right (and will be deemed to have accepted the right) to enforce these Terms and Conditions against you as a third party beneficiary thereof.&nbsp;&nbsp;&nbsp;</p>
-                        <p><strong>10. General &nbsp;</strong>&nbsp; &nbsp; &nbsp;</p>
-                        <p><strong>10.1&nbsp;&nbsp;Visiting the Site</strong>, sending us emails, and completing online forms constitute electronic communications. You consent to receive electronic communications and you agree that all agreements, notices, disclosures, and other communications we provide to you electronically, via email and on the Site, satisfy any legal requirement that such communication be in writing.&nbsp;&nbsp;</p>
-                        <p>You hereby agree to the use of electronic signatures, contracts, orders and other records and to electronic delivery of notices, policies and records of transactions initiated or completed by us or via the Site.</strong>&nbsp;You hereby waive any rights or requirements under any statutes, regulations, rules, ordinances or other laws in any jurisdiction which require an original signature or delivery or retention of non-electronic records, or to payments or the granting of credits by other than electronic means.&nbsp;&nbsp;</p>
-                        <p><strong>10.2 &nbsp;These Terms and Conditions</strong> and any policies or operating rules posted by us on the Site or in respect to the Services constitute the entire agreement and understanding between you and us. &nbsp;&nbsp;</p>
-                        <p><strong>10.3 &nbsp;Our failure to exercise</strong> or enforce any right or provision of these Terms and Conditions shall not operate as a waiver of such right or provision. &nbsp;&nbsp;</p>
-                        <p><strong>10.4 &nbsp;We may assign</strong> any or all of our rights and obligations to others at any time. &nbsp;&nbsp;</p>
-                        <p><strong>10.5 &nbsp;We shall not be responsible</strong> or liable for any loss, damage, delay or failure to act caused by any cause beyond our reasonable control. &nbsp;&nbsp;</p>
-                        <p><strong>10.6 &nbsp;If any provision</strong> or part of a provision of these Terms and Conditions is unlawful, void or unenforceable, that provision or part of the provision is deemed severable from these Terms and Conditions and does not affect the validity and enforceability of any remaining provisions.&nbsp;&nbsp;</p>
-                        <p><strong>10.7 &nbsp;There is no joint venture</strong>, partnership, employment or agency relationship created between you and us as a result of these Terms and Conditions or use of the Site or Services.&nbsp;</p>
-                        <p><strong>10.8</strong> &nbsp;<strong><em>For consumers only&nbsp;</em></strong><em>&nbsp;- Please note that these Terms and Conditions, their subject matter and their formation, are governed by English law. You and we both agree that the courts of England and Wales will have exclusive jurisdiction expect that if you are a resident of Northern Ireland you may also bring proceedings in Northern Ireland, and if you are resident of Scotland, you may also bring proceedings in Scotland. If you have any complaint or wish to raise a dispute under these Terms and Conditions or otherwise in relation to the Site please follow this link</em>&nbsp;<a href="http://ec.europa.eu/odr"><em>http://ec.europa.eu/odr</em></a><em>&nbsp;</em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-                        <p><strong>10.9&nbsp;&nbsp;Except as stated</strong> under the Mobile Application section, a&nbsp;person who is not a party to these Terms and Conditions shall have no right under the Contracts (Rights of Third Parties) Act 1999 to enforce any term of these Terms and Conditions.&nbsp;</p>
-                        <p><strong>10.10 &nbsp;In order to resolve</strong> a complaint regarding the Services or to receive further information regarding use of the Services, please contact us by email at&nbsp;info@serviceloop.com&nbsp;or by post to:&nbsp;</p>
-                        <p><strong>Service Loop&nbsp;&nbsp;</p>
-                        <p>Dundalk,&nbsp;Louth,</p>
-                        <p>Ireland&nbsp;&nbsp;&nbsp;</strong></p>
-                        <p>&nbsp;</p>
-                        </ion-list>
-                        </ion-content>
-        `;
-
-    let modal_created = await createModal(controller, modal_text);
-
-    modal_created.present().then(() => {
-        currentModal = modal_created;
-
-        document.getElementById("modal_close").addEventListener('click', () => {
-            dismissModal(currentModal);
-        });
-    });
+    show_terms_conditions();
 });
 
 
