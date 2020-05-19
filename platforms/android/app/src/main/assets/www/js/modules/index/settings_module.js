@@ -537,7 +537,7 @@ document.getElementById('fingerprint_toggle').addEventListener('click', async ()
             </ion-item>
             
           <ion-item>
-            <ion-label class="pass_label" align="center" position="stacked">Enter your password <ion-text color="danger">*</ion-text></ion-label>
+            <ion-label class="pass_label" align="center" position="stacked">Enter password <ion-text color="danger">*</ion-text></ion-label>
             <ion-input align="center" placeholder="********" id="fingerprint_password" required type="password"></ion-input>
           </ion-item>
 
@@ -650,7 +650,7 @@ document.getElementById('personal_info').addEventListener('click', async () => {
         </ion-item>-->
 
         <ion-item>
-            <ion-label class="pass_label" align="center" position="stacked">Phone Number</ion-label>
+            <ion-label class="pass_label" align="center" position="stacked">Phone Number<ion-text color="danger">*</ion-text></ion-label>
             <ion-input align="center" placeholder="1234567890" id="new_phone_number" type="tel" ></ion-input>
         </ion-item>
 
