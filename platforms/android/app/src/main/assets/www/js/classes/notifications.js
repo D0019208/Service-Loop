@@ -601,6 +601,7 @@ class Notifications extends User {
         });
 
         socket.on('tutor_update_rating', (data) => {
+            console.log(data);
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }

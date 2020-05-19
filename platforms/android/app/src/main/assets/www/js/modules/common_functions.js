@@ -1508,7 +1508,6 @@ async function generate_agreement(nav_controller, tutorial) {
 
 //Function to remove all null values (VERY BUFFER METHOD!)
 async function walkText(node) {
-    console.log("test")
     if (node !== null) {
         if (node.nodeType == 3) {
             node.data = node.data.replace(/null/g, "");

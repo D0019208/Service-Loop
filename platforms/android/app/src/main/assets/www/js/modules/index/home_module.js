@@ -60,9 +60,9 @@ document.addEventListener(start, async function () {
         user.setEmail("D00192082@student.dkit.ie");
 
         //Set status of user to tutor
-//        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-//        user.setStatus("Tutor");
-//        user.setEmail("nikito888@gmail.com");
+        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+        user.setStatus("Tutor");
+        user.setEmail("nikito888@gmail.com");
     }
 
     if (!localhost) {
