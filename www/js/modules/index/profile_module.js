@@ -265,11 +265,9 @@ function load_profile_page(nav_controller) {
                         
                         document.getElementById('menu_avatar').src = change_avatar_response.avatar + "?" + performance.now();
                         
+                        user.setAvatar(change_avatar_response.avatar);
                         resolve(change_avatar_response.avatar);
-                    })
-
-                    user.setAvatar(response.user_avatar);
-
+                    });
                 }
 
                 function onFail(message) {
