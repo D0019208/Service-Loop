@@ -18,7 +18,7 @@ var handler;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
 
-var localhost = true;
+var localhost = false;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -57,12 +57,12 @@ document.addEventListener(start, async function () {
         //Set status of user to tutor
         user.setName("John Doe".replace(/\s+$/, ''));
         user.setStatus("Student");
-        user.setEmail("D00192082@student.dkit.ie");
+        user.setEmail("micko3722@gmail.com");
 
         //Set status of user to tutor
-        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
-        user.setStatus("Tutor");
-        user.setEmail("nikito888@gmail.com");
+//        user.setName("Nichita Postolachi".replace(/\s+$/, ''));
+//        user.setStatus("Tutor");
+//        user.setEmail("nikito888@gmail.com");
     }
 
     if (!localhost) {
