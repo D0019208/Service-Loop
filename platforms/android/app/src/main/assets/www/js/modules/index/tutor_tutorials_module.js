@@ -23,11 +23,29 @@ function all_tutor_tutorials(nav_controller) {
 
         async connectedCallback() {
             if (!tutor_tutorials_response) {
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
                 let data = {
+                    token: token,
                     users_email: user.getEmail()
                 };
 
                 tutor_tutorials_response = await access_route(data, "get_all_tutor_tutorials");
+
+                if (!tutor_tutorials_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", tutor_tutorials_response.new_token);
+                    }
+                }
 
                 tutor_tutorials_loaded = true;
 
@@ -223,11 +241,11 @@ function all_tutor_tutorials(nav_controller) {
 
             //List element we are appending our tutorials to  
             const pendingInfiniteScroll = document.getElementById('pending-tutorials-infinite-scroll');
-            //If we have less than 4 tutorials we display all of them otherwise we display only 4
-            if (tutor_tutorials.get_pending_tutor_tutorials().length <= 4) {
+            //If we have less than 7 tutorials we display all of them otherwise we display only 7
+            if (tutor_tutorials.get_pending_tutor_tutorials().length <= 7) {
                 tutor_tutorials.pending_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_pending_tutor_tutorials().length, pendingInfiniteScroll, tutor_tutorials.pending_tutor_tutorials, tutor_tutorials.pending_tutor_tutorials_length);
             } else {
-                tutor_tutorials.pending_tutor_tutorials_length = tutor_tutorials.appendPosts(4, pendingInfiniteScroll, tutor_tutorials.pending_tutor_tutorials, tutor_tutorials.pending_tutor_tutorials_length);
+                tutor_tutorials.pending_tutor_tutorials_length = tutor_tutorials.appendPosts(7, pendingInfiniteScroll, tutor_tutorials.pending_tutor_tutorials, tutor_tutorials.pending_tutor_tutorials_length);
             }
 
             const ongoingInfiniteScroll = document.getElementById('ongoing-tutorials-infinite-scroll');
@@ -244,8 +262,8 @@ function all_tutor_tutorials(nav_controller) {
                     pendingInfiniteScroll.complete();
 
                     number_of_pending_tutor_tutorials_to_add = tutor_tutorials.get_pending_tutor_tutorials().length - tutor_tutorials.pending_tutor_tutorials_length;
-                    if (number_of_pending_tutor_tutorials_to_add > 4) {
-                        number_of_pending_tutor_tutorials_to_add = 4;
+                    if (number_of_pending_tutor_tutorials_to_add > 7) {
+                        number_of_pending_tutor_tutorials_to_add = 7;
                     }
 
                     tutor_tutorials.pending_tutor_tutorials_length = tutor_tutorials.appendPosts(number_of_pending_tutor_tutorials_to_add, pendingInfiniteScroll, tutor_tutorials.pending_tutor_tutorials, tutor_tutorials.pending_tutor_tutorials_length);
@@ -294,12 +312,29 @@ function all_tutor_tutorials(nav_controller) {
 
             const tutor_tutorials_refresher = document.getElementById('tutor_tutorials_refresher');
             tutor_tutorials_refresher.addEventListener('ionRefresh', async () => {
-                let load_more_response = await access_route({users_email: user.getEmail()}, "get_all_tutor_tutorials", false);
 
-                if (typeof load_more_response.response !== "string") {
-                    //Update the posts object with the new reloaded values
-                    tutor_tutorials.refresh_tutor_tutorials(load_more_response, active_tutor_segment);
+
+
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
                 }
+
+                let load_more_response = await access_route({token: token, users_email: user.getEmail()}, "get_all_tutor_tutorials", false);
+                
+                if (!load_more_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", load_more_response.new_token);
+                    }
+                }
+                
+                tutor_tutorials.refresh_tutor_tutorials(load_more_response);
 
                 tutor_tutorials_refresher.complete();
             });
@@ -328,12 +363,12 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!tutor_tutorials_ongoing_loaded || document.getElementById('tutor_tutorials_ongoing').childElementCount <= 4) {
-                            //If we have less than 4 tutorials we display all of them otherwise we display only 4  
-                            if (tutor_tutorials.get_ongoing_tutor_tutorials().length <= 4) {
+                        if (!tutor_tutorials_ongoing_loaded || document.getElementById('tutor_tutorials_ongoing').childElementCount <= 7) {
+                            //If we have less than 7 tutorials we display all of them otherwise we display only 7  
+                            if (tutor_tutorials.get_ongoing_tutor_tutorials().length <= 7) {
                                 tutor_tutorials.ongoing_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_ongoing_tutor_tutorials().length, ongoingInfiniteScroll, tutor_tutorials.ongoing_tutor_tutorials, tutor_tutorials.ongoing_tutor_tutorials_length);
                             } else {
-                                tutor_tutorials.ongoing_tutor_tutorials_length = tutor_tutorials.appendPosts(4, ongoingInfiniteScroll, tutor_tutorials.ongoing_tutor_tutorials, tutor_tutorials.ongoing_tutor_tutorials_length);
+                                tutor_tutorials.ongoing_tutor_tutorials_length = tutor_tutorials.appendPosts(7, ongoingInfiniteScroll, tutor_tutorials.ongoing_tutor_tutorials, tutor_tutorials.ongoing_tutor_tutorials_length);
                             }
 
                             tutor_tutorials_ongoing_loaded = true;
@@ -348,12 +383,12 @@ function all_tutor_tutorials(nav_controller) {
                         segment_elements.ongoing.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!tutor_tutorials_done_loaded || document.getElementById('tutor_tutorials_done').childElementCount <= 4) {
-                            //If we have less than 4 tutorials we display all of them otherwise we display only 4 
-                            if (tutor_tutorials.get_done_tutor_tutorials().length <= 4) {
+                        if (!tutor_tutorials_done_loaded || document.getElementById('tutor_tutorials_done').childElementCount <= 7) {
+                            //If we have less than 7 tutorials we display all of them otherwise we display only 7 
+                            if (tutor_tutorials.get_done_tutor_tutorials().length <= 7) {
                                 tutor_tutorials.done_tutor_tutorials_length = tutor_tutorials.appendPosts(tutor_tutorials.get_done_tutor_tutorials().length, doneInfiniteScroll, tutor_tutorials.done_tutor_tutorials, tutor_tutorials.done_tutor_tutorials_length);
                             } else {
-                                tutor_tutorials.done_tutor_tutorials_length = tutor_tutorials.appendPosts(4, doneInfiniteScroll, tutor_tutorials.done_tutor_tutorials, tutor_tutorials.done_tutor_tutorials_length);
+                                tutor_tutorials.done_tutor_tutorials_length = tutor_tutorials.appendPosts(7, doneInfiniteScroll, tutor_tutorials.done_tutor_tutorials, tutor_tutorials.done_tutor_tutorials_length);
                             }
 
                             tutor_tutorials_done_loaded = true;

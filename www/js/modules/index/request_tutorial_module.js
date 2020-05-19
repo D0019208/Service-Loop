@@ -68,7 +68,7 @@ function load_request_tutorial(nav_controller) {
           </ion-content> 
           <ion-modal-controller></ion-modal-controller>
         `;
-            
+
             setTimeout(function () {
                 if (document.querySelector('.my-select') !== null) {
                     document.querySelector('.my-select').shadowRoot.querySelector('.select-icon').setAttribute('style', 'position:absolute; right:10px; bottom:15px');
@@ -82,8 +82,17 @@ function load_request_tutorial(nav_controller) {
 
                 //Prevent the user from clicking the "Request Tutorial" button twice
                 request_tutorial_button.disabled = true;
+                
+                let token;
+                if(!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+                
                 //Data to pass to the server
                 let data = {
+                    token: token,
                     user_avatar: user.getAvatar(),
                     request_title: document.getElementById("tutorial_title").value,
                     request_description: document.getElementById("tutorial_description").value,
@@ -101,6 +110,16 @@ function load_request_tutorial(nav_controller) {
                 //Create new tutorial and get the response from the server
                 let tutorial_request_response = await access_route(data, "request_tutorial");
 
+                if (!tutorial_request_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", tutorial_request_response.new_token);
+                    }
+                }
+
                 //If no error occured, we add a new notification to the users current notfifications that his request was successful
                 if (!tutorial_request_response.error) {
                     user_notifications.addToNotifications(tutorial_request_response.response[1]);
@@ -113,7 +132,7 @@ function load_request_tutorial(nav_controller) {
                     posts.notification_posts.push(tutorial_request_response.response[0]);
 
                     tutorials.add_post_to_segment("Open", document.getElementById('pending_tutorials_header'), tutorial_request_response.response[0]);
-                    if(typeof tutorials.all_tutorials === 'string') {
+                    if (typeof tutorials.all_tutorials === 'string') {
                         tutorials.all_tutorials = [tutorial_request_response.response[0]];
                     }
 
@@ -127,9 +146,9 @@ function load_request_tutorial(nav_controller) {
                             }
                         }
                     ];
-                    
+
                     user.setOpenTutorials(user.getOpenTutorials() + 1);
-                    
+
                     create_toast("You have requested a tutorial.", "dark", 2000, toast_buttons);
                     nav_controller.pop();
                 } else {

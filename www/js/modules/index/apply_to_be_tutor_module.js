@@ -60,9 +60,10 @@ function apply_to_be_tutor(handler) {
         <div class="ion-padding-top">
           <ion-button expand="block" type="button" class="ion-no-margin" id="tutor_apply">Apply to be a tutor</ion-button>
         </div>
-            <p style="text-align: center; color: gray;">By agreeing to be a tutor for DKIT, you agree to our <a href="#">Terms and Conditions</a></p>
+            <p style="text-align: center; color: gray;">By agreeing to be a tutor for DKIT, you agree to our <a onclick="device_feedback(); show_terms_conditions();">Terms and Conditions</a></p>
 
           </ion-content>
+            <ion-modal-controller></ion-modal-controller>
         `;
 
             let tutor_apply_button = document.getElementById("tutor_apply");
@@ -71,8 +72,15 @@ function apply_to_be_tutor(handler) {
                 device_feedback();
                 tutor_apply_button.disabled = true;
 
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
 
                 let data = {
+                    token: token,
                     users_email: user.getEmail(),
                     users_skills: document.getElementById("tutor_modules").value
                 };
@@ -85,14 +93,24 @@ function apply_to_be_tutor(handler) {
 
                 let tutor_added_response = await access_route(data, "appply_to_be_tutor");
 
+                if (!tutor_added_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", tutor_added_response.new_token);
+                    }
+                }
+
                 if (!tutor_added_response.error) {
                     //We update the user so he becomes a tutor
                     user.setStatus("Tutor");
                     user.setModules(document.getElementById("tutor_modules").value);
-                    
+
                     set_secure_storage("user_status", true);
-                    set_secure_storage("user_modules", document.getElementById("tutor_modules").value); 
-                    user.ascendToTutor(user_notifications, document.getElementById("tutor_modules").value, handler); 
+                    set_secure_storage("user_modules", document.getElementById("tutor_modules").value);
+                    user.ascendToTutor(user_notifications, document.getElementById("tutor_modules").value, handler);
                 } else {
                     tutor_apply_button.disabled = false;
                     create_ionic_alert("Tutor application failed", tutor_added_response.response, ["OK"]);

@@ -25,7 +25,7 @@ class Notifications extends User {
     update_with_new_notifications(all_notifications) {
         this.all_notifications = all_notifications;
 
-        if (typeof all_notifications !== "string") {
+        if (typeof all_notifications !== "string" && typeof all_notifications !== 'undefined') {
             let unopened_notifications_counter = 0;
             for (let i = 0; i < this.all_notifications.length; i++) {
                 if (!this.all_notifications[i]["notification_opened"]) {
@@ -50,8 +50,8 @@ class Notifications extends User {
 
         document.getElementById('list').innerHTML = "";
 
-        if (this.total_notifications > 3) {
-            this.appendNotifications(3, document.getElementById('list'));
+        if (this.total_notifications > 10) {
+            this.appendNotifications(10, document.getElementById('list'));
         } else {
             this.appendNotifications(this.total_notifications, document.getElementById('list'));
         }
@@ -545,18 +545,18 @@ class Notifications extends User {
                 window.plugins.deviceFeedback.haptic();
             }
 
-            if (tutorial.post_status == "Open") {
-                if (user.getEmail() !== tutorial.post_tutor_email) {
+            if (data.post.post_status == "Open") {
+                if (user.getEmail() !== data.post.post_tutor_email) {
                     user.setOpenTutorials(user.getOpenTutorials() - 1);
                 }
-            } else if (tutorial.post_status == "Pending" || tutorial.post_status == "In negotiation") {
-                if (user.getEmail() !== tutorial.post_tutor_email) {
+            } else if (data.post.post_status == "Pending" || data.post.post_status == "In negotiation") {
+                if (user.getEmail() !== data.post.post_tutor_email) {
                     user.setPendingTutorials(user.getPendingTutorials() - 1);
                 } else {
                     user.setPendingTutoredTutorials(user.getPendingTutoredTutorials() - 1);
                 }
-            } else if (tutorial.post_status == "Ongoing") {
-                if (user.getEmail() !== tutorial.post_tutor_email) {
+            } else if (data.post.post_status == "Ongoing") {
+                if (user.getEmail() !== data.post.post_tutor_email) {
                     user.setOngoingTutorials(user.getOngoingTutorials() - 1);
                 } else {
                     user.setOngoingTutoredTutorials(user.getOngoingTutoredTutorials() - 1);
@@ -601,6 +601,7 @@ class Notifications extends User {
         });
 
         socket.on('tutor_update_rating', (data) => {
+            console.log(data);
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }

@@ -11,7 +11,25 @@ let posts_loaded = false;
 async function all_tutorials(nav) {
     //Check to see if we have already quereyd the database for posts, if not, we query
     if (!posts_loaded) {
-        posts_response = await access_route({email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        posts_response = await access_route({token: token, email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+
+        if (!posts_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", posts_response.new_token);
+            }
+        }
+
         posts.addPosts(posts_response.response);
     }
 
@@ -72,7 +90,24 @@ async function all_tutorials(nav) {
             const forum_refresher = document.getElementById('forum_refresher');
 
             forum_refresher.addEventListener('ionRefresh', async () => {
-                let load_more_response = await access_route({email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let load_more_response = await access_route({token: token, email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+
+                if (!load_more_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", load_more_response.new_token);
+                    }
+                }
 
                 if (typeof load_more_response.response !== "string") {
                     //Update the posts object with the new reloaded values
@@ -130,7 +165,7 @@ async function all_tutorials(nav) {
                     //Get closest element with specified class
                     let post = getClosest(event.target, '.post');
                     let active_component = await nav.getActive();
-                    
+
                     //If we clicked on a post
                     //NEEDS TO BE CHANGED!!!!!!!
                     if (post && active_component.component == "nav-all-tutorials") {

@@ -35,7 +35,7 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                                 </ion-avatar>
                                 <ion-label>
                                     <h2>Personal Information</h2>
-                                    <p>Update your name, phone number</p>
+                                    <p>Update your phone number</p>
                                 </ion-label>
 
                             </ion-item>
@@ -657,7 +657,7 @@ document.getElementById('personal_info').addEventListener('click', async () => {
         <div class="ion-padding-top">
           <ion-button expand="block" type="button" class="ion-no-margin" id="update_info">Update Information</ion-button>
         </div>
-            <p style="text-align: center; color: gray;">Make sure information is correct!</p>
+            <p style="text-align: center; color: gray;">The value you enter will be used in case you forget your password. Make sure it's correct!</p>
 
           </ion-content>
         `;
@@ -671,7 +671,7 @@ document.getElementById('personal_info').addEventListener('click', async () => {
             dismissModal(currentModal);
         });
         document.getElementById("update_info").addEventListener('click', () => {
-            update_info();
+            update_info(currentModal);
         });
     });
 });

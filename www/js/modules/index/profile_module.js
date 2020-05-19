@@ -27,7 +27,7 @@ function load_profile_page(nav_controller) {
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
-            <ion-fab>
+            <ion-fab onclick="device_feedback();">
                 <ion-fab-button id="cameraTakePicture">
                   <ion-icon name="camera"></ion-icon>
                 </ion-fab-button>
@@ -131,7 +131,7 @@ function load_profile_page(nav_controller) {
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
-            <ion-fab>
+            <ion-fab onclick="device_feedback();">
                 <ion-fab-button id="cameraTakePicture">
                   <ion-icon name="camera"></ion-icon>
                 </ion-fab-button>
@@ -244,7 +244,28 @@ function load_profile_page(nav_controller) {
                     home_avatar.src = "data:image/jpeg;base64," + imageData;
 
                     let response = new Promise(async (resolve, reject) => {
-                        resolve(await access_route({email: user.getEmail(), image: imageData}, "update_avatar"));
+                        let token;
+                        if (!localhost) {
+                            token = await get_secure_storage("jwt_session");
+                        } else {
+                            token = "";
+                        }
+
+                        let change_avatar_response = await access_route({token: token, email: user.getEmail(), image: imageData}, "update_avatar");
+
+                        if (!change_avatar_response.session_valid) {
+                            sessionStorage.setItem("session_timeout", true);
+                            window.location = "login.html";
+                            return;
+                        } else {
+                            if (!localhost) {
+                                set_secure_storage("jwt_session", change_avatar_response.new_token);
+                            }
+                        }
+                        
+                        document.getElementById('menu_avatar').src = change_avatar_response.avatar + "?" + performance.now();
+                        
+                        resolve(change_avatar_response.avatar);
                     })
 
                     user.setAvatar(response.user_avatar);
@@ -333,7 +354,7 @@ function load_profile_page(nav_controller) {
                         });
                         ion_select.value = user.getModules();
 
-                        document.getElementById('save_button').addEventListener('click', () => {
+                        document.getElementById('save_button').addEventListener('click', async () => {
                             device_feedback();
                             let toast_buttons = [
                                 {
@@ -354,8 +375,26 @@ function load_profile_page(nav_controller) {
                             }
 
                             if (skills_array.length >= 1) {
+                                let token;
+                                if (!localhost) {
+                                    token = await get_secure_storage("jwt_session");
+                                } else {
+                                    token = "";
+                                }
 
-                                access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
+                                let change_skills_response = await access_route({token: token, users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
+
+                                if (!change_skills_response.session_valid) {
+                                    sessionStorage.setItem("session_timeout", true);
+                                    window.location = "login.html";
+                                    return;
+                                } else {
+                                    if (!localhost) {
+                                        set_secure_storage("jwt_session", change_skills_response.new_token);
+                                    }
+                                }
+
+
                                 set_secure_storage("user_modules", skills_array);
                                 user.setModules(skills_array);
 

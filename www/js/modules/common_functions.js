@@ -552,7 +552,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 </ion-label>
             </ion-item>      
             <ion-item style="margin-top:-15px;" lines="none">
-                <h6>
+                <h6 style="font-weight:normal;">
                     Your tutor, ${this_post.post_tutor_name} has sent you an agreement regarding your tutorial request, please
                     review it before accepting or rejecting it. If you have any questions, contact him through his college email at 
                     '${this_post.post_tutor_email}' 
@@ -563,7 +563,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             <div class="ion-padding-top">
                 <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                 <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                 <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="accept_agreement">Accept<br/>agreement</ion-button>
                 <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="reject_agreement">Reject<br/>agreement</ion-button>
             </div>               
@@ -591,7 +591,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         </div>
             <ion-item-divider class="divider"></ion-item-divider>
                 <ion-list-header class="collapsible">
-                    <strong>TUTORIAL LINKS</strong>
+                    <strong>SUPPORT MATERIALS</strong>
                 </ion-list-header>
             <ion-list class="content">
                 ${tutorial_links}
@@ -649,7 +649,13 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_post.post_tutor_email, pdf: this_post.post_agreement_url, verify_single: true});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        validate_digital_signatures({token: token, tutor_email: this_post.post_tutor_email, pdf: this_post.post_agreement_url, verify_single: true});
     };
 
     let openPdf;
@@ -659,7 +665,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -723,20 +729,24 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
 }
 
 async function accept_post(nav_controller, this_post, post, is_forum, previous_view, user_avatar) {
-    let post_acceptated_response = await access_route({tutor_email: user.getEmail(), tutor_name: user.getName(), post_id: this_post._id, user_avatar: user_avatar}, "post_accepted", function () {
-        let toast_buttons = [
-            {
-                side: 'end',
-                text: 'Close',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel clicked');
-                }
-            }
-        ];
+    let token;
+    if (!localhost) {
+        token = await get_secure_storage("jwt_session");
+    } else {
+        token = "";
+    }
 
-        create_toast("You have accepted a tutorial.", "dark", 2000, toast_buttons);
-    });
+    let post_acceptated_response = await access_route({token: token, tutor_email: user.getEmail(), tutor_name: user.getName(), post_id: this_post._id, user_avatar: user_avatar}, "post_accepted");
+
+    if (!post_acceptated_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", post_acceptated_response.new_token);
+        }
+    }
 
     if (!post_acceptated_response.error) {
         user.setPendingTutoredTutorials(user.getPendingTutoredTutorials() + 1);
@@ -813,7 +823,6 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
                     posts.removePostById(this_post._id);
                 }
             } else {
-                alert("d")
                 if (posts.all_posts.length !== 0) {
                     posts.all_posts = posts.all_posts.filter(function (obj) {
                         return obj._id !== this_post._id;
@@ -886,6 +895,10 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
 
 
 function load_pending_tutorial_component_signed(nav_controller, this_tutorial, tutorial_status, tutorial_tag) {
+    if (tutorial_status === "In negotiation") {
+        tutorial_status = "Pending";
+    }
+
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
     let tutor_info = "";
@@ -950,7 +963,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                                 </ion-label>
                                                             </ion-item>      
                                                              <ion-item style="margin-top:-15px;" lines="none">
-                                                                <h6>
+                                                                <h6 style="font-weight:normal;">
                                                                 An agreement is created. Please wait for ${this_tutorial.std_name} to accept or reject the agreement.
                                                                 </h6>
 
@@ -959,7 +972,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                                 <div class="ion-padding-top">
                                                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                                                 </div> 
                                                                 <ion-item-divider class="divider2"></ion-item-divider> 
                                                         <ion-item lines="none">
@@ -985,7 +998,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                         </div>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
-                                                                <strong>TUTORIAL LINKS</strong>
+                                                                <strong>SUPPORT MATERIALS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
                                                             ${tutorial_links}
@@ -1014,7 +1027,13 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_tutorial.post_tutor_email, student_email: this_tutorial.std_email, pdf: this_tutorial.post_agreement_url, verify_single: false});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        validate_digital_signatures({token: token, tutor_email: this_tutorial.post_tutor_email, student_email: this_tutorial.std_email, pdf: this_tutorial.post_agreement_url, verify_single: false});
     };
 
     let openPdf;
@@ -1024,7 +1043,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -1079,7 +1098,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
-    if (tutorial_status == "In Negotiation") {
+    if (tutorial_status == "In negotiation") {
         tutorial_status = "Pending";
     }
 
@@ -1146,14 +1165,14 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                     </ion-label>
                                 </ion-item>      
                                  <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
-                                        ${this_post.post_tutor_name} has assigned to be your tutor and will contact with you shorty via college email
+                                    <h6 style="font-weight:normal;">
+                                        ${this_post.post_tutor_name} has assigned to be your tutor and will contact with you shortly via college email
                                         '${this_post.post_tutor_email}'.
                                     </h6>
                                 </ion-item>    
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                     <div class="ion-padding-top">
-                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                     </div> 
                                 <ion-item-divider class="divider2"></ion-item-divider> 
                             <ion-item lines="none">
@@ -1179,7 +1198,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                                         </div>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
-                                                                <strong>TUTORIAL LINKS</strong>
+                                                                <strong>SUPPORT MATERIALS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
                                                             ${tutorial_links}
@@ -1206,7 +1225,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     };
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -1270,7 +1289,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
                                     </ion-item-divider>
                                     <ion-item>
                                         <ion-label>Date <ion-text color="danger">*</ion-text></ion-label>
-                                        <ion-datetime id="tutorial_date" value="${current_date}" min="${year}" max="${year}" placeholder="Select Date"></ion-datetime>
+                                        <ion-datetime id="tutorial_date" value="${current_date}" min="${new Date().toISOString()}" max="${year}" placeholder="Select Date"></ion-datetime>
                                     </ion-item>
                                     <ion-item>
                                         <ion-label>Start Time <ion-text color="danger">*</ion-text></ion-label>
@@ -1325,7 +1344,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
     let ionNavDidChangeEvent = async function () {
         let previous_view = await nav_controller.getPrevious();
 
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -1387,12 +1406,19 @@ async function generate_agreement(nav_controller, tutorial) {
         let date = new Date(document.getElementById('tutorial_date').value);
         let final_date = date.getUTCFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
 
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
         if (new Date(final_date + ' ' + document.getElementById('tutorial_time').value) > new Date()) {
             if (new Date(final_date + ' ' + document.getElementById('end_tutorial_time').value) > new Date(final_date + ' ' + document.getElementById('tutorial_time').value)) {
                 if (typeof tutorial._id == 'undefined') {
-                    agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+                    agreement_generated_response = await access_route({token: token, tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
                 } else {
-                    agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+                    agreement_generated_response = await access_route({token: token, tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
                 }
             } else {
                 create_ionic_alert("What's the rush?", "Tutorial end date must not be shorter than or the same as tutorial start time!", ["OK"]);
@@ -1401,6 +1427,16 @@ async function generate_agreement(nav_controller, tutorial) {
         } else {
             create_ionic_alert("What's the rush?", "This is not a time machine! Please choose a time that is not in the past!", ["OK"]);
             return;
+        }
+
+        if (!agreement_generated_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", agreement_generated_response.new_token);
+            }
         }
 
         if (agreement_generated_response.action_available) {
@@ -1466,6 +1502,20 @@ async function generate_agreement(nav_controller, tutorial) {
                     }
                 }
             ]);
+        }
+    }
+}
+
+//Function to remove all null values (VERY BUFFER METHOD!)
+async function walkText(node) {
+    if (node !== null) {
+        if (node.nodeType == 3) {
+            node.data = node.data.replace(/null/g, "");
+        }
+        if (node.nodeType == 1 && node.nodeName != "SCRIPT") {
+            for (var i = 0; i < node.childNodes.length; i++) {
+                walkText(node.childNodes[i]);
+            }
         }
     }
 }
@@ -1678,7 +1728,25 @@ async function accept_agreement(nav_controller, this_tutorial, previous_view) {
     if (isCanvasBlank(document.getElementById('signature-pad'))) {
         create_ionic_alert("Failed to accept agreement", "Please enter a signature to accept the agreement.", ["OK"]);
     } else {
-        let agreement_accepted_response = await access_route({tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        let agreement_accepted_response = await access_route({token: token, tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
+
+        if (!agreement_accepted_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", agreement_accepted_response.new_token);
+            }
+        }
+
         if (agreement_accepted_response.action_available) {
             if (!agreement_accepted_response.error) {
                 user.setPendingTutorials(user.getPendingTutorials() - 1);
@@ -1740,7 +1808,24 @@ async function accept_agreement(nav_controller, this_tutorial, previous_view) {
 }
 
 async function reject_this_agreement(nav_controller, this_tutorial) {
-    let agreement_rejected_response = await access_route({tutorial_id: this_tutorial._id}, "reject_agreement");
+    let token;
+    if (!localhost) {
+        token = await get_secure_storage("jwt_session");
+    } else {
+        token = "";
+    }
+
+    let agreement_rejected_response = await access_route({token: token, tutorial_id: this_tutorial._id}, "reject_agreement");
+
+    if (!agreement_rejected_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", agreement_rejected_response.new_token);
+        }
+    }
 
     if (agreement_rejected_response.action_available) {
         if (!agreement_rejected_response.error) {
@@ -1890,7 +1975,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                     ${begin_button}
                                     <ion-button style="display:none;" expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
                                 </div> 
                                  <ion-item-divider class="divider2"></ion-item-divider>   
@@ -1918,7 +2003,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                             </div>
                                     <ion-item-divider class="divider"></ion-item-divider>
                                         <ion-list-header class="collapsible">
-                                            <strong>TUTORIAL LINKS</strong>
+                                            <strong>SUPPORT MATERIALS</strong>
                                         </ion-list-header>
                                     <ion-list class="content">
                                         ${tutorial_links}
@@ -1971,7 +2056,13 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        validate_digital_signatures({token: token, tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
     };
 
     let openPdf;
@@ -1981,7 +2072,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -2115,7 +2206,7 @@ async function load_open_tutorial_component(nav_controller, this_post) {
                                     </ion-label>
                                 </ion-item>      
                                  <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
+                                    <h6 style="font-weight:normal;">
                                         A tutor has not yet accepted your agreement. Please be patient
                                         as we have limited tutors.
                                     </h6>
@@ -2144,7 +2235,7 @@ async function load_open_tutorial_component(nav_controller, this_post) {
                                                         </div>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
-                                                                <strong>TUTORIAL LINKS</strong>
+                                                                <strong>SUPPORT MATERIALS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
                                                             ${tutorial_links}
@@ -2163,7 +2254,7 @@ async function load_open_tutorial_component(nav_controller, this_post) {
     };
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -2285,7 +2376,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
                                     ${rate_button}
                                 </div> 
@@ -2314,7 +2405,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                             </div>
                                     <ion-item-divider class="divider"></ion-item-divider>
                                         <ion-list-header class="collapsible">
-                                            <strong>TUTORIAL LINKS</strong>
+                                            <strong>SUPPORT MATERIALS</strong>
                                         </ion-list-header>
                                     <ion-list id='tutorial_links_list' class="content">
                                         ${tutorial_links}
@@ -2340,7 +2431,14 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        validate_digital_signatures({token: token, tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
     };
 
     let openPdf;
@@ -2350,7 +2448,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -2412,7 +2510,24 @@ async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status
             handler: async () => {
                 device_feedback();
 
-                let cancel_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let cancel_response = await access_route({token: token, tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
+
+                if (!cancel_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", cancel_response.new_token);
+                    }
+                }
 
                 if (cancel_response.action_available) {
                     if (status == "In negotiation") {
@@ -2652,6 +2767,16 @@ async function activate_bar_code_scanner() {
 async function validate_digital_signatures(data_object) {
     let validate_digital_signatures_response = await access_route(data_object, "validate_digital_signatures");
 
+    if (!validate_digital_signatures_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", validate_digital_signatures_response.new_token);
+        }
+    }
+
     if (validate_digital_signatures_response.error) {
         let toast_buttons = [
             {
@@ -2818,7 +2943,24 @@ function start_tutorial(nav_controller, this_post, post_id, tutorial_status, stu
             handler: async () => {
                 device_feedback();
                 //Update the tutorial 
-                let begin_response = await access_route({tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let begin_response = await access_route({token: token, tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
+
+                if (!begin_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", begin_response.new_token);
+                    }
+                }
 
                 if (begin_response.action_available) {
                     user_notifications.addUnreadNotificationsToDOM();
@@ -2909,7 +3051,24 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
             handler: async () => {
                 device_feedback();
 
-                let end_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "finish_tutorial");
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let end_response = await access_route({token: token, tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "finish_tutorial");
+
+                if (!end_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", end_response.new_token);
+                    }
+                }
 
                 if (end_response.action_available) {
                     user.setOngoingTutoredTutorials(user.getOngoingTutoredTutorials() - 1);
@@ -3093,7 +3252,24 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
         device_feedback();
 
         if (rating !== 0 && document.getElementById('comment').value !== '') {
-            let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating, comment: document.getElementById('comment').value}, "rate_tutor");
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let rate_response = await access_route({token: token, tutorial: tutorial, tutorial_id: tutorial_id, rating: rating, comment: document.getElementById('comment').value}, "rate_tutor");
+
+            if (!rate_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", rate_response.new_token);
+                }
+            }
 
             if (rate_response.action_available) {
                 tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
@@ -3359,10 +3535,26 @@ async function change_pass(modal_created) {
     if (document.getElementById('old_password').value == "" || document.getElementById('new_password').value == "" || document.getElementById('conf_new_password').value == "") {
         create_ionic_alert("Change Password", "Please fill in all fields to reset password.", ["OK"]);
     } else {
-        change_pass_response = await access_route({old_password: document.getElementById('old_password').value, new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: user.getEmail()}, "change_password");
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
 
-        if (change_pass_response !== 'Password changed') {
-            create_ionic_alert("Change Password", change_pass_response, ["OK"]);
+        change_pass_response = await access_route({token: token, old_password: document.getElementById('old_password').value, new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: user.getEmail()}, "change_password");
+
+        if (!change_pass_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", change_pass_response.new_token);
+            }
+        }
+
+        if (change_pass_response.response !== 'Password changed') {
+            create_ionic_alert("Change Password", change_pass_response.response, ["OK"]);
         } else {
             let toast_buttons = [
                 {
@@ -3387,9 +3579,26 @@ async function update_info(currentModal) {
     let update_info_response;
 
     if (document.getElementById('new_phone_number').value !== "") {
-        update_info_response = await access_route({user_phone_number: document.getElementById('new_phone_number').value, users_email: user.getEmail()}, "change_phone");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
 
-        if (update_info_response === "Phone number is not valid") {
+        update_info_response = await access_route({token: token, user_phone_number: document.getElementById('new_phone_number').value, users_email: user.getEmail()}, "change_phone");
+
+        if (!update_info_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", update_info_response.new_token);
+            }
+        }
+
+        if (update_info_response.response === "Phone number is not valid") {
             create_ionic_alert("Personal Information", "Please enter a valid phone number!", ["OK"]);
         } else {
             let toast_buttons = [

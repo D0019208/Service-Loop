@@ -18,22 +18,23 @@ class Posts extends User {
     async update_with_new_posts(posts) {
         this.all_posts = posts.response;
         this.posts_length = 0;
-        
+
         //Check to see if there are any posts (If empty, there will be a string)
         if (typeof posts.response !== "string") {
             this.total_posts = this.all_posts.length;
             document.getElementById('posts_header').innerText = "ALL REQUESTED TUTORIALS";
         } else {
             this.total_posts = 0;
+            document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
         }
-        
+
         document.getElementById('forum_list').innerHTML = "";
-        if(this.total_posts > 3) {
-            this.appendPosts(3, document.getElementById('forum_list'));
+        if (this.total_posts > 7) {
+            this.appendPosts(7, document.getElementById('forum_list'));
         } else {
             this.appendPosts(this.total_posts, document.getElementById('forum_list'));
         }
-        
+
         notification_posts = await this.getAllNotificationPosts();
         console.log(notification_posts)
     }
@@ -241,8 +242,6 @@ class Posts extends User {
         this.total_posts--;
 
         if (typeof document.getElementById('forum_list') !== 'undefined' && !is_notifications) {
-            console.log("trst")
-            console.log(typeof document.getElementById('forum_list'));
             if (document.querySelector('[post_id="' + id + '"]') !== null) {
                 document.querySelector('[post_id="' + id + '"]').parentNode.remove();
             }
@@ -252,7 +251,7 @@ class Posts extends User {
                     document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
                 }
             }
-    }
+        }
     }
 
     removeNotificationPostByPostId(post_id) {
@@ -286,8 +285,26 @@ class Posts extends User {
         for (let i = 0; i < notification_list.length; i++) {
             post_ids.push(notification_list[i].post_id);
         }
-
-        notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
+        
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        
+        notification_posts = await access_route({token: token, notification_posts_id: post_ids}, "get_notification_posts");
+        
+        if (!notification_posts.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", notification_posts.new_token);
+            }
+        }
+        
         return notification_posts.response;
     }
 

@@ -35,7 +35,7 @@ customElements.define('nav-settings', class NavSettings extends HTMLElement {
                                 </ion-avatar>
                                 <ion-label>
                                     <h2>Personal Information</h2>
-                                    <p>Update your name, phone number</p>
+                                    <p>Update your phone number</p>
                                 </ion-label>
 
                             </ion-item>
