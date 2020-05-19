@@ -25,7 +25,7 @@ class Notifications extends User {
     update_with_new_notifications(all_notifications) {
         this.all_notifications = all_notifications;
 
-        if (typeof all_notifications !== "string") {
+        if (typeof all_notifications !== "string" && typeof all_notifications !== 'undefined') {
             let unopened_notifications_counter = 0;
             for (let i = 0; i < this.all_notifications.length; i++) {
                 if (!this.all_notifications[i]["notification_opened"]) {
@@ -35,10 +35,10 @@ class Notifications extends User {
 
             this.total_notifications = this.all_notifications.length;
             this.unread_notifications = unopened_notifications_counter;
-            
+
             document.getElementById('notifications_header').innerText = "NOTIFICATIONS";
-            
-            if(!document.getElementById('new_notifications')) {
+
+            if (!document.getElementById('new_notifications')) {
                 this.addUnreadNotificationsToDOM();
             }
         } else {
@@ -47,15 +47,15 @@ class Notifications extends User {
         }
 
         this.notifications_length = 0;
-        
+
         document.getElementById('list').innerHTML = "";
-        
-        if(this.total_notifications > 3) {
-            this.appendNotifications(3, document.getElementById('list'));
+
+        if (this.total_notifications > 10) {
+            this.appendNotifications(10, document.getElementById('list'));
         } else {
             this.appendNotifications(this.total_notifications, document.getElementById('list'));
         }
-        
+
         this.addUnreadNotificationsToBadge(this.unread_notifications);
     }
 
@@ -227,7 +227,7 @@ class Notifications extends User {
         let notifications = this.getAllNotifications();
         const originalLength = this.notifications_length;
         let read_class;
-        
+
         for (var i = 0; i < number; i++) {
             const el = document.createElement('ion-list');
 
@@ -335,6 +335,9 @@ class Notifications extends User {
         });
 
         socket.on('agreement_accepted_tutor', (data) => {
+            user.setPendingTutoredTutorials(user.getPendingTutoredTutorials() - 1);
+            user.setOngoingTutoredTutorials(user.getOngoingTutoredTutorials() + 1);
+
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
@@ -409,6 +412,9 @@ class Notifications extends User {
         });
 
         socket.on('tutorial_has_finished', (data) => {
+            user.setOngoingTutorials(user.getOngoingTutorials() - 1);
+            user.setDoneTutorials(user.getDoneTutorials() + 1);
+
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
             }
@@ -496,6 +502,9 @@ class Notifications extends User {
                 }
             ];
 
+            user.setOpenTutorials(user.getOpenTutorials() - 1);
+            user.setPendingTutorials(user.getPendingTutorials() + 1);
+
             create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
             new_message_ping.play();
             posts.replace_notification_posts(data.post);
@@ -534,6 +543,24 @@ class Notifications extends User {
         socket.on('tutorial_has_been_canceled', (data) => {
             if (!localhost) {
                 window.plugins.deviceFeedback.haptic();
+            }
+
+            if (data.post.post_status == "Open") {
+                if (user.getEmail() !== data.post.post_tutor_email) {
+                    user.setOpenTutorials(user.getOpenTutorials() - 1);
+                }
+            } else if (data.post.post_status == "Pending" || data.post.post_status == "In negotiation") {
+                if (user.getEmail() !== data.post.post_tutor_email) {
+                    user.setPendingTutorials(user.getPendingTutorials() - 1);
+                } else {
+                    user.setPendingTutoredTutorials(user.getPendingTutoredTutorials() - 1);
+                }
+            } else if (data.post.post_status == "Ongoing") {
+                if (user.getEmail() !== data.post.post_tutor_email) {
+                    user.setOngoingTutorials(user.getOngoingTutorials() - 1);
+                } else {
+                    user.setOngoingTutoredTutorials(user.getOngoingTutoredTutorials() - 1);
+                }
             }
 
             let status = data.post.post_status;

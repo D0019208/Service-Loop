@@ -301,8 +301,11 @@
                             if (reset_password !== "Password changed") {
                                 create_ionic_alert("Forgot Password", reset_password, ["OK"]);
                             } else {
-                                localStorage.removeItem("fingerprint_setup")
-                                delete_fingerprint(u_email);
+                                if (localStorage.getItem("fingerprint_user") == u_email) {
+                                    delete_fingerprint(u_email);
+                                    localStorage.removeItem("fingerprint_setup");
+                                    localStorage.getItem("fingerprint_user");
+                                }
 
                                 sessionStorage.setItem("pass_reset", "true");
                                 window.location.href = 'login.html';

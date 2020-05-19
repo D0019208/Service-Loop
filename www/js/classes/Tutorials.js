@@ -38,6 +38,8 @@ class Tutorials extends User {
     }
 
     refresh_tutorials(tutorials) {
+        walkText(document.querySelector('nav-my-requested-tutorials'));
+
         if (typeof tutorials.response !== "string") {
             this.all_tutorials = tutorials.response;
 
@@ -122,36 +124,52 @@ class Tutorials extends User {
 
         document.getElementById('open_badge').innerText = this.get_open_tutorials().length;
         if (this.get_open_tutorials().length > 0) {
-            document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
+            if (document.getElementById('open_tutorials_header')) {
+                document.getElementById('open_tutorials_header').innerText = "OPEN TUTORIALS";
+            }
         } else {
-            document.getElementById('open_tutorials_header').innerText = "NO OPEN TUTORIALS";
+            if (document.getElementById('open_tutorials_header')) {
+                document.getElementById('open_tutorials_header').innerText = "NO OPEN TUTORIALS";
+            }
         }
 
         document.getElementById('pending_badge').innerText = this.get_pending_tutorials().length;
         if (this.get_pending_tutorials().length > 0) {
-            document.getElementById('pending_tutorials_header').innerText = "PENDING TUTORIALS";
+            if (document.getElementById('pending_tutorials_header')) {
+                document.getElementById('pending_tutorials_header').innerText = "PENDING TUTORIALS";
+            }
         } else {
-            document.getElementById('pending_tutorials_header').innerText = "NO PENDING TUTORIALS";
+            if (document.getElementById('pending_tutorials_header')) {
+                document.getElementById('pending_tutorials_header').innerText = "NO PENDING TUTORIALS";
+            }
         }
 
         document.getElementById('ongoing_badge').innerText = this.get_ongoing_tutorials().length;
         if (this.get_ongoing_tutorials().length > 0) {
-            document.getElementById('ongoing_tutorials_header').innerText = "ONGOING TUTORIALS";
+            if (document.getElementById('ongoing_tutorials_header')) {
+                document.getElementById('ongoing_tutorials_header').innerText = "ONGOING TUTORIALS";
+            }
         } else {
-            document.getElementById('ongoing_tutorials_header').innerText = "NO ONGOING TUTORIALS";
+            if (document.getElementById('ongoing_tutorials_header')) {
+                document.getElementById('ongoing_tutorials_header').innerText = "NO ONGOING TUTORIALS";
+            }
         }
 
         document.getElementById('done_badge').innerText = this.get_done_tutorials().length;
         if (this.get_done_tutorials().length > 0) {
-            document.getElementById('done_tutorials_header').innerText = "DONE TUTORIALS";
+            if (document.getElementById('done_tutorials_header')) {
+                document.getElementById('done_tutorials_header').innerText = "DONE TUTORIALS";
+            }
         } else {
-            document.getElementById('done_tutorials_header').innerText = "NO DONE TUTORIALS";
+            if (document.getElementById('done_tutorials_header')) {
+                document.getElementById('done_tutorials_header').innerText = "NO DONE TUTORIALS";
+            }
         }
     }
 
     add_refreshed_tutorials() {
         this.clear_tutored_segments();
-        
+
         if (this.get_open_tutorials().length <= 7) {
             this.open_tutorials_length = this.appendPosts(this.get_open_tutorials().length, document.getElementById('open-tutorials-infinite-scroll'), this.open_tutorials, this.open_tutorials_length);
         } else {
@@ -193,6 +211,8 @@ class Tutorials extends User {
         } else {
             this.done_tutorials_length = this.appendPosts(7, document.getElementById('done-tutorials-infinite-scroll'), this.done_tutorials, this.done_tutorials_length);
         }
+
+        walkText(document.querySelector('nav-my-requested-tutorials'));
     }
 
     //GETTERS
@@ -256,7 +276,7 @@ class Tutorials extends User {
         el.classList.add('ion-activatable', 'ripple', "not_read");
 
         el.innerHTML = `
-                <ion-card class="test post" post_id="${tutorial._id}" post_modules="${tutorial.post_modules.join(', ')}" post_status="${tutorial.post_status}">
+                <ion-card class="test post" onclick="device_feedback();" post_id="${tutorial._id}" post_modules="${tutorial.post_modules.join(', ')}" post_status="${tutorial.post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
                                 <img src="${tutorial.std_avatar}">
@@ -337,6 +357,8 @@ class Tutorials extends User {
             }
             //}
         }
+
+        walkText(document.querySelector('nav-my-requested-tutorials'));
     }
 
     remove_tutorial_by_id(array, id) {
@@ -346,13 +368,13 @@ class Tutorials extends User {
     }
 
     appendPosts(number, list, tutorials_array, tutorials_length) {
-        let tutorials = tutorials_array;
+        try {
+            let tutorials = tutorials_array;
 
-        const originalLength = tutorials_length;
-
-        for (var i = 0; i < number; i++) {
-            const el = document.createElement('ion-list');
-            el.className = "ion-activatable ripple";
+            const originalLength = tutorials_length;
+            for (var i = 0; i < number; i++) {
+                const el = document.createElement('ion-list');
+                el.className = "ion-activatable ripple";
 
 //            if (posts[i + originalLength].notification_opened) {
 //                read_class = "read";
@@ -360,9 +382,9 @@ class Tutorials extends User {
 //                read_class = "not_read";
 //            }
 
-            el.classList.add('ion-activatable', 'ripple', "not_read");
-            el.setAttribute('onClick', 'device_feedback()');
-            el.innerHTML = `
+                el.classList.add('ion-activatable', 'ripple', "not_read");
+                el.setAttribute('onClick', 'device_feedback()');
+                el.innerHTML = `
                 <ion-card class="test post" post_id="${tutorials[i + originalLength]._id}" post_modules="${tutorials[i + originalLength].post_modules.join(', ')}" post_status="${tutorials[i + originalLength].post_status}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
@@ -388,11 +410,16 @@ class Tutorials extends User {
             
         `;
 
-            list.parentNode.insertBefore(el, list.previousSibling);
-            //list.appendChild(el);
+                list.parentNode.insertBefore(el, list.previousSibling);
+                //list.appendChild(el);
 
-            tutorials_length += 1;
+                tutorials_length += 1;
+            }
+        } catch (ex) {
+            console.log("exception has occured!")
         }
+
+        walkText(document.querySelector('nav-my-requested-tutorials'));
 
         return tutorials_length;
     }

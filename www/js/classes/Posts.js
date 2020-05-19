@@ -285,8 +285,26 @@ class Posts extends User {
         for (let i = 0; i < notification_list.length; i++) {
             post_ids.push(notification_list[i].post_id);
         }
-
-        notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
+        
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        
+        notification_posts = await access_route({token: token, notification_posts_id: post_ids}, "get_notification_posts");
+        
+        if (!notification_posts.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", notification_posts.new_token);
+            }
+        }
+        
         return notification_posts.response;
     }
 

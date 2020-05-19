@@ -25,11 +25,30 @@ function load_my_requested_tutorials(nav_controller) {
 
         async connectedCallback() {
             if (!my_requested_posts_loaded) {
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
                 let data = {
+                    token: token,
                     users_email: user.getEmail()
                 };
 
                 my_requested_posts_response = await access_route(data, "get_my_requested_posts");
+
+                if (!my_requested_posts_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", my_requested_posts_response.new_token);
+                    }
+                }
+
                 my_requested_posts_loaded = true;
 
                 tutorials = new Tutorials(user.getId(), my_requested_posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
@@ -284,7 +303,24 @@ function load_my_requested_tutorials(nav_controller) {
 
             const tutorials_refresher = document.getElementById('tutorials_refresher');
             tutorials_refresher.addEventListener('ionRefresh', async () => {
-                let load_more_response = await access_route({users_email: user.getEmail()}, "get_my_requested_posts", false);
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let load_more_response = await access_route({token: token, users_email: user.getEmail()}, "get_my_requested_posts", false);
+
+                if (!load_more_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", load_more_response.new_token);
+                    }
+                }
 
                 //Update the posts object with the new reloaded values
                 tutorials.refresh_tutorials(load_more_response);
@@ -464,7 +500,7 @@ function load_my_requested_tutorials(nav_controller) {
                         //Add the infinite scroll listener
                         if (!my_requested_posts_done_loaded || document.getElementById('done').childElementCount <= 7) {
                             //If we have less than 7 tutorials we display all of them otherwise we display only 7 
-                            if (tutorials.get_done_tutorials().length <= 7 && document.getElementById('done').childElementCount > 7) {
+                            if (tutorials.get_done_tutorials().length <= 7) {
                                 tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.get_done_tutorials().length, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
                             } else if (document.getElementById('done').childElementCount <= 7) {
                                 if (tutorials.total_done_tutorials >= 7) {

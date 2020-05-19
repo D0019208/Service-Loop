@@ -66,8 +66,25 @@ let number_of_notifications_to_add;
 //Refresher
 const notifications_refresher = document.getElementById('notifications_refresher');
 notifications_refresher.addEventListener('ionRefresh', async () => {
-    let load_more_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: user.getStatus(), user_modules: user.getModules()}}, "get_all_notifications", false);
-console.log(load_more_response)
+    let token;
+    if (!localhost) {
+        token = await get_secure_storage("jwt_session");
+    } else {
+        token = "";
+    }
+
+    let load_more_response = await access_route({token: token, users_email: user.getEmail(), user_tutor: {is_tutor: user.getStatus(), user_modules: user.getModules()}}, "get_all_notifications", false);
+
+    if (!load_more_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", load_more_response.new_token);
+        }
+    }
+
     if (typeof load_more_response.response !== "string") {
         notification_posts = await posts.getAllNotificationPosts();
         posts.set_notification_posts(notification_posts);
@@ -152,7 +169,25 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -260,7 +295,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial requested") && notification_tags.length !== 0) {
         device_feedback();
-        
+
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
@@ -277,15 +312,34 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
         let nav_notification_tutorial_requested = document.createElement('nav-notification-tutorial-requested');
-        
+
         console.log(notification_posts);
         console.log(this_post);
-        
+
         if (typeof this_post === 'undefined') {
             nav_notification_tutorial_requested.innerHTML = `
           <ion-header translucent>
@@ -391,7 +445,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -558,6 +631,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -568,6 +646,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -578,6 +661,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -617,7 +705,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -714,7 +821,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
             let tutorial_status = this_post.post_status;
             let tutorial_tag = this_post.post_modules.join(', ');
 
-            if (tutorial_status == "In Negotiation") {
+            if (tutorial_status == "In negotiation") {
                 tutorial_status = "Pending";
             }
 
@@ -800,7 +907,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial agreement accepted") && notification_tags.length !== 0) {
         device_feedback();
-        
+
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
@@ -817,7 +924,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -928,7 +1054,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -979,7 +1124,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notifications.push(nav_notification_tutorial_agreement_rejected);
             let tutorial_status = this_post.post_status;
             let tutorial_tag = this_post.post_modules.join(', ');
-
+            
+            if(tutorial_status === 'In negotiation') {
+                tutorial_status = "Pending";
+            }
+            
             let agreement_reject_event_handler = function () {
                 device_feedback();
 
@@ -1052,7 +1201,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -1097,7 +1265,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -1214,7 +1401,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 

@@ -225,7 +225,7 @@ class User {
     createWebSocketConnection() {
         let modules = encodeURIComponent(JSON.stringify(this.modules));
         let socket;
-        
+
         if (localhost) {
             socket = io.connect('http://localhost', {query: 'email=' + this.email + '&modules=' + modules});
         } else {
@@ -241,9 +241,25 @@ class User {
         this.status = "Tutor";
         this.socket.emit('update_socket', {user_email: this.getEmail(), user_modules: user_modules});
 
-        //Get the new notifications that the user would see as a tutor
-        let notifications_response = await access_route({users_email: this.getEmail(), user_tutor: {is_tutor: true, user_modules: user_modules}}, "get_all_notifications");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
 
+        //Get the new notifications that the user would see as a tutor
+        let notifications_response = await access_route({token: token, users_email: this.getEmail(), user_tutor: {is_tutor: true, user_modules: user_modules}}, "get_all_notifications");
+
+        if (!notifications_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", notifications_response.new_token);
+            }
+        }
 
         if (typeof notifications_response === "string") {
             user_notifications.all_notifications = notifications_response;

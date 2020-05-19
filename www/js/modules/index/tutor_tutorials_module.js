@@ -23,11 +23,29 @@ function all_tutor_tutorials(nav_controller) {
 
         async connectedCallback() {
             if (!tutor_tutorials_response) {
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
                 let data = {
+                    token: token,
                     users_email: user.getEmail()
                 };
 
                 tutor_tutorials_response = await access_route(data, "get_all_tutor_tutorials");
+
+                if (!tutor_tutorials_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", tutor_tutorials_response.new_token);
+                    }
+                }
 
                 tutor_tutorials_loaded = true;
 
@@ -294,8 +312,28 @@ function all_tutor_tutorials(nav_controller) {
 
             const tutor_tutorials_refresher = document.getElementById('tutor_tutorials_refresher');
             tutor_tutorials_refresher.addEventListener('ionRefresh', async () => {
-                let load_more_response = await access_route({users_email: user.getEmail()}, "get_all_tutor_tutorials", false);
 
+
+
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let load_more_response = await access_route({token: token, users_email: user.getEmail()}, "get_all_tutor_tutorials", false);
+                
+                if (!load_more_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", load_more_response.new_token);
+                    }
+                }
+                
                 tutor_tutorials.refresh_tutor_tutorials(load_more_response);
 
                 tutor_tutorials_refresher.complete();
