@@ -26,13 +26,11 @@ function create_ionic_alert(header, message, buttons, on_alert_dismiss_function 
         if (on_alert_dismiss_function !== null) {
             alert.onDidDismiss().then(() => {
                 document.querySelector('ion-alert-controller').remove();
-                console.log("dismissed");
                 on_alert_dismiss_function();
             });
         } else {
             alert.onDidDismiss().then(() => {
                 document.querySelector('ion-alert-controller').remove();
-                console.log("dismissed no function");
             });
         }
     });
@@ -61,7 +59,7 @@ function create_ionic_loading() {
     return new Promise((resolve, reject) => {
         ion_loading_controller.create({
             message: 'Please wait...',
-            duration: 30000
+            duration: 300000
         }).then((loading) => {
             loading.present();
             resolve(loading);
@@ -89,6 +87,7 @@ async function access_route(data, route, show_loading = true) {
 
     try {
         let path = localhost ? "http://localhost:3001/" : "http://serviceloopserver.ga/";
+        //let path = "http://serviceloopserver.ga/";
         const rawResponse = await fetch(path + route, {
             method: 'POST',
             headers: {
@@ -154,14 +153,12 @@ async function is_fingerprint_available() {
          *   }
          */
         function isAvailableSuccess(result) {
-            console.log("FingerprintAuth available: " + JSON.stringify(result));
             if (result.isAvailable) {
                 resolve(true);
             }
         }
 
         function isAvailableError(message) {
-            console.log("isAvailableError(): " + message);
             resolve(false);
         }
     });
@@ -467,6 +464,7 @@ function drawing_pad() {
     var cancelButton = document.getElementById('clear');
 
     undoButton.addEventListener('click', () => {
+        device_feedback();
         var data = signaturePad.toData();
         if (data) {
             data.pop(); // remove the last dot or line
@@ -475,6 +473,7 @@ function drawing_pad() {
     });
 
     cancelButton.addEventListener('click', function (event) {
+        device_feedback();
         signaturePad.clear();
     });
 }
@@ -491,6 +490,10 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
+    }
+
+    if (tutorial_status == "In negotiation") {
+        tutorial_status = "Pending";
     }
 
     let tutorial_element = document.createElement('tutorial');
@@ -549,7 +552,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
                 </ion-label>
             </ion-item>      
             <ion-item style="margin-top:-15px;" lines="none">
-                <h6>
+                <h6 style="font-weight:normal;">
                     Your tutor, ${this_post.post_tutor_name} has sent you an agreement regarding your tutorial request, please
                     review it before accepting or rejecting it. If you have any questions, contact him through his college email at 
                     '${this_post.post_tutor_email}' 
@@ -560,7 +563,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             <div class="ion-padding-top">
                 <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                 <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                 <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="success" id="accept_agreement">Accept<br/>agreement</ion-button>
                 <ion-button expand="full" type="button" class="ion-no-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="reject_agreement">Reject<br/>agreement</ion-button>
             </div>               
@@ -588,7 +591,7 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
         </div>
             <ion-item-divider class="divider"></ion-item-divider>
                 <ion-list-header class="collapsible">
-                    <strong>TUTORIAL LINKS</strong>
+                    <strong>SUPPORT MATERIALS</strong>
                 </ion-list-header>
             <ion-list class="content">
                 ${tutorial_links}
@@ -604,7 +607,9 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let tutorial_log;
@@ -615,8 +620,8 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let accept_agreement;
     let accept_agreement_handler = async function () {
         device_feedback();
-        load_sign_accepted_agreement_component(nav_controller, this_post);
-
+        let previous_view = await nav_controller.getPrevious();
+        load_sign_accepted_agreement_component(nav_controller, this_post, previous_view);
     }
 
     let reject_agreement;
@@ -627,7 +632,6 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
             {
                 text: 'Reject',
                 handler: () => {
-                    console.log('Rejected')
                     reject_this_agreement(nav_controller, this_post);
                 }
             },
@@ -645,18 +649,23 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_post.post_tutor_email, pdf: this_post.post_agreement_url, verify_single: true});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        validate_digital_signatures({token: token, tutor_email: this_post.post_tutor_email, pdf: this_post.post_agreement_url, verify_single: true});
     };
 
     let openPdf;
     let openPdfHandler = async function () {
         device_feedback();
         openPDF(this_post.post_agreement_url);
-        //console.log(this_tutorial);
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -720,24 +729,28 @@ function load_post_agreement_offered_component(nav_controller, this_post, tutori
 }
 
 async function accept_post(nav_controller, this_post, post, is_forum, previous_view, user_avatar) {
-    console.log("This_post")
-    console.log(this_post)
-    let post_acceptated_response = await access_route({tutor_email: user.getEmail(), tutor_name: user.getName(), post_id: this_post._id, user_avatar: user_avatar}, "post_accepted", function () {
-        let toast_buttons = [
-            {
-                side: 'end',
-                text: 'Close',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel clicked');
-                }
-            }
-        ];
+    let token;
+    if (!localhost) {
+        token = await get_secure_storage("jwt_session");
+    } else {
+        token = "";
+    }
 
-        create_toast("You have accepted a tutorial.", "dark", 2000, toast_buttons);
-    });
+    let post_acceptated_response = await access_route({token: token, tutor_email: user.getEmail(), tutor_name: user.getName(), post_id: this_post._id, user_avatar: user_avatar}, "post_accepted");
+
+    if (!post_acceptated_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", post_acceptated_response.new_token);
+        }
+    }
 
     if (!post_acceptated_response.error) {
+        user.setPendingTutoredTutorials(user.getPendingTutoredTutorials() + 1);
+
         user_notifications.addToNotifications(post_acceptated_response.response.tutor_notification);
         user_notifications.sendTutorialAcceptedNotification(post_acceptated_response.response.student_notification, post_acceptated_response.response.post);
 
@@ -809,6 +822,18 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
                     posts.all_posts = posts.all_posts.filter(e => e !== this_post);
                     posts.removePostById(this_post._id);
                 }
+            } else {
+                if (posts.all_posts.length !== 0) {
+                    posts.all_posts = posts.all_posts.filter(function (obj) {
+                        return obj._id !== this_post._id;
+                    });
+                }
+
+                if (posts.all_posts.length == 0) {
+                    if (document.getElementById('posts_header') !== null) {
+                        document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
+                    }
+                }
             }
 
             posts.replace_notification_posts(post_acceptated_response.response.post);
@@ -828,9 +853,6 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
 
         nav_controller.push(success_screen_element);
 
-
-
-
         let ionNavDidChangeEvent = async function () {
             if (document.getElementById('ok_btn') !== null) {
                 ok_btn = document.getElementById("ok_btn");
@@ -848,31 +870,6 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
         };
 
         nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
-
-
-
-
-
-
-
-
-
-
-
-
-//        create_ionic_alert("Tutorial request acceptated", "You have successfully acceptated a tutorial request.", ["OK"], function () {
-//            posts.all_posts = posts.all_posts.filter(e => e !== this_post);
-//            posts.total_posts = posts.total_posts - 1;
-//
-//            if (document.getElementById("forum_list").childNodes.length === 0) {
-//                document.getElementById("forum_list").remove();
-//            }
-//
-//            post.remove();
-//            nav.popToRoot();
-//
-//            posts.removePostById(post.getAttribute("post_id"));
-//        });
     } else {
         create_ionic_alert("Tutorial request error", post_acceptated_response.response, ["OK"], function () {
             posts.all_posts = posts.all_posts.filter(e => e !== this_post);
@@ -898,6 +895,10 @@ async function accept_post(nav_controller, this_post, post, is_forum, previous_v
 
 
 function load_pending_tutorial_component_signed(nav_controller, this_tutorial, tutorial_status, tutorial_tag) {
+    if (tutorial_status === "In negotiation") {
+        tutorial_status = "Pending";
+    }
+
     let tutorial_links = get_tutorial_links(tutorial_tag);
 
     let tutor_info = "";
@@ -962,7 +963,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                                 </ion-label>
                                                             </ion-item>      
                                                              <ion-item style="margin-top:-15px;" lines="none">
-                                                                <h6>
+                                                                <h6 style="font-weight:normal;">
                                                                 An agreement is created. Please wait for ${this_tutorial.std_name} to accept or reject the agreement.
                                                                 </h6>
 
@@ -971,7 +972,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                                 <div class="ion-padding-top">
                                                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
                                                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
-                                                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                                                 </div> 
                                                                 <ion-item-divider class="divider2"></ion-item-divider> 
                                                         <ion-item lines="none">
@@ -997,7 +998,7 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
                                                         </div>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
-                                                                <strong>TUTORIAL LINKS</strong>
+                                                                <strong>SUPPORT MATERIALS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
                                                             ${tutorial_links}
@@ -1012,7 +1013,9 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, tutorial_status, previous);
     };
 
     let tutorial_log;
@@ -1024,18 +1027,23 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_tutorial.post_tutor_email, student_email: this_tutorial.std_email, pdf: this_tutorial.post_agreement_url, verify_single: false});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        validate_digital_signatures({token: token, tutor_email: this_tutorial.post_tutor_email, student_email: this_tutorial.std_email, pdf: this_tutorial.post_agreement_url, verify_single: false});
     };
 
     let openPdf;
     let openPdfHandler = async function () {
         device_feedback();
         openPDF(this_tutorial.post_agreement_url);
-        //console.log(this_tutorial);
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -1089,11 +1097,11 @@ function load_pending_tutorial_component_signed(nav_controller, this_tutorial, t
 
 function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-    
-    if (tutorial_status == "In Negotiation") {
+
+    if (tutorial_status == "In negotiation") {
         tutorial_status = "Pending";
     }
-    
+
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
@@ -1157,14 +1165,14 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                     </ion-label>
                                 </ion-item>      
                                  <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
-                                        ${this_post.post_tutor_name} has assigned to be your tutor and will contact with you shorty via college email
+                                    <h6 style="font-weight:normal;">
+                                        ${this_post.post_tutor_name} has assigned to be your tutor and will contact with you shortly via college email
                                         '${this_post.post_tutor_email}'.
                                     </h6>
                                 </ion-item>    
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                     <div class="ion-padding-top">
-                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                        <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                     </div> 
                                 <ion-item-divider class="divider2"></ion-item-divider> 
                             <ion-item lines="none">
@@ -1190,7 +1198,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
                                                         </div>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
-                                                                <strong>TUTORIAL LINKS</strong>
+                                                                <strong>SUPPORT MATERIALS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
                                                             ${tutorial_links}
@@ -1206,7 +1214,9 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let tutorial_log;
@@ -1215,7 +1225,7 @@ function load_pending_tutorial_component(nav_controller, this_post, tutorial_tag
     };
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -1279,7 +1289,7 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
                                     </ion-item-divider>
                                     <ion-item>
                                         <ion-label>Date <ion-text color="danger">*</ion-text></ion-label>
-                                        <ion-datetime id="tutorial_date" value="${current_date}" min="${year}" max="${year}" placeholder="Select Date"></ion-datetime>
+                                        <ion-datetime id="tutorial_date" value="${current_date}" min="${new Date().toISOString()}" max="${year}" placeholder="Select Date"></ion-datetime>
                                     </ion-item>
                                     <ion-item>
                                         <ion-label>Start Time <ion-text color="danger">*</ion-text></ion-label>
@@ -1315,14 +1325,13 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        console.log("Eeeeey")
-        console.log(this_tutorial)
-
         if (this_tutorial.post_status = "In negotiation") {
             this_tutorial.post_status = "Pending"
         }
 
-        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, this_tutorial.post_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_tutorial, this_tutorial._id, this_tutorial.post_status, previous);
     };
 
     let generate_agreement_button;
@@ -1333,7 +1342,9 @@ function load_pending_tutorial_component_not_signed(nav_controller, this_tutoria
     };
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        let previous_view = await nav_controller.getPrevious();
+
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -1395,81 +1406,124 @@ async function generate_agreement(nav_controller, tutorial) {
         let date = new Date(document.getElementById('tutorial_date').value);
         let final_date = date.getUTCFullYear() + '-' + (date.getMonth() + 1) + "-" + date.getDate();
 
-        if (new Date(final_date + ' ' + document.getElementById('end_tutorial_time').value) > new Date(final_date + ' ' + document.getElementById('tutorial_time').value)) {
-            if (typeof tutorial._id == 'undefined') {
-                agreement_generated_response = await access_route({tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        if (new Date(final_date + ' ' + document.getElementById('tutorial_time').value) > new Date()) {
+            if (new Date(final_date + ' ' + document.getElementById('end_tutorial_time').value) > new Date(final_date + ' ' + document.getElementById('tutorial_time').value)) {
+                if (typeof tutorial._id == 'undefined') {
+                    agreement_generated_response = await access_route({token: token, tutorial_id: tutorial.getAttribute('post_id'), tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+                } else {
+                    agreement_generated_response = await access_route({token: token, tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+                }
             } else {
-                agreement_generated_response = await access_route({tutorial_id: tutorial._id, tutor_avatar: user.getAvatar(), tutorial_date: final_date, tutorial_time: document.getElementById('tutorial_time').value, tutorial_end_time: document.getElementById('end_tutorial_time').value, tutor_signature: signaturePad.toDataURL('image/png')}, "offer_agreement");
+                create_ionic_alert("What's the rush?", "Tutorial end date must not be shorter than or the same as tutorial start time!", ["OK"]);
+                return;
             }
         } else {
-            create_ionic_alert("What's the rush?", "Tutorial end date must not be shorter than or the same as tutorial start time!", ["OK"]);
+            create_ionic_alert("What's the rush?", "This is not a time machine! Please choose a time that is not in the past!", ["OK"]);
             return;
         }
 
-        console.log(agreement_generated_response);
-        if (!agreement_generated_response.error) {
-            //Send push notification
-            if (!localhost) {
-                push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Tutorial accepted", {}, {});
-            }
-
-            //push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Agreement offer accepted", agreement_generated_response.updated_tutorial, agreement_generated_response.student_notification.response);
-
-            user_notifications.addToNotifications(agreement_generated_response.tutor_notification.response);
-            user_notifications.sendAgreementGeneratedNotification({response: agreement_generated_response.student_notification.response}, agreement_generated_response.updated_tutorial);
-
-            if (typeof notification_posts !== 'undefined') {
-                notification_posts = notification_posts.filter(function (obj) {
-                    return obj._id !== agreement_generated_response.updated_tutorial._id;
-                });
-
-                notification_posts.push(agreement_generated_response.updated_tutorial);
-            }
-
-            //tutor_tutorials.remove_tutorial_from_DOM("Pending", agreement_generated_response);
-            tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
-            posts.replace_notification_posts(agreement_generated_response.updated_tutorial);
-            //tutor_tutorials.add_tutorial_to_DOM("Ongoing", agreement_generated_response.updated_tutorial)
-
-            let toast_buttons = [
-                {
-                    side: 'end',
-                    text: 'Close',
-                    role: 'cancel',
-                    handler: () => {
-                        console.log('Cancel clicked');
-                    }
-                }
-            ];
-
-            create_toast("Agreement offer sent.", "dark", 2000, toast_buttons);
-
-            nav_controller.pop();
+        if (!agreement_generated_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
         } else {
-            create_ionic_alert("Tutorial request error", agreement_generated_response.response, ["OK"]);
+            if (!localhost) {
+                set_secure_storage("jwt_session", agreement_generated_response.new_token);
+            }
         }
 
-        console.log(agreement_generated_response);
+        if (agreement_generated_response.action_available) {
+            if (!agreement_generated_response.error) {
+                //Send push notification
+                if (!localhost) {
+                    push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Tutorial accepted", {}, {});
+                }
+
+                //push.send_notification("Preliminary agreement generated", "An agreement for the tutorial '" + agreement_generated_response.updated_tutorial.post_title + "' has ben created. Click on this notification to open it.", agreement_generated_response.updated_tutorial.std_email, "Agreement offer accepted", agreement_generated_response.updated_tutorial, agreement_generated_response.student_notification.response);
+
+                user_notifications.addToNotifications(agreement_generated_response.tutor_notification.response);
+                user_notifications.sendAgreementGeneratedNotification({response: agreement_generated_response.student_notification.response}, agreement_generated_response.updated_tutorial);
+
+                if (typeof notification_posts !== 'undefined') {
+                    notification_posts = notification_posts.filter(function (obj) {
+                        return obj._id !== agreement_generated_response.updated_tutorial._id;
+                    });
+
+                    notification_posts.push(agreement_generated_response.updated_tutorial);
+                }
+
+                //tutor_tutorials.remove_tutorial_from_DOM("Pending", agreement_generated_response);
+                tutor_tutorials.update_tutorial("Pending", agreement_generated_response.updated_tutorial);
+                posts.replace_notification_posts(agreement_generated_response.updated_tutorial);
+                //tutor_tutorials.add_tutorial_to_DOM("Ongoing", agreement_generated_response.updated_tutorial)
+
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Agreement offer sent.", "dark", 2000, toast_buttons);
+
+                let previous_view = await nav_controller.getPrevious();
+                if (previous_view.element.tagName === "NAV-NOTIFICATION" || previous_view.element.tagName === "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-REJECTED") {
+                    nav_controller.popTo(0);
+                } else {
+                    nav_controller.pop();
+                }
+            } else {
+                create_ionic_alert("Agreement creation", agreement_generated_response.response, ["OK"]);
+            }
+        } else {
+            create_ionic_alert("Agreement creation", "The tutorial you wish to create an agreement for is either no longer available or has an agreement.`Please refresh your tutorials.", [
+                {
+                    text: 'OK',
+                    handler: async () => {
+                        device_feedback();
+
+                        let previous_view = await nav_controller.getPrevious();
+                        if (previous_view.element.tagName === "NAV-NOTIFICATION" || previous_view.element.tagName === "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-REJECTED") {
+                            nav_controller.popTo(0);
+                        } else {
+                            nav_controller.pop();
+                        }
+                    }
+                }
+            ]);
+        }
+    }
+}
+
+//Function to remove all null values (VERY BUFFER METHOD!)
+async function walkText(node) {
+    console.log("test")
+    if (node !== null) {
+        if (node.nodeType == 3) {
+            node.data = node.data.replace(/null/g, "");
+        }
+        if (node.nodeType == 1 && node.nodeName != "SCRIPT") {
+            for (var i = 0; i < node.childNodes.length; i++) {
+                walkText(node.childNodes[i]);
+            }
+        }
     }
 }
 
 async function load_new_tutorial_request_component(nav_controller, this_notification, extra_information) {
-//    let notification_posts;
-//
-//    if (posts.get_notification_posts().length == 0) {
-//        //Function to get all ids from the notifications list and find the posts associated with them
-//        notification_posts = await posts.getAllNotificationPosts();
-//        console.log(notification_posts);
-//        posts.set_notification_posts(notification_posts);
-//    } else {
-//        notification_posts = posts.get_notification_posts();
-//    }
-
     //Get the current post notification
     let this_post = posts.getNotificationPostDetailsById(this_notification.post_id);
-    console.log("Test - " + this_notification.post_id)
-    console.log("This post");
-    console.log(this_post)
     if (typeof this_post == 'undefined') {
         this_post = posts.getNotificationById(this_notification.post_id);
     }
@@ -1542,7 +1596,6 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
                 role: 'cancel',
                 handler: () => {
                     device_feedback();
-                    console.log('Cancel')
                 }
             }
         ]);
@@ -1579,13 +1632,11 @@ async function load_new_tutorial_request_component(nav_controller, this_notifica
 
 
 
-function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
+function load_sign_accepted_agreement_component(nav_controller, this_tutorial, previous_view) {
     let tutor_tutorial_element = document.createElement('sign-tutorial-agreement');
     let date = new Date();
     let year = date.getFullYear();
     let current_date = year + "-" + parseInt(date.getMonth() + 1) + "-" + date.getDate();
-    console.log(current_date);
-    console.log(year)
 
     let tutor_tutorial_element_html = `
                                 <ion-header translucent>
@@ -1634,9 +1685,8 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
             create_ionic_alert("Accept agreement", "Please confirm that you wish to accept this agreement.", [
                 {
                     text: 'Accept',
-                    handler: () => {
-                        console.log('Accepted');
-                        accept_agreement(nav_controller, this_tutorial);
+                    handler: async () => {
+                        accept_agreement(nav_controller, this_tutorial, previous_view);
                     }
                 },
                 {
@@ -1675,22 +1725,116 @@ function load_sign_accepted_agreement_component(nav_controller, this_tutorial) {
 
 
 
-async function accept_agreement(nav_controller, this_tutorial) {
+async function accept_agreement(nav_controller, this_tutorial, previous_view) {
     if (isCanvasBlank(document.getElementById('signature-pad'))) {
         create_ionic_alert("Failed to accept agreement", "Please enter a signature to accept the agreement.", ["OK"]);
     } else {
-        let agreement_accepted_response = await access_route({tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
 
-        if (!agreement_accepted_response.error) {
-            user_notifications.addUnreadNotificationsToDOM();
-            user_notifications.addToNotifications(agreement_accepted_response.student_notification.response);
+        let agreement_accepted_response = await access_route({token: token, tutorial_id: this_tutorial._id, student_signature: signaturePad.toDataURL('image/png')}, "accept_agreement");
 
-            //Send push notification
+        if (!agreement_accepted_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
             if (!localhost) {
-                push.send_notification("Agreement accepted", "The student has accepted your agreement for the '" + agreement_accepted_response.updated_tutorial.post_title + "' tutorial. Click on this notification to view it.", agreement_accepted_response.updated_tutorial.post_tutor_email, "Agreement accepted", {}, {});
+                set_secure_storage("jwt_session", agreement_accepted_response.new_token);
             }
+        }
 
-            let toast_buttons = [
+        if (agreement_accepted_response.action_available) {
+            if (!agreement_accepted_response.error) {
+                user.setPendingTutorials(user.getPendingTutorials() - 1);
+                user.setOngoingTutorials(user.getOngoingTutorials() + 1);
+
+                user_notifications.addUnreadNotificationsToDOM();
+                user_notifications.addToNotifications(agreement_accepted_response.student_notification.response);
+
+                //Send push notification
+                if (!localhost) {
+                    push.send_notification("Agreement accepted", "The student has accepted your agreement for the '" + agreement_accepted_response.updated_tutorial.post_title + "' tutorial. Click on this notification to view it.", agreement_accepted_response.updated_tutorial.post_tutor_email, "Agreement accepted", {}, {});
+                }
+
+                let toast_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Agreement accepted.", "dark", 2000, toast_buttons);
+                user_notifications.sendAgreementAcceptedNotification({response: agreement_accepted_response.tutor_notification.response}, agreement_accepted_response.updated_tutorial);
+
+                //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
+                posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
+
+                tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), agreement_accepted_response.updated_tutorial);
+                tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
+
+                if (previous_view.element.tagName === "NAV-NOTIFICATION") {
+                    nav_controller.popTo(0);
+                } else {
+                    nav_controller.popTo(1);
+                }
+            } else {
+                create_ionic_alert("Failed to accept agreement", agreement_accepted_response.response, ["OK"]);
+            }
+        } else {
+            create_ionic_alert("Agreement rejection", "The agreement you are trying to reject either no longer exists, has already been reject or accepted. Please refresh your tutorials.", [
+                {
+                    text: 'OK',
+                    handler: async () => {
+                        device_feedback();
+
+                        if (previous_view.element.tagName === "NAV-NOTIFICATION") {
+                            nav_controller.popTo(0);
+                        } else {
+                            nav_controller.popTo(1);
+                        }
+                    }
+                }
+            ]);
+        }
+    }
+}
+
+async function reject_this_agreement(nav_controller, this_tutorial) {
+    let token;
+    if (!localhost) {
+        token = await get_secure_storage("jwt_session");
+    } else {
+        token = "";
+    }
+
+    let agreement_rejected_response = await access_route({token: token, tutorial_id: this_tutorial._id}, "reject_agreement");
+
+    if (!agreement_rejected_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", agreement_rejected_response.new_token);
+        }
+    }
+
+    if (agreement_rejected_response.action_available) {
+        if (!agreement_rejected_response.error) {
+            user_notifications.addUnreadNotificationsToDOM();
+            user_notifications.addToNotifications(agreement_rejected_response.student_notification.response);
+            user_notifications.sendAgreementRejectedNotification({response: agreement_rejected_response.tutor_notification.response}, agreement_rejected_response.updated_tutorial);
+
+            let reject_buttons = [
                 {
                     side: 'end',
                     text: 'Close',
@@ -1701,64 +1845,45 @@ async function accept_agreement(nav_controller, this_tutorial) {
                 }
             ];
 
-            create_toast("Agreement accepted.", "dark", 2000, toast_buttons);
-            user_notifications.sendAgreementAcceptedNotification({response: agreement_accepted_response.tutor_notification.response}, agreement_accepted_response.updated_tutorial);
+            create_toast("Agreement rejected!", "dark", 2000, reject_buttons);
+            //Send push notification
+            if (!localhost) {
+                push.send_notification("Agreement rejected", "The student has rejected your agreement for the '" + agreement_rejected_response.updated_tutorial.post_title + "' tutorial. Click on this notification to create a new one.", agreement_rejected_response.updated_tutorial.post_tutor_email, "Agreement rejected", {}, {});
+            }
 
-            //tutorials.update_my_tutorial("Pending", agreement_accepted_response.updated_tutorial); 
-            posts.replace_notification_posts(agreement_accepted_response.updated_tutorial);
+            posts.replace_notification_posts(agreement_rejected_response.updated_tutorial);
 
-            tutorials.add_post_to_segment("Ongoing", document.getElementById('ongoing_tutorials_header'), agreement_accepted_response.updated_tutorial);
-            tutorials.remove_tutorial_from_DOM("Pending", agreement_accepted_response, this_tutorial);
+
+            let previous_view = await nav_controller.getPrevious();
+
+            if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
+                nav_controller.pop();
+            } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+                nav_controller.popTo(0);
+            }
+
+            tutorials.total_open_tutorials = tutorials.open_tutorials.length;
+            tutorials.update_my_tutorial("Pending", agreement_rejected_response.updated_tutorial);
         } else {
-            create_ionic_alert("Failed to accept agreement", agreement_accepted_response.response, ["OK"]);
+            create_ionic_alert("Failed to reject agreement", agreement_rejected_response.response, ["OK"]);
         }
-
-        console.log(agreement_accepted_response);
-    }
-
-    nav_controller.popToRoot();
-}
-
-async function reject_this_agreement(nav_controller, this_tutorial) {
-    let agreement_rejected_response = await access_route({tutorial_id: this_tutorial._id}, "reject_agreement");
-
-    if (!agreement_rejected_response.error) {
-        user_notifications.addUnreadNotificationsToDOM();
-        user_notifications.addToNotifications(agreement_rejected_response.student_notification.response);
-        user_notifications.sendAgreementRejectedNotification({response: agreement_rejected_response.tutor_notification.response}, agreement_rejected_response.updated_tutorial);
-
-        let reject_buttons = [
+    } else {
+        create_ionic_alert("Agreement rejection", "The agreement you are trying to reject either no longer exists, has already been reject or accepted.", [
             {
-                side: 'end',
-                text: 'Close',
-                role: 'cancel',
-                handler: () => {
-                    console.log('Cancel clicked');
+                text: 'OK',
+                handler: async () => {
+                    device_feedback();
+
+                    let previous_view = await nav_controller.getPrevious();
+
+                    if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
+                        nav_controller.pop();
+                    } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+                        nav_controller.popTo(0);
+                    }
                 }
             }
-        ];
-
-        create_toast("Tutorial canceled!", "dark", 2000, reject_buttons);
-        //Send push notification
-        if (!localhost) {
-            push.send_notification("Agreement rejected", "The student has rejected your agreement for the '" + agreement_rejected_response.updated_tutorial.post_title + "' tutorial. Click on this notification to create a new one.", agreement_rejected_response.updated_tutorial.post_tutor_email, "Agreement rejected", {}, {});
-        }
-
-        posts.replace_notification_posts(agreement_rejected_response.updated_tutorial);
-
-
-        let previous_view = await nav_controller.getPrevious();
-
-        if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
-            nav_controller.pop();
-        } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
-            nav_controller.popTo(0);
-        }
-
-        tutorials.total_open_tutorials = tutorials.open_tutorials.length;
-        tutorials.update_my_tutorial("Pending", agreement_rejected_response.updated_tutorial);
-    } else {
-        create_ionic_alert("Failed to reject agreement", agreement_rejected_response.response, ["OK"]);
+        ]);
     }
 }
 
@@ -1851,7 +1976,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                                     ${begin_button}
                                     <ion-button style="display:none;" expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="danger" id="finish_tutorial">Finish Tutorial</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
                                 </div> 
                                  <ion-item-divider class="divider2"></ion-item-divider>   
@@ -1879,7 +2004,7 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
                             </div>
                                     <ion-item-divider class="divider"></ion-item-divider>
                                         <ion-list-header class="collapsible">
-                                            <strong>TUTORIAL LINKS</strong>
+                                            <strong>SUPPORT MATERIALS</strong>
                                         </ion-list-header>
                                     <ion-list class="content">
                                         ${tutorial_links}
@@ -1895,7 +2020,9 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let begin_tutorial;
@@ -1909,13 +2036,16 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
         }
 
         if (student_number !== "Canceled") {
-            start_tutorial(this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler);
+            let previous_view = await nav_controller.getPrevious();
+            start_tutorial(nav_controller, this_post, this_post._id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view);
         }
     };
 
     let finish_tutorial;
     let finish_tutorial_handler = async function () {
-        end_tutorial(nav_controller, this_post, this_post._id, tutorial_status, finish_tutorial, finish_tutorial_handler);
+        let previous = await nav_controller.getPrevious();
+
+        end_tutorial(nav_controller, this_post, this_post._id, tutorial_status, finish_tutorial, finish_tutorial_handler, previous);
     };
 
     let tutorial_log;
@@ -1927,18 +2057,23 @@ function load_ongoing_tutorial_component(nav_controller, this_post, tutorial_tag
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        validate_digital_signatures({token: token, tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
     };
 
     let openPdf;
     let openPdfHandler = async function () {
         device_feedback();
         openPDF(this_post.post_agreement_url);
-        //console.log(this_tutorial);
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -2072,7 +2207,7 @@ async function load_open_tutorial_component(nav_controller, this_post) {
                                     </ion-label>
                                 </ion-item>      
                                  <ion-item style="margin-top:-15px;" lines="none">
-                                    <h6>
+                                    <h6 style="font-weight:normal;">
                                         A tutor has not yet accepted your agreement. Please be patient
                                         as we have limited tutors.
                                     </h6>
@@ -2101,7 +2236,7 @@ async function load_open_tutorial_component(nav_controller, this_post) {
                                                         </div>
                                                         <ion-item-divider class="divider"></ion-item-divider>
                                                             <ion-list-header class="collapsible">
-                                                                <strong>TUTORIAL LINKS</strong>
+                                                                <strong>SUPPORT MATERIALS</strong>
                                                             </ion-list-header>
                                                         <ion-list class="content">
                                                             ${tutorial_links}
@@ -2114,11 +2249,13 @@ async function load_open_tutorial_component(nav_controller, this_post) {
     let cancel_tutorial_handler = async function () {
         device_feedback();
 
-        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status);
+        let previous = await nav_controller.getPrevious();
+
+        cancel_the_tutorial(nav_controller, this_post, this_post._id, tutorial_status, previous);
     };
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -2154,9 +2291,9 @@ async function load_open_tutorial_component(nav_controller, this_post) {
 
 async function load_done_tutorial_component(nav_controller, this_post, tutorial_tag, tutorial_status) {
     let tutorial_links = get_tutorial_links(tutorial_tag);
-    
+
     let comment = "";
-    if(this_post.tutor_rated) {
+    if (this_post.tutor_rated) {
         comment = `<ion-list>
                                 <ion-list-header>
                                   <strong>STUDENT COMMENT</strong>
@@ -2174,8 +2311,8 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                 <ion-item-divider class="divider3"></ion-item-divider>
                                 
                             </ion-list>`;
-    } 
-    
+    }
+
     let tutor_info = "";
     if (this_post.std_email === user.getEmail()) {
         tutor_info = `<ion-item-divider class="divider"></ion-item-divider><ion-item lines="none"><h6><strong>Tutor's Information</strong></h6></ion-item><ion-item style="margin-top:-10px;margin-bottom: -30px;" lines="none"><p style="font-size: 14px;margin-left: 3px;"><strong>Name:</strong> ${this_post.post_tutor_name}<br><strong>Email:</strong> ${this_post.post_tutor_email}</p></ion-item>`;
@@ -2240,7 +2377,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                                 <ion-item-divider class="divider2"></ion-item-divider>   
                                 <div class="ion-padding-top">
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="view_agreement">View agreement</ion-button>
-                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log">Tutorial Log</ion-button>
+                                    <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="tutorial_log" onclick="device_feedback();">Tutorial Log</ion-button>
                                     <ion-button expand="block" type="button" class="ion-margin ion-color ion-color-primary md button button-block button-solid ion-activatable ion-focusable hydrated" color="primary" id="verify_agreement">Check agreement validity</ion-button>
                                     ${rate_button}
                                 </div> 
@@ -2269,7 +2406,7 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
                             </div>
                                     <ion-item-divider class="divider"></ion-item-divider>
                                         <ion-list-header class="collapsible">
-                                            <strong>TUTORIAL LINKS</strong>
+                                            <strong>SUPPORT MATERIALS</strong>
                                         </ion-list-header>
                                     <ion-list id='tutorial_links_list' class="content">
                                         ${tutorial_links}
@@ -2295,18 +2432,24 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     let validate_agreement_handler = async function () {
         device_feedback();
 
-        validate_digital_signatures({tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        validate_digital_signatures({token: token, tutor_email: this_post.post_tutor_email, student_email: this_post.std_email, pdf: this_post.post_agreement_url, verify_single: false});
     };
 
     let openPdf;
     let openPdfHandler = async function () {
         device_feedback();
         openPDF(this_post.post_agreement_url);
-        //console.log(this_tutorial);
     }
 
     let ionNavDidChangeEvent = async function () {
-        //TUTORIAL LINKS ACCORDION
+        //SUPPORT MATERIALS ACCORDION
         if (document.getElementsByClassName("collapsible") !== null) {
             var coll = document.getElementsByClassName("collapsible");
             var i;
@@ -2361,122 +2504,185 @@ async function load_done_tutorial_component(nav_controller, this_post, tutorial_
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 }
 
-async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status) {
+async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status, previous) {
     create_ionic_alert("Cancel tutorial?", "Are you sure you want to cancel this tutorial? You cannot undo this action!", [
         {
             text: 'Yes',
             handler: async () => {
                 device_feedback();
 
-                console.log("Tutorial to be removed");
-                console.log(tutorial);
-
-                //Check what page we on, my tutorials or my requested tutorials
-                if (document.getElementById('my_posts_content') !== null) {
-                    tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
                 } else {
-                    let total_tutorials;
+                    token = "";
+                }
 
-                    if (status === "Open") {
-                        total_tutorials = tutorials.total_open_tutorials;
+                let cancel_response = await access_route({token: token, tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
 
-                        if (total_tutorials > 0) {
-                            tutorials.total_open_tutorials--;
-                            tutorials.open_tutorials = tutorials.open_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Pending" || status === "In negotiation") {
-                        total_tutorials = tutorials.total_pending_tutorials;
-
-                        if (total_tutorials > 0) {
-                            tutorials.total_pending_tutorials--;
-                            tutorials.pending_tutorials = tutorials.pending_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Ongoing") {
-                        total_tutorials = tutorials.total_ongoing_tutorials;
-
-                        if (total_tutorials > 0) {
-                            tutorials.total_ongoing_tutorials--;
-                            tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Done") {
-                        total_tutorials = tutorials.total_done_tutorials;
-
-                        if (total_tutorials > 0) {
-                            tutorials.total_done_tutorials--;
-                            tutorials.done_tutorials = tutorials.done_tutorials.filter(e => e._id !== tutorial._id);
-                        }
+                if (!cancel_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", cancel_response.new_token);
                     }
                 }
 
-                if (document.getElementById('my_tutored_posts_content') !== null) {
-                    tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial)
-                } else if (user.getStatus() == "Tutor") {
-                    let total_tutorials;
+                if (cancel_response.action_available) {
+                    if (status == "In negotiation") {
+                        status = "Pending";
+                    }
 
-                    if (status === "Pending" || status === "In negotiation") {
-                        total_tutorials = tutor_tutorials.total_tutor_pending_tutorials;
+                    //Canceler is THE student
+                    if (user.getEmail() == tutorial.std_email) {
+                        //Check what page we on, my tutorials or my requested tutorials
+                        if (document.getElementById('my_posts_content') !== null) {
+                            tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+                        } else {
+                            let total_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutor_tutorials.total_tutor_pending_tutorials--;
-                            tutor_tutorials.pending_tutor_tutorials = tutor_tutorials.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                            if (status === "Open") {
+                                total_tutorials = tutorials.total_open_tutorials;
+
+                                if (total_tutorials > 0) {
+                                    tutorials.total_open_tutorials--;
+                                    tutorials.open_tutorials = tutorials.open_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            } else if (status === "Pending") {
+                                total_tutorials = tutorials.total_pending_tutorials;
+
+                                if (total_tutorials > 0) {
+                                    tutorials.total_pending_tutorials--;
+                                    tutorials.pending_tutorials = tutorials.pending_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            } else if (status === "Ongoing") {
+                                total_tutorials = tutorials.total_ongoing_tutorials;
+
+                                if (total_tutorials > 0) {
+                                    tutorials.total_ongoing_tutorials--;
+                                    tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            } else if (status === "Done") {
+                                total_tutorials = tutorials.total_done_tutorials;
+
+                                if (total_tutorials > 0) {
+                                    tutorials.total_done_tutorials--;
+                                    tutorials.done_tutorials = tutorials.done_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            }
                         }
-                    } else if (status === "Ongoing") {
-                        total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
+                    } else {
+                        if (document.getElementById('my_tutored_posts_content') !== null) {
+                            tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial)
+                        } else {
+                            let total_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutor_tutorials.total_tutor_ongoing_tutorials--;
-                            tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    } else if (status === "Done") {
-                        total_tutorials = tutor_tutorials.total_tutor_done_tutorials;
+                            if (status === "Pending") {
+                                total_tutorials = tutor_tutorials.total_tutor_pending_tutorials;
 
-                        if (total_tutorials > 0) {
-                            tutor_tutorials.total_tutor_done_tutorials--;
-                            tutor_tutorials.done_tutor_tutorials = tutor_tutorials.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                                if (total_tutorials > 0) {
+                                    tutor_tutorials.total_tutor_pending_tutorials--;
+                                    tutor_tutorials.pending_tutor_tutorials = tutor_tutorials.pending_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            } else if (status === "Ongoing") {
+                                total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
+
+                                if (total_tutorials > 0) {
+                                    tutor_tutorials.total_tutor_ongoing_tutorials--;
+                                    tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            } else if (status === "Done") {
+                                total_tutorials = tutor_tutorials.total_tutor_done_tutorials;
+
+                                if (total_tutorials > 0) {
+                                    tutor_tutorials.total_tutor_done_tutorials--;
+                                    tutor_tutorials.done_tutor_tutorials = tutor_tutorials.done_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                                }
+                            }
                         }
                     }
-                }
 
-                console.log("Tutorial removed?");
-                console.log(tutor_tutorials.pending_tutor_tutorials);
+                    user_notifications.addUnreadNotificationsToDOM();
+                    user_notifications.addToNotifications(cancel_response.student_notification.response);
 
-                let cancel_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "cancel_tutorial");
-                user_notifications.addUnreadNotificationsToDOM();
-                user_notifications.addToNotifications(cancel_response.student_notification.response);
-
-                let cancel_buttons = [
-                    {
-                        side: 'end',
-                        text: 'Close',
-                        role: 'cancel',
-                        handler: () => {
-                            console.log('Cancel clicked');
+                    if (tutorial.post_status == "Open") {
+                        if (user.getEmail() !== tutorial.post_tutor_email) {
+                            user.setOpenTutorials(user.getOpenTutorials() - 1);
+                        }
+                    } else if (tutorial.post_status == "Pending" || tutorial.post_status == "In negotiation") {
+                        if (user.getEmail() !== tutorial.post_tutor_email) {
+                            user.setPendingTutorials(user.getPendingTutorials() - 1);
+                        } else {
+                            user.setPendingTutoredTutorials(user.getPendingTutoredTutorials() - 1);
+                        }
+                    } else if (tutorial.post_status == "Ongoing") {
+                        if (user.getEmail() !== tutorial.post_tutor_email) {
+                            user.setOngoingTutorials(user.getOngoingTutorials() - 1);
+                        } else {
+                            user.setOngoingTutoredTutorials(user.getOngoingTutoredTutorials() - 1);
                         }
                     }
-                ];
 
-                create_toast("Tutorial canceled!", "dark", 2000, cancel_buttons);
+                    console.log(tutorial);
+                    console.log("above tut");
 
-                posts.removeNotificationPostByPostId(tutorial_id)
+                    let cancel_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
 
-                if (typeof notification_posts !== 'undefined') {
-                    notification_posts = notification_posts.filter(function (obj) {
-                        return obj._id !== tutorial_id;
-                    });
+                    create_toast("Tutorial canceled!", "dark", 2000, cancel_buttons);
+
+                    posts.removeNotificationPostByPostId(tutorial_id);
+                    //tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+
+                    if (typeof notification_posts !== 'undefined') {
+                        notification_posts = notification_posts.filter(function (obj) {
+                            return obj._id !== tutorial_id;
+                        });
+                    }
+
+                    //Canceler is a student, send notification to only tutor (if exists)
+                    if (user.getEmail() == tutorial.std_email) {
+                        //Send notification to tutor if he exists
+                        if (cancel_response.tutor_exists) {
+                            user_notifications.sendTutorialCanceledNotification(cancel_response.tutor_notification.response, tutorial);
+                        } else {
+                            user_notifications.removeOpenPost(tutorial);
+                        }
+                    } else {
+                        user_notifications.sendTutorialCanceledNotification(cancel_response.student_notification.response, tutorial);
+                    }
+
+                    if (previous.element.nodeName == "NAV-NOTIFICATION" || "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-ACCEPTED" || "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-REJECTED") {
+                        nav_controller.popToRoot();
+                    } else {
+                        nav_controller.pop();
+                    }
+                } else {
+                    create_ionic_alert("Cancel tutorial", "The tutorial you wish to cancel is no longer available! Please refresh your tutorials.", [
+                        {
+                            text: 'OK',
+                            handler: async () => {
+                                device_feedback();
+
+                                if (previous.element.nodeName == "NAV-NOTIFICATION" || "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-ACCEPTED" || "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-REJECTED") {
+                                    nav_controller.popToRoot();
+                                } else {
+                                    nav_controller.pop();
+                                }
+                            }
+                        }
+                    ]);
                 }
-
-                console.log("Notification Posts");
-                console.log(notification_posts);
-
-                console.log("Notification Posts Remove")
-                console.log(posts.notification_posts)
-
-                //Send notification to tutor if he exists
-                if (cancel_response.tutor_exists) {
-                    user_notifications.sendNewNotification(cancel_response.tutor_notification.response);
-                }
-
-                nav_controller.pop();
             }
         },
         {
@@ -2484,7 +2690,6 @@ async function cancel_the_tutorial(nav_controller, tutorial, tutorial_id, status
             role: 'cancel',
             handler: () => {
                 device_feedback();
-                console.log('Cancel')
             }
         }
     ]);
@@ -2562,6 +2767,16 @@ async function activate_bar_code_scanner() {
 
 async function validate_digital_signatures(data_object) {
     let validate_digital_signatures_response = await access_route(data_object, "validate_digital_signatures");
+
+    if (!validate_digital_signatures_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", validate_digital_signatures_response.new_token);
+        }
+    }
 
     if (validate_digital_signatures_response.error) {
         let toast_buttons = [
@@ -2716,82 +2931,108 @@ function get_tutorial_links(tutorial_tag) {
     return tutorial_links;
 }
 
-function start_tutorial(this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler) {
-    console.log("Start");
-    console.log(begin_tutorial);
-    console.log(begin_tutorial_handler)
+function start_tutorial(nav_controller, this_post, post_id, tutorial_status, student_number, begin_tutorial, begin_tutorial_handler, cancel_tutorial, cancel_tutorial_handler, previous_view) {
+    if (previous_view.element.tagName === 'NAV-MY-REQUESTED-TUTORIALS') {
+        nav_controller.pop();
+    } else if (previous_view.element.tagName === 'NAV-NOTIFICATION') {
+        nav_controller.popTo(0);
+    }
+
     create_ionic_alert("Begin tutorial?", "Are you sure you want to begin this tutorial? Once a tutorial is started, it cannot be canceled or paused!", [
         {
             text: 'Yes',
             handler: async () => {
                 device_feedback();
                 //Update the tutorial 
-                let begin_response = await access_route({tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
-                user_notifications.addUnreadNotificationsToDOM();
-                user_notifications.addToNotifications(begin_response.student_notification.response);
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
 
-                let begin_buttons = [
-                    {
-                        side: 'end',
-                        text: 'Close',
-                        role: 'cancel',
-                        handler: () => {
-                            console.log('Cancel clicked');
+                let begin_response = await access_route({token: token, tutorial_id: post_id, student_number: student_number, avatar: user.getAvatar()}, "begin_tutorial");
+
+                if (!begin_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", begin_response.new_token);
+                    }
+                }
+
+                if (begin_response.action_available) {
+                    user_notifications.addUnreadNotificationsToDOM();
+                    user_notifications.addToNotifications(begin_response.student_notification.response);
+
+                    let begin_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    //Update our tutorials
+                    if (tutorial_status === "Ongoing") {
+                        tutorials.total_ongoing_tutorials--;
+                        tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== this_post._id);
+
+                        tutorials.ongoing_tutorials.push(begin_response.updated_tutorial);
+                    }
+
+                    if (user.getStatus() == "Tutor") {
+                        if (tutorial_status === "Ongoing") {
+                            tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== this_post._id);
+
+                            tutor_tutorials.ongoing_tutor_tutorials.push(begin_response.updated_tutorial);
                         }
                     }
-                ];
 
-                //Update our tutorials
-                if (tutorial_status === "Ongoing") {
-                    tutorials.total_ongoing_tutorials--;
-                    tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== this_post._id);
+                    create_toast("Tutorial started!", "dark", 2000, begin_buttons);
 
-                    tutorials.ongoing_tutorials.push(begin_response.updated_tutorial);
-                }
+                    //Remove notification post and add new one (The post object we are using to get the information for notifications)
+                    posts.removeNotificationPostByPostId(post_id);
+                    posts.notification_posts.push(begin_response.updated_tutorial);
 
-                if (user.getStatus() == "Tutor") {
-                    if (tutorial_status === "Ongoing") {
-                        tutor_tutorials.total_tutor_ongoing_tutorials--;
-                        tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== this_post._id);
+                    //Do same for the notification_posts variable
+                    if (typeof notification_posts !== 'undefined') {
+                        notification_posts = notification_posts.filter(function (obj) {
+                            return obj._id !== post_id;
+                        });
 
-                        tutor_tutorials.ongoing_tutor_tutorials.push(begin_response.updated_tutorial);
+                        notification_posts.push(begin_response.updated_tutorial);
                     }
+
+                    //REMOVE BEGIN TUTORIAL EVENT LISTENER
+                    begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
+                    cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
+                    cancel_tutorial.remove();
+
+                    //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
+                    var element = document.getElementById("begin_tutorial");
+                    element.parentNode.removeChild(element);
+                    document.getElementById("finish_tutorial").style.display = "block";
+                    user_notifications.sendBeginTutorialNotification(begin_response.student_notification.response, begin_response.updated_tutorial);
+
+                    if (!localhost) {
+                        push.send_notification("Tutorial has begun", "The '" + begin_response.updated_tutorial.post_title + "' tutorial has begun", begin_response.updated_tutorial.std_email, "Tutorial has begun", {}, {});
+                    }
+                } else {
+                    create_ionic_alert("Begin tutorial", "The tutorial you wish to begin has either already begun or has been canceled. Please refresh your tutorials.", [
+                        {
+                            text: 'OK',
+                            handler: async () => {
+                                device_feedback();
+                            }
+                        }
+                    ]);
                 }
-
-                create_toast("Tutorial started!", "dark", 2000, begin_buttons);
-
-                //Remove notification post and add new one (The post object we are using to get the information for notifications)
-                posts.removeNotificationPostByPostId(post_id);
-                posts.notification_posts.push(begin_response.updated_tutorial);
-
-                //Do same for the notification_posts variable
-                if (typeof notification_posts !== 'undefined') {
-                    notification_posts = notification_posts.filter(function (obj) {
-                        return obj._id !== post_id;
-                    });
-
-                    notification_posts.push(begin_response.updated_tutorial);
-                }
-
-
-                console.log("Notification Posts");
-                console.log(notification_posts);
-
-                console.log("Notification Posts Remove")
-                console.log(posts.notification_posts)
-
-                //REMOVE BEGIN TUTORIAL EVENT LISTENER
-                begin_tutorial.removeEventListener("click", begin_tutorial_handler, false);
-                cancel_tutorial.removeEventListener("click", cancel_tutorial_handler, false);
-                cancel_tutorial.remove();
-
-                //ADD YOUR CODE TO CHANGE THE 'Begin Tutorial' BUTTON to 'Finish Tutorial' HERE!
-                var element = document.getElementById("begin_tutorial");
-                element.parentNode.removeChild(element);
-                document.getElementById("finish_tutorial").style.display = "block";
-                console.log("STOP!!!!!!!!")
-                console.log(begin_response.student_notification.response);
-                user_notifications.sendBeginTutorialNotification(begin_response.student_notification.response, begin_response.updated_tutorial);
             }
         },
         {
@@ -2799,113 +3040,141 @@ function start_tutorial(this_post, post_id, tutorial_status, student_number, beg
             role: 'cancel',
             handler: () => {
                 device_feedback();
-                console.log('Cancel')
             }
         }
     ]);
 }
 
-function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tutorial, finish_tutorial_handler) {
+function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tutorial, finish_tutorial_handler, previous) {
     create_ionic_alert("Finish tutorial?", "Are you sure you want to finish this tutorial? The tutorial will be moved to done and be considered completed.", [
         {
             text: 'Yes',
             handler: async () => {
                 device_feedback();
 
-                console.log("Tutorial to be removed");
-                console.log(tutorial);
-
-                let end_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "finish_tutorial");
-                user_notifications.addUnreadNotificationsToDOM();
-                user_notifications.addToNotifications(end_response.tutor_notification.response);
-
-                //Check what page we on, my tutorials or my requested tutorials
-                if (document.getElementById('my_posts_content') !== null) {
-                    tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
-                    tutorials.total_done_tutorials++;
-                    tutorials.add_post_to_segment("Done", document.getElementById('done_tutorials_header'), end_response.updated_tutorial);
-
-                    console.log(tutorials.done_tutorials);
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
                 } else {
-                    let total_tutorials;
-
-                    if (status === "Ongoing") {
-                        total_tutorials = tutorials.total_ongoing_tutorials;
-
-                        if (total_tutorials > 0) {
-                            alert("Subtract 1")
-                            tutorials.total_ongoing_tutorials--;
-                            tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
-                        }
-                    }
-
-                    //ADD A TUTORIAL TO DONE ARRAY
-                    tutorials.total_done_tutorials++;
-                    tutorials.done_tutorials.push(end_response.updated_tutorial);
+                    token = "";
                 }
 
-                if (document.getElementById('my_tutored_posts_content') !== null) {
-                    tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, end_response.updated_tutorial);
+                let end_response = await access_route({token: token, tutorial: tutorial, tutorial_id: tutorial_id, avatar: user.getAvatar()}, "finish_tutorial");
 
-                    //Add tutorial to Done segment
-                    tutor_tutorials.add_tutorial_to_DOM("Done", end_response.updated_tutorial);
-                } else if (user.getStatus() == "Tutor") {
-                    let total_tutorials;
-
-                    if (status === "Ongoing") {
-                        total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
-
-                        if (total_tutorials > 0) {
-                            alert("4")
-                            tutor_tutorials.total_tutor_ongoing_tutorials--;
-                            tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
-                        }
+                if (!end_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", end_response.new_token);
                     }
-
-                    //ADD A TUTORIAL TO DONE ARRAY
-                    tutor_tutorials.total_tutor_done_tutorials++;
-                    tutor_tutorials.done_tutor_tutorials.push(end_response.updated_tutorial);
                 }
 
-                console.log("Tutorial removed?");
-                console.log(tutor_tutorials.pending_tutor_tutorials);
+                if (end_response.action_available) {
+                    user.setOngoingTutoredTutorials(user.getOngoingTutoredTutorials() - 1);
+                    user.setDoneTutoredTutorials(user.getDoneTutoredTutorials() + 1);
 
-                let cancel_buttons = [
-                    {
-                        side: 'end',
-                        text: 'Close',
-                        role: 'cancel',
-                        handler: () => {
-                            console.log('Cancel clicked');
+                    user_notifications.addUnreadNotificationsToDOM();
+                    user_notifications.addToNotifications(end_response.tutor_notification.response);
+
+                    //Check what page we on, my tutorials or my requested tutorials
+                    if (document.getElementById('my_posts_content') !== null) {
+                        tutorials.remove_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, tutorial);
+                        tutorials.total_done_tutorials++;
+                        tutorials.add_post_to_segment("Done", document.getElementById('done_tutorials_header'), end_response.updated_tutorial);
+                    } else {
+                        let total_tutorials;
+
+                        if (status === "Ongoing") {
+                            total_tutorials = tutorials.total_ongoing_tutorials;
+
+                            if (total_tutorials > 0) {
+                                tutorials.total_ongoing_tutorials--;
+                                tutorials.ongoing_tutorials = tutorials.ongoing_tutorials.filter(e => e._id !== tutorial._id);
+                            }
                         }
+
+                        //ADD A TUTORIAL TO DONE ARRAY
+                        tutorials.total_done_tutorials++;
+                        tutorials.done_tutorials.push(end_response.updated_tutorial);
                     }
-                ];
 
-                create_toast("Tutorial finished!", "dark", 2000, cancel_buttons);
+                    if (document.getElementById('my_tutored_posts_content') !== null) {
+                        tutor_tutorials.remove_tutor_tutorial_from_DOM(status, {updated_tutorial: {_id: tutorial_id}}, end_response.updated_tutorial);
 
-                posts.removeNotificationPostByPostId(tutorial_id)
+                        //Add tutorial to Done segment
+                        tutor_tutorials.add_tutorial_to_DOM("Done", end_response.updated_tutorial);
+                    } else if (user.getStatus() == "Tutor") {
+                        let total_tutorials;
 
-                if (typeof notification_posts !== 'undefined') {
-                    notification_posts = notification_posts.filter(function (obj) {
-                        return obj._id !== tutorial_id;
-                    });
+                        if (status === "Ongoing") {
+                            total_tutorials = tutor_tutorials.total_tutor_ongoing_tutorials;
 
-                    notification_posts.push(end_response.updated_tutorial);
+                            if (total_tutorials > 0) {
+                                tutor_tutorials.total_tutor_ongoing_tutorials--;
+                                tutor_tutorials.ongoing_tutor_tutorials = tutor_tutorials.ongoing_tutor_tutorials.filter(e => e._id !== tutorial._id);
+                            }
+                        }
+
+                        //ADD A TUTORIAL TO DONE ARRAY
+                        tutor_tutorials.total_tutor_done_tutorials++;
+                        tutor_tutorials.done_tutor_tutorials.push(end_response.updated_tutorial);
+                    }
+
+                    let cancel_buttons = [
+                        {
+                            side: 'end',
+                            text: 'Close',
+                            role: 'cancel',
+                            handler: () => {
+                                console.log('Cancel clicked');
+                            }
+                        }
+                    ];
+
+                    create_toast("Tutorial finished!", "dark", 2000, cancel_buttons);
+
+                    posts.removeNotificationPostByPostId(tutorial_id)
+
+                    if (typeof notification_posts !== 'undefined') {
+                        notification_posts = notification_posts.filter(function (obj) {
+                            return obj._id !== tutorial_id;
+                        });
+
+                        notification_posts.push(end_response.updated_tutorial);
+                    }
+
+                    //REMOVE BEGIN TUTORIAL EVENT LISTENER
+                    finish_tutorial.removeEventListener("click", finish_tutorial_handler, false);
+
+                    user_notifications.sendTutorialFinished(end_response.student_notification.response, end_response.updated_tutorial);
+
+                    if (!localhost) {
+                        push.send_notification("Tutorial has finished!", "The '" + end_response.updated_tutorial.post_title + "' tutorial has finished! Thank you for using Student Loop.", end_response.updated_tutorial.std_email, "Tutorial has finished", {}, {});
+                    }
+
+                    if (previous.element.nodeName == "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-ACCEPTED") {
+                        nav_controller.popToRoot();
+                    } else {
+                        nav_controller.pop();
+                    }
+                } else {
+                    create_ionic_alert("Finish tutorial", "The tutorial you wish to finish has already been finished. Please refresh your tutorials.", [
+                        {
+                            text: 'OK',
+                            handler: async () => {
+                                device_feedback();
+
+                                if (previous.element.nodeName == "NAV-NOTIFICATION-TUTORIAL-AGREEMENT-ACCEPTED") {
+                                    nav_controller.popToRoot();
+                                } else {
+                                    nav_controller.pop();
+                                }
+                            }
+                        }
+                    ]);
                 }
-
-                console.log("Notification Posts");
-                console.log(notification_posts);
-
-                console.log("Notification Posts Remove")
-                console.log(posts.notification_posts)
-
-                //REMOVE BEGIN TUTORIAL EVENT LISTENER
-                finish_tutorial.removeEventListener("click", finish_tutorial_handler, false);
-
-                user_notifications.sendTutorialFinished(end_response.student_notification.response, end_response.updated_tutorial);
-
-
-                nav_controller.pop();
             }
         },
         {
@@ -2913,7 +3182,6 @@ function end_tutorial(nav_controller, tutorial, tutorial_id, status, finish_tuto
             role: 'cancel',
             handler: () => {
                 device_feedback();
-                console.log('Cancel')
             }
         }
     ]);
@@ -2985,44 +3253,62 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
         device_feedback();
 
         if (rating !== 0 && document.getElementById('comment').value !== '') {
-            let rate_response = await access_route({tutorial: tutorial, tutorial_id: tutorial_id, rating: rating, comment: document.getElementById('comment').value}, "rate_tutor");
-            
-            tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
-
-            //IMPORTNAT!!!! LOOK INTO ADDING THIS FOR CANCEL, BEGIN AND FINISH TUTORIAL!!!!!!!!
-            posts.replace_notification_posts(rate_response.updated_tutorial);
-
-            if (typeof notification_posts !== 'undefined') {
-                notification_posts = notification_posts.filter(function (obj) {
-                    return obj._id !== tutorial_id;
-                });
-
-                notification_posts.push(rate_response.updated_tutorial);
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
             }
 
-            let cancel_buttons = [
-                {
-                    side: 'end',
-                    text: 'Close',
-                    role: 'cancel',
-                    handler: () => {
-                        console.log('Cancel clicked');
-                    }
+            let rate_response = await access_route({token: token, tutorial: tutorial, tutorial_id: tutorial_id, rating: rating, comment: document.getElementById('comment').value}, "rate_tutor");
+
+            if (!rate_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", rate_response.new_token);
                 }
-            ];
+            }
 
-            create_toast("Tutor rated " + rating + "/5!", "dark", 2000, cancel_buttons);
+            if (rate_response.action_available) {
+                tutorials.update_my_tutorial("Done", rate_response.updated_tutorial);
 
-            if (from_forum) {
-                tutorial.tutor_rated = true;
-                tutorial.comment = document.getElementById('comment').value;
-                
-                rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
-                rate_the_tutor.remove();
-                
-                if(document.getElementById('tutorial_links_list') !== null) {
-                    let comment = document.createElement('ion-list');
-                    comment.innerHTML = `<ion-list>
+                //IMPORTNAT!!!! LOOK INTO ADDING THIS FOR CANCEL, BEGIN AND FINISH TUTORIAL!!!!!!!!
+                posts.replace_notification_posts(rate_response.updated_tutorial);
+
+                if (typeof notification_posts !== 'undefined') {
+                    notification_posts = notification_posts.filter(function (obj) {
+                        return obj._id !== tutorial_id;
+                    });
+
+                    notification_posts.push(rate_response.updated_tutorial);
+                }
+
+                let cancel_buttons = [
+                    {
+                        side: 'end',
+                        text: 'Close',
+                        role: 'cancel',
+                        handler: () => {
+                            console.log('Cancel clicked');
+                        }
+                    }
+                ];
+
+                create_toast("Tutor rated " + rating + "/5!", "dark", 2000, cancel_buttons);
+
+                if (from_forum) {
+                    tutorial.tutor_rated = true;
+                    tutorial.comment = document.getElementById('comment').value;
+
+                    rate_the_tutor.removeEventListener('click', rate_the_tutor_handler, false);
+                    rate_the_tutor.remove();
+
+                    if (document.getElementById('tutorial_links_list') !== null) {
+                        let comment = document.createElement('ion-list');
+                        comment.innerHTML = `<ion-list>
                                 <ion-list-header>
                                   <strong>STUDENT COMMENT</strong>
                                 </ion-list-header>
@@ -3039,14 +3325,26 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
                                 <ion-item-divider class="divider3"></ion-item-divider>
                                 
                             </ion-list>`;
-                    
-                    document.getElementById('tutorial_links_list').after(comment);
+
+                        document.getElementById('tutorial_links_list').after(comment);
+                    }
                 }
+
+                user_notifications.sendRateTutor(rate_response.updated_tutorial, rate_response.rating);
+
+                nav_controller.pop();
+            } else {
+                create_ionic_alert("Rate tutor", "You have already rated this tutor. Please refresh your tutorials.", [
+                    {
+                        text: 'OK',
+                        handler: async () => {
+                            device_feedback();
+
+                            nav_controller.pop();
+                        }
+                    }
+                ]);
             }
-            
-            user_notifications.sendRateTutor(rate_response.updated_tutorial, rate_response.rating);
-            
-            nav_controller.pop();
         } else {
             create_ionic_alert("Failed to rate tutor", "Please add a rating from half a star to 5 stars and add a comment.", ["OK"]);
         }
@@ -3085,6 +3383,242 @@ function rate_tutor(nav_controller, tutorial, tutorial_id, from_forum, rate_the_
     };
 
     nav_controller.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
+}
+
+async function show_terms_conditions() {
+    const controller = document.querySelector('ion-modal-controller');
+    let modal_text;
+
+    modal_text = `
+          <ion-header translucent>
+                            <ion-toolbar>
+                                <ion-title>Terms & conditions</ion-title>
+                                <ion-buttons onclick="device_feedback()" slot="end">
+                <ion-button id="modal_close">Close</ion-button>
+              </ion-buttons>
+                            </ion-toolbar>
+                        </ion-header>
+                
+                        <ion-content fullscreen>
+                            <ion-list class="terms">
+                        <p><strong style="opacity: 0.7;">Last Updated&nbsp;30&nbsp;January&nbsp;&nbsp;2020&nbsp;</strong>&nbsp;</p>
+                        <p><strong>1. Agreement to Terms</strong>&nbsp;&nbsp;</p>
+                        <p><strong>1.1 &nbsp;These Terms and Conditions</strong> constitute a legally binding agreement made between you, whether personally or on behalf of an entity (you), and&nbsp;Service Loop,&nbsp;located at&nbsp;Dundalk,&nbsp;Louth,&nbsp;Ireland&nbsp;(we,&nbsp;us), concerning your access to and use of the&nbsp;Service Loop&nbsp;website as well as any related applications (the&nbsp;Site).&nbsp;&nbsp;</p>
+                        <p>The Site provides the following services:&nbsp;App that helps students to book tutorials&nbsp;(Services). You agree that by accessing the Site and/or Services, you have read, understood, and agree to be bound by all of these Terms and Conditions.&nbsp;&nbsp;</p>
+                        <p>If you do not agree with all of these Terms and Conditions, then you are prohibited from using the Site and Services and you must discontinue use immediately. We recommend that you print a copy of these Terms and Conditions for future reference.&nbsp;&nbsp;</p>
+                        <p><strong>1.2 &nbsp;The supplemental policies</strong> set out in Section 1.7 below, as well as any supplemental terms and condition or documents that may be posted on the Site from time to time, are expressly incorporated by reference.&nbsp;&nbsp;</p>
+                        <p><strong>1.3 &nbsp;We may make changes</strong> to these Terms and Conditions at any time. The updated version of these Terms and Conditions will be indicated by an updated &ldquo;Revised&rdquo; date and the updated version will be effective as soon as it is accessible. You are responsible for reviewing these Terms and Conditions to stay informed of updates. Your continued use of the Site represents that you have accepted such changes.&nbsp;&nbsp;</p>
+                        <p><strong>1.4 &nbsp;We may update or change</strong> the Site from time to time to reflect changes to our products, our users' needs and/or our business priorities.&nbsp;&nbsp;</p>
+                        <p><strong>1.5 &nbsp;Our site</strong> is directed to people residing in&nbsp;England. The information provided on the Site is not intended for distribution to or use by any person or entity in any jurisdiction or country where such distribution or use would be contrary to law or regulation or which would subject us to any registration requirement within such jurisdiction or country. &nbsp;&nbsp;</p>
+                        <p><strong>1.6 &nbsp;The Site</strong> is intended for users who are at least 18 years old. &nbsp;If you are under the age of 18, you are not permitted to register for the Site or use the Services without parental permission.&nbsp;</p>
+                        <p><strong>1.7 &nbsp;Additional policies</strong> which also apply to your use of the Site include:&nbsp;&nbsp;&nbsp;</p>
+
+                        <p><strong>2. Acceptable Use</strong>&nbsp;&nbsp;</p>
+                        <p><strong>2.1 &nbsp;You may not</strong> access or use the Site for any purpose other than that for which we make the site and our services available. The Site may not be used in connection with any commercial endeavors except those that are specifically endorsed or approved by us.&nbsp;&nbsp;</p>
+                        <p><strong>2.2 &nbsp;As a user</strong> of this Site, you agree not to:&nbsp;&nbsp;</p>
+                        <ul>
+                        <li>Systematically retrieve data or other content from the Site to a compile database or directory without written permission from us&nbsp;</li>
+                        <li>Make any unauthorized use of the Site, including collecting usernames and/or email addresses of users to send unsolicited email or creating user accounts under false pretenses&nbsp;</li>
+                        <li>Engage in unauthorized framing of or linking to the Site&nbsp;</li>
+                        <li>Trick, defraud, or mislead us and other users, especially in any attempt to learn sensitive account information such as user passwords&nbsp;</li>
+                        <li>Make improper use of our support services, or submit false reports of abuse or misconduct&nbsp;</li>
+                        <li>Engage in any automated use of the system, such as using scripts to send comments or messages, or using any data mining, robots, or similar data gathering and extraction tools&nbsp;</li>
+                        <li>Attempt to impersonate another user or person, or use the username of another user&nbsp;</li>
+                        <li>Interfere with, disrupt, or create an undue burden on the Site or the networks and services connected to the Site&nbsp;</li>
+                        <li>Sell or otherwise transfer your profile&nbsp;</li>
+                        <li>Use any information obtained from the Site in order to harass, abuse, or harm another person&nbsp;</li>
+                        <li>Use the Site or our content as part of any effort to compete with us or to create a revenue-generating endeavor or commercial enterprise&nbsp;</li>
+                        <li>Decipher, decompile, disassemble, or reverse engineer any of the software comprising or in any way making up a part of the Site&nbsp;</li>
+                        <li>Attempt to access any portions of the Site that you are restricted from accessing&nbsp;</li>
+                        <li>Harass, annoy, intimidate, or threaten any of our employees, agents, or other users&nbsp;</li>
+                        <li>Delete the copyright or other proprietary rights notice from any of the content&nbsp;</li>
+                        <li>Copy or adapt the Site&rsquo;s software, including but not limited to Flash, PHP, HTML, JavaScript, or other code&nbsp;</li>
+                        <li>Upload or transmit (or attempt to upload or to transmit) viruses, Trojan horses, or other material that interferes with any party&rsquo;s uninterrupted use and enjoyment of the Site, or any material that acts as a passive or active information collection or transmission mechanism&nbsp;</li>
+                        <li>Use, launch, or engage in any automated use of the system, such as using scripts to send comments or messages, robots, scrapers, offline readers, or similar data gathering and extraction tools&nbsp;</li>
+                        <li>Disparage, tarnish, or otherwise harm, in our opinion, us and/or the Site&nbsp;</li>
+                        <li>Use the Site in a manner inconsistent with any applicable laws or regulations&nbsp;</li>
+                        <li>Threaten users with negative feedback or offering services solely to give positive feedback to users&nbsp;</li>
+                        <li>Misrepresent experience, skills, or information about a User&nbsp;</li>
+                        <li>Advertise products or services not intended by us</li>
+                        <li>Falsely imply a relationship with us or another company with whom you do not have a relationship&nbsp;</li>
+                        </ul>
+                        <p><strong>3. Information you provide to us</strong></p>
+                        <p><strong>3.1 &nbsp;You represent and warrant that:</strong> (a) all registration information you submit will be true, accurate, current, and complete and relate to you and not a third party; (b) you will maintain the accuracy of such information and promptly update such information as necessary; (c) you will keep your password confidential and will be responsible for all use of your password and account; (d) you have the legal capacity and you agree to comply with these Terms and Conditions; and (e) you are not a minor in the jurisdiction in which you reside, or if a minor, you have received parental permission to use the Site.&nbsp;&nbsp;</p>
+                        <p>If you know or suspect that anyone other than you knows your user information (such as an identification code or user name) and/or password you must promptly notify us at&nbsp;info@serviceloop.com.</p>
+                        <p><strong>3.2 &nbsp;If you provide</strong> any information that is untrue, inaccurate, not current or incomplete, we may suspend or terminate your account. We may remove or change a user name you select if we determine that such user name is inappropriate.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p><strong>4. Our content&nbsp;</strong></p>
+                        <p><strong>4.1 &nbsp;Unless otherwise indicated</strong>, the Site and Services including source code, databases, functionality, software, website designs, audio, video, text, photographs, and graphics on the Site (<strong>Our Content</strong>) are owned or licensed to us, and are protected by copyright and trade mark laws. &nbsp;&nbsp;</p>
+                        <p><strong>4.2 &nbsp;Except</strong> as expressly provided in these Terms and Conditions, no part of the Site, Services or Our Content may be copied, reproduced, aggregated, republished, uploaded, posted, publicly displayed, encoded, translated, transmitted, distributed, sold, licensed, or otherwise exploited for any commercial purpose whatsoever, without our express prior written permission.&nbsp;</p>
+                        <p><strong>4.3 &nbsp;Provided that you</strong> are eligible to use the Site, you are granted a limited licence to access and use the Site and Our Content and to download or print a copy of any portion of the Content to which you have properly gained access solely for your personal, non-commercial use. &nbsp;&nbsp;</p>
+                        <p><strong>4.4 &nbsp;You shall not</strong> (a) try to gain unauthorised access to the Site or any networks, servers or computer systems connected to the Site; and/or (b) make for any purpose including error correction, any modifications, adaptions, additions or enhancements to the Site or Our Content, including the modification of the paper or digital copies you may have downloaded.&nbsp;</p>
+                        <p><strong>4.5 &nbsp;We shall</strong> (a) prepare the Site and Our Content with reasonable skill and care; and (b) use industry standard virus detection software to try to block the uploading of content to the Site that contains viruses.&nbsp;&nbsp;</p>
+                        <p><strong>4.6 &nbsp;The content on the Site</strong> is provided for general information only. It is not intended to amount to advice on which you should rely. You must obtain professional or specialist advice before taking, or refraining from taking, any action on the basis of the content on the Site.&nbsp;&nbsp;</p>
+                        <p><strong>4.7 &nbsp;Although</strong> we make reasonable efforts to update the information on our site, we make no representations, warranties or guarantees, whether express or implied, that Our Content on the Site is accurate, complete or up to date.&nbsp;</p>
+                        <p><strong>5. Site Management &nbsp;</strong>&nbsp; &nbsp;</p>
+                        <p><strong>5.1&nbsp;&nbsp;We reserve the right</strong> at our sole discretion, to (1) monitor the Site for breaches of these Terms and Conditions; (2) take appropriate legal action against anyone in breach of applicable laws or these Terms and Conditions;&nbsp;(3) remove from the Site or otherwise disable all files and content that are excessive in size or are in any way a burden to our systems; and (4) otherwise manage the Site in a manner designed to protect our rights and property and to facilitate the proper functioning of the Site and Services.&nbsp;&nbsp;</p>
+                        <p><strong>5.2 &nbsp;We do not guarantee</strong> that the Site will be secure or free from bugs or viruses.&nbsp;</p>
+                        <p><strong>5.3 &nbsp;You are responsible</strong> for configuring your information technology, computer programs and platform to access the Site and you should use your own virus protection software.&nbsp;&nbsp;</p>
+                        <p><strong>6. Modifications to and availability of the Site &nbsp;</strong>&nbsp; &nbsp;</p>
+                        <p><strong>6.1 &nbsp;We reserve the right</strong> to change, modify, or remove the contents of the Site at any time or for any reason at our sole discretion without notice. We also reserve the right to modify or discontinue all or part of the Services without notice at any time.&nbsp; &nbsp;</p>
+                        <p><strong>6.2 &nbsp;We cannot guarantee</strong> the Site and Services will be available at all times. We may experience hardware, software, or other problems or need to perform maintenance related to the Site, resulting in interruptions, delays, or errors. You agree that we have no liability whatsoever for any loss, damage, or inconvenience caused by your inability to access or use the Site or Services during any downtime or discontinuance of the Site or Services.We are not obliged to maintain and support the Site or Services or to supply any corrections, updates, or releases.&nbsp;</p>
+                        <p><strong>6.3 &nbsp;There may be information</strong> on the Site that contains typographical errors, inaccuracies, or omissions that may relate to the Services, including descriptions, pricing, availability, and various other information. We reserve the right to correct any errors, inaccuracies, or omissions and to change or update the information at any time, without prior notice.&nbsp;&nbsp;</p>
+                        <p><strong>7. Disclaimer/Limitation of Liability &nbsp;</strong>&nbsp; &nbsp;</p>
+                        <p><strong>7.1&nbsp;&nbsp;The Site and Services</strong> are provided on an as-is and as-available basis. You agree that your use of the Site and/or Services will be at your sole risk except as expressly set out in these Terms and Conditions. All warranties, terms, conditions and undertakings, express or implied (including by statute, custom or usage, a course of dealing, or common law) in connection with the Site and Services and your use thereof including, without limitation, the implied warranties of satisfactory quality, fitness for a particular purpose and non-infringement are excluded to the fullest extent permitted by applicable law.&nbsp;&nbsp;</p>
+                        <p>We make no warranties or representations about the accuracy or completeness of the Site&rsquo;s content and are not liable for any (1) errors or omissions in content: (2) any unauthorized access to or use of our servers and/or any and all personal information and/or financial information stored on our server; (3) any interruption or cessation of transmission to or from the site or services; and/or (4) any bugs, viruses, trojan horses, or the like which may be transmitted to or through the site by any third party. We will not be responsible for any delay or failure to comply with our obligations under these Terms and Conditions if such delay or failure is caused by an event beyond our reasonable control.</p>
+                        <p><strong>7.2&nbsp;&nbsp;Our responsibility</strong> for loss or damage suffered by you:&nbsp;</p>
+                        <p><strong>Whether you are a consumer or a business user:</strong>&nbsp;</p>
+                        <ul>
+                        <li>We do not exclude or limit in any way our liability to you where it would be unlawful to do so. This includes liability for death or personal injury caused by our negligence or the negligence of our employees, agents or subcontractors and for fraud or fraudulent misrepresentation.&nbsp;</li>
+                        </ul>
+                        <ul>
+                        <li>If we fail to comply with these Terms and Conditions, we will be responsible for loss or damage you suffer that is a foreseeable result of our breach of these Terms and Conditions, but we would not be responsible for any loss or damage that were not foreseeable at the time you started using the Site/Services.&nbsp;</li>
+                        </ul>
+                        <p>Notwithstanding anything to the contrary contained in the Disclaimer/Limitation of Liability section, our liability to you for any cause whatsoever and regardless of the form of the action, will at all times be limited to a total aggregate amount equal to the greater of (a) the sum of &pound;5000 or (b) the amount paid, if any, by you to us for the Services/Site during the six (6) month period prior to any cause of action arising.&nbsp;&nbsp;&nbsp;</p>
+                        <p><strong>If you are a consumer user:</strong>&nbsp;</p>
+                        <ul>
+                        <li>Please note that we only provide our Site for domestic and private use. You agree not to use our Site for any commercial or business purposes, and we have no liability to you for any loss of profit, loss of business, business interruption, or loss of business opportunity.</li>
+                        </ul>
+                        <ul>
+                        <li>If defective digital content that we have supplied, damages a device or digital content belonging to you and this is caused by our failure to use reasonable care and skill, we will either repair the damage or pay you compensation.&nbsp;&nbsp;</li>
+                        </ul>
+                        <ul>
+                        <li>You have legal rights in relation to goods that are faulty or not as described. Advice about your legal rights is available from your local Citizens' Advice Bureau or Trading Standards office. Nothing in these Terms and Conditions will affect these legal rights.&nbsp; &nbsp;&nbsp;</li>
+                        </ul>
+                        <p><strong>8. Term and Termination &nbsp;</strong>&nbsp; &nbsp;</p>
+                        <p><strong>8.1 &nbsp;These Terms and Conditions</strong> shall remain in full force and effect while you use the Site or Services or are otherwise a user of the Site, as applicable. You may terminate your use or participation at any time, for any reason, by following the instructions for terminating user accounts in your account settings, if available, or by contacting us at&nbsp;info@serviceloop.com.&nbsp;&nbsp;</p>
+                        <p><strong>8.2 &nbsp;Without limiting</strong> any other provision of these Terms and Conditions, we reserve the right to, in our sole discretion and without notice or liability, deny access to and use of the Site and the Services (including blocking certain IP addresses), to any person for any reason including without limitation for breach of any representation, warranty or covenant contained in these Terms and Conditions or of any applicable law or regulation.&nbsp;&nbsp;</p>
+                        <p>If we determine, in our sole discretion, that your use of the Site/Services is in breach of these Terms and Conditions or of any applicable law or regulation, we may terminate your use or participation in the Site and the Services or delete&nbsp;your profile and&nbsp;any content or information that you posted at any time, without warning, in our sole discretion.&nbsp;&nbsp;</p>
+                        <p><strong>8.3 &nbsp;If we terminate</strong> or suspend your account for any reason set out in this Section 9, you are prohibited from registering and creating a new account under your name, a fake or borrowed name, or the name of any third party, even if you may be acting on behalf of the third party. In addition to terminating or suspending your account, we reserve the right to take appropriate legal action, including without limitation pursuing civil, criminal, and injunctive redress.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p><strong>9. Mobile Application &nbsp;&nbsp;</strong>&nbsp;&nbsp;</p>
+                        <p><strong>9.1 &nbsp;If you access</strong> the Services via a mobile application, then we grant you a revocable, non-exclusive, non-transferable, limited right to install and use the mobile application on wireless electronic devices owned or controlled by you, and to access and use the mobile application on such devices strictly in accordance with the terms and conditions of this license.&nbsp;&nbsp;</p>
+                        <p><strong>9.2 &nbsp;The following terms</strong> apply when you use a mobile application obtained from either the Apple Store or Google Play (each an App Distributor) to access the Services:&nbsp;</p>
+                        <p><strong>(a)</strong> The licence granted to you for our mobile application is limited to a non-transferable licence to use the application on a device that utilizes the Apple iOS or Android operating system, as applicable, and in accordance with the usage rules set forth in the applicable App Distributor terms of service;&nbsp;</p>
+                        <p><strong>(b)</strong> We are responsible for providing any maintenance and support services with respect to the mobile application as specified in these Terms and Conditions or as otherwise required under applicable law. You acknowledge that each App Distributor has no obligation whatsoever to furnish any maintenance and support services with respect to the mobile application;&nbsp;</p>
+                        <p><strong>(c)</strong> In the event of any failure of the mobile application to conform to any applicable warranty, you may notify an App Distributor, and the App Distributor, in accordance with its terms and policies, may refund the purchase price, if any, paid for the mobile application, and to the maximum extent permitted by applicable law, an App Distributor will have no other warranty obligation whatsoever with respect to the mobile application;&nbsp;</p>
+                        <p><strong>(d)</strong> You represent and warrant that (i) you are not located in a country that is subject to a U.S. government embargo, or that has been designated by the U.S. government as a &ldquo;terrorist supporting&rdquo; country; and (ii) you are not listed on any U.S. government list of prohibited or restricted parties;&nbsp;</p>
+                        <p><strong>(e)</strong> You must comply with applicable third party terms of agreement when using the mobile application, e.g., if you have a VoIP application, then you must not be in breach of their wireless data service agreement when using the mobile application; and&nbsp;</p>
+                        <p><strong>(f)</strong> You acknowledge and agree that the App Distributors are third party beneficiaries of these Terms and Conditions, and that each App Distributor will have the right (and will be deemed to have accepted the right) to enforce these Terms and Conditions against you as a third party beneficiary thereof.&nbsp;&nbsp;&nbsp;</p>
+                        <p><strong>10. General &nbsp;</strong>&nbsp; &nbsp; &nbsp;</p>
+                        <p><strong>10.1&nbsp;&nbsp;Visiting the Site</strong>, sending us emails, and completing online forms constitute electronic communications. You consent to receive electronic communications and you agree that all agreements, notices, disclosures, and other communications we provide to you electronically, via email and on the Site, satisfy any legal requirement that such communication be in writing.&nbsp;&nbsp;</p>
+                        <p>You hereby agree to the use of electronic signatures, contracts, orders and other records and to electronic delivery of notices, policies and records of transactions initiated or completed by us or via the Site.</strong>&nbsp;You hereby waive any rights or requirements under any statutes, regulations, rules, ordinances or other laws in any jurisdiction which require an original signature or delivery or retention of non-electronic records, or to payments or the granting of credits by other than electronic means.&nbsp;&nbsp;</p>
+                        <p><strong>10.2 &nbsp;These Terms and Conditions</strong> and any policies or operating rules posted by us on the Site or in respect to the Services constitute the entire agreement and understanding between you and us. &nbsp;&nbsp;</p>
+                        <p><strong>10.3 &nbsp;Our failure to exercise</strong> or enforce any right or provision of these Terms and Conditions shall not operate as a waiver of such right or provision. &nbsp;&nbsp;</p>
+                        <p><strong>10.4 &nbsp;We may assign</strong> any or all of our rights and obligations to others at any time. &nbsp;&nbsp;</p>
+                        <p><strong>10.5 &nbsp;We shall not be responsible</strong> or liable for any loss, damage, delay or failure to act caused by any cause beyond our reasonable control. &nbsp;&nbsp;</p>
+                        <p><strong>10.6 &nbsp;If any provision</strong> or part of a provision of these Terms and Conditions is unlawful, void or unenforceable, that provision or part of the provision is deemed severable from these Terms and Conditions and does not affect the validity and enforceability of any remaining provisions.&nbsp;&nbsp;</p>
+                        <p><strong>10.7 &nbsp;There is no joint venture</strong>, partnership, employment or agency relationship created between you and us as a result of these Terms and Conditions or use of the Site or Services.&nbsp;</p>
+                        <p><strong>10.8</strong> &nbsp;<strong><em>For consumers only&nbsp;</em></strong><em>&nbsp;- Please note that these Terms and Conditions, their subject matter and their formation, are governed by English law. You and we both agree that the courts of England and Wales will have exclusive jurisdiction expect that if you are a resident of Northern Ireland you may also bring proceedings in Northern Ireland, and if you are resident of Scotland, you may also bring proceedings in Scotland. If you have any complaint or wish to raise a dispute under these Terms and Conditions or otherwise in relation to the Site please follow this link</em>&nbsp;<a href="http://ec.europa.eu/odr"><em>http://ec.europa.eu/odr</em></a><em>&nbsp;</em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p><strong>10.9&nbsp;&nbsp;Except as stated</strong> under the Mobile Application section, a&nbsp;person who is not a party to these Terms and Conditions shall have no right under the Contracts (Rights of Third Parties) Act 1999 to enforce any term of these Terms and Conditions.&nbsp;</p>
+                        <p><strong>10.10 &nbsp;In order to resolve</strong> a complaint regarding the Services or to receive further information regarding use of the Services, please contact us by email at&nbsp;info@serviceloop.com&nbsp;or by post to:&nbsp;</p>
+                        <p><strong>Service Loop&nbsp;&nbsp;</p>
+                        <p>Dundalk,&nbsp;Louth,</p>
+                        <p>Ireland&nbsp;&nbsp;&nbsp;</strong></p>
+                        <p>&nbsp;</p>
+                        </ion-list>
+                        </ion-content>
+        `;
+
+    let modal_created = await createModal(controller, modal_text);
+
+    modal_created.present().then(() => {
+        currentModal = modal_created;
+
+        document.getElementById("modal_close").addEventListener('click', () => {
+            dismissModal(currentModal);
+        });
+    });
+}
+
+//Change password
+async function change_pass(modal_created) {
+    let change_pass_response;
+
+    if (document.getElementById('old_password').value == "" || document.getElementById('new_password').value == "" || document.getElementById('conf_new_password').value == "") {
+        create_ionic_alert("Change Password", "Please fill in all fields to reset password.", ["OK"]);
+    } else {
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        change_pass_response = await access_route({token: token, old_password: document.getElementById('old_password').value, new_password: document.getElementById('new_password').value, password_confirm: document.getElementById('conf_new_password').value, users_email: user.getEmail()}, "change_password");
+
+        if (!change_pass_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", change_pass_response.new_token);
+            }
+        }
+
+        if (change_pass_response.response !== 'Password changed') {
+            create_ionic_alert("Change Password", change_pass_response.response, ["OK"]);
+        } else {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+            delete_fingerprint(user.getEmail());
+            create_toast("Password changed.", "dark", 2000, toast_buttons);
+            modal_created.dismiss();
+        }
+    }
+
+}
+
+//Update Personal Information
+async function update_info(currentModal) {
+    let update_info_response;
+
+    if (document.getElementById('new_phone_number').value !== "") {
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        update_info_response = await access_route({token: token, user_phone_number: document.getElementById('new_phone_number').value, users_email: user.getEmail()}, "change_phone");
+
+        if (!update_info_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", update_info_response.new_token);
+            }
+        }
+
+        if (update_info_response.response === "Phone number is not valid") {
+            create_ionic_alert("Personal Information", "Please enter a valid phone number!", ["OK"]);
+        } else {
+            let toast_buttons = [
+                {
+                    side: 'end',
+                    text: 'Close',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ];
+
+            create_toast("Phone number updated", "dark", 2000, toast_buttons);
+            dismissModal(currentModal);
+        }
+    } else {
+        create_ionic_alert("Personal Information", "Please fill in your phone number to continue!", ["OK"]);
+    }
 }
 
 function convertDate(inputFormat) {

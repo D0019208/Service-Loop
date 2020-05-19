@@ -27,7 +27,7 @@ function load_profile_page(nav_controller) {
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
-            <ion-fab>
+            <ion-fab onclick="device_feedback();">
                 <ion-fab-button id="cameraTakePicture">
                   <ion-icon name="camera"></ion-icon>
                 </ion-fab-button>
@@ -131,7 +131,7 @@ function load_profile_page(nav_controller) {
           </ion-avatar>
             <div class='avatar'></div>
         </ion-item>
-            <ion-fab>
+            <ion-fab onclick="device_feedback();">
                 <ion-fab-button id="cameraTakePicture">
                   <ion-icon name="camera"></ion-icon>
                 </ion-fab-button>
@@ -179,9 +179,9 @@ function load_profile_page(nav_controller) {
 <ion-alert-controller></ion-alert-controller>
         `;
             }
-            
+
             //Add rating
-            for(let i = 1; i <= user.get_tutor_rating(); i++) {
+            for (let i = 1; i <= user.get_tutor_rating(); i++) {
                 document.querySelector(`#rating_container > span:nth-child(${i})`).classList.add('checked');
             }
 
@@ -244,7 +244,28 @@ function load_profile_page(nav_controller) {
                     home_avatar.src = "data:image/jpeg;base64," + imageData;
 
                     let response = new Promise(async (resolve, reject) => {
-                        resolve(await access_route({email: user.getEmail(), image: imageData}, "update_avatar"));
+                        let token;
+                        if (!localhost) {
+                            token = await get_secure_storage("jwt_session");
+                        } else {
+                            token = "";
+                        }
+
+                        let change_avatar_response = await access_route({token: token, email: user.getEmail(), image: imageData}, "update_avatar");
+
+                        if (!change_avatar_response.session_valid) {
+                            sessionStorage.setItem("session_timeout", true);
+                            window.location = "login.html";
+                            return;
+                        } else {
+                            if (!localhost) {
+                                set_secure_storage("jwt_session", change_avatar_response.new_token);
+                            }
+                        }
+                        
+                        document.getElementById('menu_avatar').src = change_avatar_response.avatar + "?" + performance.now();
+                        
+                        resolve(change_avatar_response.avatar);
                     })
 
                     user.setAvatar(response.user_avatar);
@@ -266,12 +287,13 @@ function load_profile_page(nav_controller) {
                 }
             }
 
-            //Displays edit skill page
-            document.getElementById("edit_skills").addEventListener("click", async function () {
-                device_feedback();
-                let controller = document.querySelector('ion-modal-controller');
+            if (user.getStatus() === "Tutor") {
+                //Displays edit skill page
+                document.getElementById("edit_skills").addEventListener("click", async function () {
+                    device_feedback();
+                    let controller = document.querySelector('ion-modal-controller');
 
-                let modal_content = `
+                    let modal_content = `
                 <ion-header translucent>
                   <ion-toolbar>
                     <ion-title>Edit subjects</ion-title>
@@ -283,7 +305,7 @@ function load_profile_page(nav_controller) {
                 <ion-content fullscreen> 
                       <ion-list lines="full" class="ion-no-margin ion-no-padding fields3">
                     <ion-item>
-                        <ion-select class="my-select" multiple="true" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
+                        <ion-select class="my-select" multiple="true" onclick="device_feedback()" selected-text="Click to edit subjects" cancel-text="Cancel" ok-text="save" id="profile_tutorial_modules" style="max-width:100%;">
                             <ion-select-option value="ASP.NET">ASP.NET</ion-select-option>
                             <ion-select-option value="CSS">CSS</ion-select-option>
                             <ion-select-option value="Databases">Databases</ion-select-option>
@@ -303,81 +325,99 @@ function load_profile_page(nav_controller) {
               </ion-content>
               `
 
-                let modal_created = await createModal(controller, modal_content);
+                    let modal_created = await createModal(controller, modal_content);
 
-                modal_created.present().then(() => {
-                    currentModal = modal_created;
+                    modal_created.present().then(() => {
+                        currentModal = modal_created;
 
-                    //Function that adds skill to the page
-                    function addItem() {
-                        device_feedback();
-                        var textInput = document.getElementById("profile_tutorial_modules");  //getting text input
-                        var skill = textInput.value;   //getting value of text input element
-                        var p = document.getElementById("p");  //getting element <ul> to add element to
-                        p.innerHTML = "";
-                        for (var i = 0; i < skill.length; i++) {
-                            var li = '<ion-chip outline color="primary"><ion-icon name="star"></ion-icon><ion-label class="add_skill_label skill">' + skill[i] + '</ion-label></ion-chip>';  //creating li element to add
-                            p.insertAdjacentHTML('afterbegin', li);    //inserting text into newly created <li> element
-                        }
-                    }
-                    //Moves select icon to the side
-                    setTimeout(function () {
-                        if (document.querySelector('.my-select') !== null) {
-                            document.querySelector('.my-select').shadowRoot.querySelector('.select-icon').setAttribute('style', 'position:absolute; right:10px; bottom:15px');
-                        }
-                    }, 100);
-                    //Runs addItem() function when user clicks save button in the select menu
-                    const ion_select = document.querySelector('ion-select');
-                    ion_select.addEventListener('ionChange', function () {
-                        addItem();
-                    });
-                    ion_select.value = user.getModules();
-
-                    document.getElementById('save_button').addEventListener('click', () => {
-                        device_feedback();
-                        let toast_buttons = [
-                            {
-                                side: 'end',
-                                text: 'Close',
-                                role: 'cancel',
-                                handler: () => {
-                                    console.log('Cancel clicked');
-                                }
+                        //Function that adds skill to the page
+                        function addItem() {
+                            var textInput = document.getElementById("profile_tutorial_modules");  //getting text input
+                            var skill = textInput.value;   //getting value of text input element
+                            var p = document.getElementById("p");  //getting element <ul> to add element to
+                            p.innerHTML = "";
+                            for (var i = 0; i < skill.length; i++) {
+                                var li = '<ion-chip outline color="primary"><ion-icon name="star"></ion-icon><ion-label class="add_skill_label skill">' + skill[i] + '</ion-label></ion-chip>';  //creating li element to add
+                                p.insertAdjacentHTML('afterbegin', li);    //inserting text into newly created <li> element
                             }
-                        ];
-                        //USE THIS TO REMOVE ELEMENT FROM MAIN PROFILE PAGE ON SAVE
-                        //console.log(document.getElementById('profile_skills').children);
-
-                        console.log(document.getElementById('p').children);
-                        let skills_array = [];
-                        let skills_list = document.getElementById('p').children;
-
-                        for (let i = 0; i < skills_list.length; i++) {
-                            skills_array.push(skills_list[i].innerText);
                         }
+                        //Moves select icon to the side
+                        setTimeout(function () {
+                            if (document.querySelector('.my-select') !== null) {
+                                document.querySelector('.my-select').shadowRoot.querySelector('.select-icon').setAttribute('style', 'position:absolute; right:10px; bottom:15px');
+                            }
+                        }, 100);
+                        //Runs addItem() function when user clicks save button in the select menu
+                        const ion_select = document.querySelector('ion-select');
+                        ion_select.addEventListener('ionChange', function () {
+                            addItem();
+                        });
+                        ion_select.value = user.getModules();
 
-                        console.log(skills_array);
+                        document.getElementById('save_button').addEventListener('click', async () => {
+                            device_feedback();
+                            let toast_buttons = [
+                                {
+                                    side: 'end',
+                                    text: 'Close',
+                                    role: 'cancel',
+                                    handler: () => {
+                                        console.log('Cancel clicked');
+                                    }
+                                }
+                            ];
 
-                        access_route({users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
-                        set_secure_storage("user_modules", skills_array);
-                        user.setModules(skills_array);
+                            let skills_array = [];
+                            let skills_list = document.getElementById('p').children;
 
-                        create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons);
+                            for (let i = 0; i < skills_list.length; i++) {
+                                skills_array.push(skills_list[i].innerText);
+                            }
 
-                        currentModal = dismissModal(currentModal);
+                            if (skills_array.length >= 1) {
+                                let token;
+                                if (!localhost) {
+                                    token = await get_secure_storage("jwt_session");
+                                } else {
+                                    token = "";
+                                }
 
-                        document.getElementById("profile_skills").innerHTML = "";  //update skills
-                        for (var i = 0; i < user.modules.length; i++) {
-                            document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
-                        }
+                                let change_skills_response = await access_route({token: token, users_email: user.getEmail(), skills: skills_array}, "edit_skills", false);
+
+                                if (!change_skills_response.session_valid) {
+                                    sessionStorage.setItem("session_timeout", true);
+                                    window.location = "login.html";
+                                    return;
+                                } else {
+                                    if (!localhost) {
+                                        set_secure_storage("jwt_session", change_skills_response.new_token);
+                                    }
+                                }
+
+
+                                set_secure_storage("user_modules", skills_array);
+                                user.setModules(skills_array);
+
+                                create_toast("Subjects saved successfully.", "dark", 2000, toast_buttons);
+
+                                currentModal = dismissModal(currentModal);
+
+                                document.getElementById("profile_skills").innerHTML = "";  //update skills
+                                for (var i = 0; i < user.modules.length; i++) {
+                                    document.getElementById('profile_skills').innerHTML += ('<ion-chip color="primary"><ion-icon name="star"></ion-icon><ion-label>' + user.modules[i] + '</ion-label></ion-chip>');
+                                }
+                            } else {
+                                create_ionic_alert("Change subjects", "You must offer to tutor at least 1 subject.", ["OK"]);
+                            }
+                        });
+
+                        document.getElementById("modal_close").addEventListener('click', () => {
+                            currentModal = dismissModal(currentModal);
+                        });
                     });
+                })
 
-                    document.getElementById("modal_close").addEventListener('click', () => {
-                        currentModal = dismissModal(currentModal);
-                    });
-                });
-            })
-
+            }
         }
 
         disconnectedCallback() {

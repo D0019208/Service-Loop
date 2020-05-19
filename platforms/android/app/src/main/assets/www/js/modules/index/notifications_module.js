@@ -1,42 +1,6 @@
 "use strict"
+var notifications_response
 let notification_posts_loaded = false;
-//Notifications
-//function appendItems(number, list, notifications) {
-//    console.log('length is', length);
-//    const originalLength = length;
-//    let read_class;
-//    console.log(notifications)
-//    for (var i = 0; i < number; i++) {
-//        const el = document.createElement('ion-list');
-//        console.log(notifications[i + originalLength])
-//        if (notifications[i + originalLength].notification_opened) {
-//            read_class = "read";
-//        } else {
-//            read_class = "not_read";
-//        }
-//
-//        el.classList.add('ion-activatable', 'ripple', read_class);
-//        el.innerHTML = `
-//                
-//                <ion-item lines="none" class="notification" notification_id="${notifications[i + originalLength]._id}" post_id="${notifications[i + originalLength].post_id}" notification_tags="${notifications[i + originalLength].notification_tags.join(', ')}" notification_modules="${notifications[i + originalLength].notification_modules.join(', ')}">
-//          <ion-avatar slot="start">
-//            <img src="${notifications[i + originalLength].notification_avatar}">
-//        </ion-avatar>
-//        <ion-label>
-//            <h2>${notifications[i + originalLength].notification_title}</h2>
-//            <span>${notifications[i + originalLength].notification_posted_on}</span>
-//            <p>${notifications[i + originalLength].notification_desc_trunc}</p>
-//        </ion-label>
-//            </ion-item>
-//            <ion-ripple-effect></ion-ripple-effect>
-//            
-//        `;
-//        list.appendChild(el);
-//
-//        length++;
-//    }
-//}
-
 const nav_notifications = document.getElementById('nav-notifications');
 let active_component;
 
@@ -63,11 +27,14 @@ customElements.get('nav-notifications') || customElements.define('nav-notificati
 
                     <ion-content fullscreen>
                         <!-- <h2><a href="login.html">Home</a></h2>-->
+                        
                         <ion-list>
                             <ion-list-header id="notifications_header">
                                 NOTIFICATIONS
-                            </ion-list-header><!--<p>Manage information about you...</p>-->
-
+                            </ion-list-header>
+                            <ion-refresher slot="fixed" id="notifications_refresher">
+                               <ion-refresher-content></ion-refresher-content>
+                            </ion-refresher>
                             <ion-list id="list"></ion-list>
 
                             <ion-infinite-scroll threshold="100px" id="infinite-scroll">
@@ -84,8 +51,6 @@ customElements.get('nav-notifications') || customElements.define('nav-notificati
         if (!notification_posts_loaded && document.getElementById('list').hasChildNodes() && active_component.component === "nav-notifications") {
             //Function to get all ids from the notifications list and find the posts associated with them
             notification_posts = await posts.getAllNotificationPosts();
-            console.log("Notification posts")
-            console.log(notification_posts);
             posts.set_notification_posts(notification_posts);
         } else {
             notification_posts = posts.get_notification_posts();
@@ -98,6 +63,39 @@ const list = document.getElementById('list');
 const infiniteScroll = document.getElementById('infinite-scroll');
 let number_of_notifications_to_add;
 
+//Refresher
+const notifications_refresher = document.getElementById('notifications_refresher');
+notifications_refresher.addEventListener('ionRefresh', async () => {
+    let token;
+    if (!localhost) {
+        token = await get_secure_storage("jwt_session");
+    } else {
+        token = "";
+    }
+
+    let load_more_response = await access_route({token: token, users_email: user.getEmail(), user_tutor: {is_tutor: user.getStatus(), user_modules: user.getModules()}}, "get_all_notifications", false);
+
+    if (!load_more_response.session_valid) {
+        sessionStorage.setItem("session_timeout", true);
+        window.location = "login.html";
+        return;
+    } else {
+        if (!localhost) {
+            set_secure_storage("jwt_session", load_more_response.new_token);
+        }
+    }
+
+    if (typeof load_more_response.response !== "string") {
+        notification_posts = await posts.getAllNotificationPosts();
+        posts.set_notification_posts(notification_posts);
+
+        //Update the user_notifications object with the new reloaded values
+        user_notifications.update_with_new_notifications(load_more_response.response);
+    }
+
+    notifications_refresher.complete();
+});
+
 if (user_notifications.getTotalNotifications() == 0) {
     document.getElementById("notifications_header").innerText = "YOU HAVE NO NOTIFICATIONS!";
 } else {
@@ -108,36 +106,34 @@ if (user_notifications.getTotalNotifications() == 0) {
      */
     infiniteScroll.addEventListener('ionInfinite', async function () {
         if (user_notifications.notifications_length < user_notifications.getAllNotifications().length - 1) {
-            console.log('Loading data...');
             await wait(500);
             infiniteScroll.complete();
 
-            if (user_notifications.getAllNotifications().length - user_notifications.notifications_length <= 7) {
+            if (user_notifications.getAllNotifications().length - user_notifications.notifications_length <= 10) {
                 number_of_notifications_to_add = user_notifications.getAllNotifications().length - user_notifications.notifications_length;
             } else {
-                number_of_notifications_to_add = 7;
+                number_of_notifications_to_add = 10;
             }
 
             user_notifications.appendNotifications(number_of_notifications_to_add, list);
-            console.log('Done');
 
             if (user_notifications.notifications_length > user_notifications.getAllNotifications().length - 1) {
-                console.log('No More Data');
                 infiniteScroll.disabled = true;
             }
         } else {
-            console.log('No More Data');
             infiniteScroll.disabled = true;
         }
     });
 
-    if (user_notifications.getAllNotifications().length <= 7) {
+    if (user_notifications.getAllNotifications().length <= 10) {
         user_notifications.appendNotifications(user_notifications.getAllNotifications().length, list);
     } else {
-        user_notifications.appendNotifications(7, list);
+        user_notifications.appendNotifications(10, list);
     }
 
 }
+
+
 
 
 
@@ -173,7 +169,25 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -281,8 +295,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial requested") && notification_tags.length !== 0) {
         device_feedback();
-        console.log("Notification <>")
-        console.log(notification);
 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
@@ -300,11 +312,33 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
         let nav_notification_tutorial_requested = document.createElement('nav-notification-tutorial-requested');
+
+        console.log(notification_posts);
+        console.log(this_post);
 
         if (typeof this_post === 'undefined') {
             nav_notification_tutorial_requested.innerHTML = `
@@ -411,7 +445,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -556,6 +609,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -573,6 +631,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -583,6 +646,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -593,6 +661,11 @@ document.querySelector('body').addEventListener('click', async function (event) 
                         device_feedback();
 
                         let tutorial_status = this_post.post_status;
+                        
+                        if (tutorial_status == "In negotiation") {
+                            tutorial_status = "Pending";
+                        }
+                        
                         let tutorial_tag = this_post.post_modules.join(', ');
                         load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
                     };
@@ -632,7 +705,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -729,7 +821,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
             let tutorial_status = this_post.post_status;
             let tutorial_tag = this_post.post_modules.join(', ');
 
-            if (tutorial_status == "In Negotiation") {
+            if (tutorial_status == "In negotiation") {
                 tutorial_status = "Pending";
             }
 
@@ -804,8 +896,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
 
                 if (notifications_active_component.component.tagName !== "NAV-NOTIFICATION") {
                     if (open_accepted_tutorial_post_button !== null && typeof open_accepted_tutorial_post_button !== 'undefined') {
-                        console.log("listener removed")
-                        console.log(open_accepted_tutorial_post_button)
                         open_accepted_tutorial_post_button.removeEventListener("click", accepted_tutorial_request_event_handler, false);
                     }
 
@@ -817,8 +907,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial agreement accepted") && notification_tags.length !== 0) {
         device_feedback();
-        console.log("Notification <>")
-        console.log(notification);
 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
@@ -836,7 +924,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -930,8 +1037,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial agreement rejected") && notification_tags.length !== 0) {
         device_feedback();
-        console.log("Notification <>")
-        console.log(notification);
 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
@@ -949,11 +1054,30 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
-        let nav_notification_tutorial_agreement_rejected = document.createElement('nav-notification-tutorial-agreement-accepted');
+        let nav_notification_tutorial_agreement_rejected = document.createElement('nav-notification-tutorial-agreement-rejected');
 
         if (typeof this_post === 'undefined') {
             nav_notification_tutorial_agreement_rejected.innerHTML = `
@@ -990,7 +1114,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
           <ion-content fullscreen class="ion-padding">
             <p>${this_notification.notification_desc}</p>
                 <div class="ion-padding-top">
-                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open post</ion-button>
+                   <ion-button expand="block" type="button" class="ion-no-margin" color="primary" id="open_tutorial_post">Open agreement form</ion-button>
                 </div>
           </ion-content>
         `;
@@ -1000,10 +1124,13 @@ document.querySelector('body').addEventListener('click', async function (event) 
             nav_notifications.push(nav_notification_tutorial_agreement_rejected);
             let tutorial_status = this_post.post_status;
             let tutorial_tag = this_post.post_modules.join(', ');
-
+            
+            if(tutorial_status === 'In negotiation') {
+                tutorial_status = "Pending";
+            }
+            
             let agreement_reject_event_handler = function () {
                 device_feedback();
-
 
                 if (user.getStatus() === "Student" && this_post.std_email.replace(/\s+$/, '') !== user.getEmail()) {
                     load_pending_tutorial_component(nav_notifications, this_post, tutorial_tag, tutorial_status);
@@ -1057,8 +1184,6 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial cancelled") && notification_tags.length !== 0) {
         device_feedback();
-        console.log("Notification <>")
-        console.log(notification);
 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
@@ -1076,7 +1201,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -1104,15 +1248,10 @@ document.querySelector('body').addEventListener('click', async function (event) 
         nav_notifications.push(nav_notification_tutorial_canceled);
     } else if (notification_tags.includes("Tutorial started") && notification_tags.length !== 0) {
         device_feedback();
-        console.log("Notification <>")
-        console.log(notification);
 
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
-        console.log("!yoyoyoyoy");
-        console.log(this_notification)
-        console.log(notification_posts)
 
         //We get the post that this notifiaction relates to by comparing the post id's
         for (let i = 0; i < notification_posts.length; i++) {
@@ -1126,7 +1265,26 @@ document.querySelector('body').addEventListener('click', async function (event) 
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -1226,7 +1384,7 @@ document.querySelector('body').addEventListener('click', async function (event) 
         }
     } else if (notification_tags.includes("Tutorial finished") && notification_tags.length !== 0) {
         device_feedback();
-    
+
         //Find a notification from notifications object that matches the ID of the clicked element.
         let this_notification = user_notifications.getNotificationDetailsById(notification.getAttribute('notification_id'));
         let this_post;
@@ -1237,17 +1395,32 @@ document.querySelector('body').addEventListener('click', async function (event) 
                 this_post = notification_posts[i];
             }
         }
-        
-        console.log("This post");
-        console.log(this_post);
-        console.log(notification_posts)
 
         if (!this_notification.notification_opened) {
             this_notification.notification_opened = true;
             user_notifications.subtractUnreadNotifications();
             notification.parentNode.classList.remove("not_read");
             notification.parentNode.classList.add("read");
-            access_route({notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            let token;
+            if (!localhost) {
+                token = await get_secure_storage("jwt_session");
+            } else {
+                token = "";
+            }
+
+            let set_read_response = await access_route({token: token, notification_id: notification.getAttribute('notification_id')}, "set_notification_to_read", false);
+
+            if (!set_read_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", set_read_response.new_token);
+                }
+            }
+
             user_notifications.updateNotification(this_notification, notification.getAttribute('notification_id'))
         }
 
@@ -1374,57 +1547,12 @@ document.querySelector('body').addEventListener('click', async function (event) 
 });
 
 function load_tutorial_accepted_component(this_post, notification_tags) {
-    console.log("Accepted post")
-    console.log(this_post);
-
     let tutorial_status = this_post.post_status;
     let tutorial_tag = this_post.post_modules.join(', ');
 
     if (tutorial_status == "In Negotiation") {
         tutorial_status = "Pending";
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//    tutor_tutorial_element.innerHTML = tutor_tutorial_element_html;
-//    nav.push(tutor_tutorial_element);
-//
-//    let generate_agreement_button;
-//    let generate_agreement_handler = async function () {
-//        device_feedback();
-//
-//        generate_agreement(tutorial);
-//    }
-//
-//    let ionNavDidChangeEvent = async function () {
-//        if (document.getElementById('signature-pad') !== null) {
-//            await include("js/signature_pad.min.js", "signature_pad");
-//            drawing_pad();
-//            generate_agreement_button = document.getElementById("generate_agreement");
-//            generate_agreement_button.addEventListener('click', generate_agreement_handler, false);
-//        }
-//
-//        let notifications_active_component = await nav.getActive();
-//
-//        if (notifications_active_component.component === "nav-my-tutorials") {
-//            generate_agreement_button.removeEventListener("click", generate_agreement_handler, false);
-//            nav.removeEventListener("ionNavDidChange", ionNavDidChangeEvent, false);
-//        }
-//    };
-//
-//    nav.addEventListener('ionNavDidChange', ionNavDidChangeEvent, false);
 
     if (this_post.post_agreement_offered) {
         load_post_agreement_offered_component(active_nav, this_post, tutorial_tag, tutorial_status);

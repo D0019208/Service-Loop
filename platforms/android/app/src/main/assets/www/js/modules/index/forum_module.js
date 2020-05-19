@@ -11,8 +11,25 @@ let posts_loaded = false;
 async function all_tutorials(nav) {
     //Check to see if we have already quereyd the database for posts, if not, we query
     if (!posts_loaded) {
-        console.log("dsfds")
-        posts_response = await access_route({email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+
+        posts_response = await access_route({token: token, email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+
+        if (!posts_response.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", posts_response.new_token);
+            }
+        }
+
         posts.addPosts(posts_response.response);
     }
 
@@ -40,7 +57,11 @@ async function all_tutorials(nav) {
                                                   <ion-list>
                                                       <ion-list-header id="posts_header">
                                                           ALL REQUESTED TUTORIALS
-                                                      </ion-list-header><!--<p>Manage information about you...</p>--> 
+                                                      </ion-list-header>
+            
+                                                        <ion-refresher slot="fixed" id="forum_refresher">
+                                                           <ion-refresher-content></ion-refresher-content>
+                                                        </ion-refresher>
 
                                                       <ion-infinite-scroll threshold="100px" id="forum-infinite-scroll">
                                                           <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
@@ -66,12 +87,42 @@ async function all_tutorials(nav) {
             //List element we are appending our tutorial requests to
             const list = document.getElementById('forum_list');
             const infiniteScroll = document.getElementById('forum-infinite-scroll');
+            const forum_refresher = document.getElementById('forum_refresher');
+
+            forum_refresher.addEventListener('ionRefresh', async () => {
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let load_more_response = await access_route({token: token, email: user.getEmail(), user_modules: user.getModules()}, "get_all_posts");
+
+                if (!load_more_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", load_more_response.new_token);
+                    }
+                }
+
+                if (typeof load_more_response.response !== "string") {
+                    //Update the posts object with the new reloaded values
+                    posts.update_with_new_posts(load_more_response);
+                }
+
+                forum_refresher.complete();
+            });
+
 
             //The number of posts we will add, this is calculated later
             let number_of_posts_to_add;
 
             //If there are no tutorial requests we display a message
-            if (posts.getTotalPosts() === 0) {
+            if (posts.getTotalPosts() === 0 || posts.all_posts.length === 0) {
                 document.getElementById("posts_header").innerText = "THERE ARE NO TUTORIAL REQUESTS!";
             } else {
                 /*
@@ -79,34 +130,27 @@ async function all_tutorials(nav) {
                  * the bottom, it appends new elements
                  */
                 infiniteScroll.addEventListener('ionInfinite', async function () {
-                    console.log(posts.posts_length)
-                    console.log(posts.getAllPosts().length);
-
                     if (posts.posts_length < posts.getAllPosts().length - 1) {
-                        console.log('Loading data...');
                         await wait(500);
                         infiniteScroll.complete();
 
                         number_of_posts_to_add = posts.getAllPosts().length - posts.posts_length;
 
                         posts.appendPosts(number_of_posts_to_add, list);
-                        console.log('Done');
 
                         if (posts.posts_length > posts.getAllPosts().length - 1) {
-                            console.log('No More Data');
                             infiniteScroll.disabled = true;
                         }
                     } else {
-                        console.log('No More Data');
                         infiniteScroll.disabled = true;
                     }
                 });
 
                 //If we have less than 7 tutorial requests we display all of them otherwise we display only 7
-                if (posts.getAllPosts().length <= 3) {
+                if (posts.getAllPosts().length <= 4) {
                     posts.appendPosts(posts.getAllPosts().length, list);
                 } else {
-                    posts.appendPosts(3, list);
+                    posts.appendPosts(4, list);
                 }
             }
 
@@ -120,17 +164,11 @@ async function all_tutorials(nav) {
                 document.querySelector('body').addEventListener('click', async function (event) {
                     //Get closest element with specified class
                     let post = getClosest(event.target, '.post');
-                    //let notification_tags = [];
-
-                    //If there exists an element with the specified target near the clicked 
-                    //if (notification !== null) {
-                    //    notification_tags.push(notification.getAttribute('notification_tags'));
-                    //}
                     let active_component = await nav.getActive();
-                    console.log(post);
+
                     //If we clicked on a post
                     //NEEDS TO BE CHANGED!!!!!!!
-                    if (post && active_component.component == "nav-all-tutorials") { 
+                    if (post && active_component.component == "nav-all-tutorials") {
                         //Find a post from posts object that matches the ID of the clicked element.
                         load_new_tutorial_request_component(nav, {post_id: post.getAttribute('post_id')}, {post: post, is_forum: true});
                     }

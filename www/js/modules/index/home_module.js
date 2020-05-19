@@ -18,7 +18,7 @@ var handler;
 
 var new_message_ping = new Audio('sounds/new_message.mp3');
 
-var localhost = false;
+var localhost = true;
 
 Element.prototype.appendAfter = function (element) {
     element.parentNode.insertBefore(this, element.nextSibling);
@@ -55,9 +55,9 @@ document.addEventListener(start, async function () {
 
     if (localhost) {
         //Set status of user to tutor
-//        user.setName("John Doe".replace(/\s+$/, ''));
-//        user.setStatus("Student");
-//        user.setEmail("D00192082@student.dkit.ie");
+        user.setName("John Doe".replace(/\s+$/, ''));
+        user.setStatus("Student");
+        user.setEmail("D00192082@student.dkit.ie");
 
         //Set status of user to tutor
         user.setName("Nichita Postolachi".replace(/\s+$/, ''));
@@ -71,10 +71,7 @@ document.addEventListener(start, async function () {
     } else {
         await user.check_session_local(user.getEmail())
     }
-    //If a user is a tutor, then he has modules he can offer and thus he can view the forum
-    //and he cannot apply to become a tutor again
 
-    console.log(notifications_response);
     //Define our Navigation controller for the home tab
     nav = document.getElementById('nav-home');
 
@@ -217,11 +214,11 @@ document.addEventListener(start, async function () {
     customElements.define('nav-home', class Home extends HTMLElement {
         async connectedCallback() {
             active_nav = nav;
-            document.getElementById('menu_avatar').src = user.getAvatar();
+            document.getElementById('menu_avatar').src = user.getAvatar() + "?" + performance.now();
 
             if (user.getStatus() === "Tutor") {
                 document.getElementById('apply_to_be_tutor_menu').classList.add('hide');
-                
+
                 if (!localhost) {
                     user.setModules(JSON.parse(await get_secure_storage("user_modules")));
                 } else {
@@ -310,14 +307,22 @@ document.addEventListener(start, async function () {
                             </div>
                     
                         </ion-content>`;
+                
+                let token;
+                if(!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+                
                 //We get all the users notifications based off his email and modules
-                notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: true, user_modules: user.getModules()}}, "get_all_notifications");
+                notifications_response = await access_route({token: token, users_email: user.getEmail(), user_tutor: {is_tutor: true, user_modules: user.getModules()}}, "get_all_notifications");
             } else {
                 document.getElementById('all_tutorial_requests_menu').classList.add('hide');
                 document.getElementById('all_tutorial_requests_menu').classList.add('hide');
                 document.getElementById('my_tutorials_menu').classList.add('hide');
-                
-                
+
+
                 home_component = `<ion-header translucent>
                             <ion-toolbar>
                                 <ion-buttons slot="start">
@@ -381,8 +386,25 @@ document.addEventListener(start, async function () {
                                 </ion-list>  
                             </div>
                         </ion-content>`;
+                
+                let token;
+                if(!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
                 //We get all the users notificatios based only on his email as the user is not a tutor
-                notifications_response = await access_route({users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications");
+                notifications_response = await access_route({token: token, users_email: user.getEmail(), user_tutor: {is_tutor: false, user_modules: user.getModules()}}, "get_all_notifications");
+            }
+
+            if (!notifications_response.session_valid) {
+                sessionStorage.setItem("session_timeout", true);
+                window.location = "login.html";
+                return;
+            } else {
+                if (!localhost) {
+                    set_secure_storage("jwt_session", notifications_response.new_token);
+                }
             }
 
             this.innerHTML = home_component;
@@ -507,7 +529,7 @@ document.addEventListener(start, async function () {
                 }
                 closeMenu();
             });
-            
+
             document.getElementById('apply_to_be_tutor_menu').addEventListener('click', async function () {
                 device_feedback();
 
@@ -572,8 +594,6 @@ document.addEventListener(start, async function () {
     });
 
     document.querySelector("ion-tabs").addEventListener('click', function (event) {
-        console.log("Which tab clicked?")
-        console.log(event)
         if (event.target.innerText == "Home" || event.target.parentNode.innerText == "Home") {
             device_feedback();
 

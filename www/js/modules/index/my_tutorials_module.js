@@ -25,19 +25,33 @@ function load_my_requested_tutorials(nav_controller) {
 
         async connectedCallback() {
             if (!my_requested_posts_loaded) {
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
                 let data = {
+                    token: token,
                     users_email: user.getEmail()
                 };
 
                 my_requested_posts_response = await access_route(data, "get_my_requested_posts");
+
+                if (!my_requested_posts_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", my_requested_posts_response.new_token);
+                    }
+                }
+
                 my_requested_posts_loaded = true;
 
                 tutorials = new Tutorials(user.getId(), my_requested_posts_response, user.getName(), user.getEmail(), user.getStatus(), user.getModules(), user.getSocket());
-
-                console.log(tutorials.open_tutorials);
-                console.log(tutorials.pending_tutorials);
-                console.log(tutorials.ongoing_tutorials);
-                console.log(tutorials.done_tutorials);
             }
 
             let html;
@@ -81,7 +95,11 @@ function load_my_requested_tutorials(nav_controller) {
                         NO OPEN TUTORIALS
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
+                    <ion-refresher slot="fixed" id="tutorials_refresher">
+                        <ion-refresher-content></ion-refresher-content>
+                    </ion-refresher>
+                    
                     <ion-infinite-scroll threshold="100px" id="open-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -93,7 +111,7 @@ function load_my_requested_tutorials(nav_controller) {
                         NO PENDING TUTORIALS
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -104,7 +122,7 @@ function load_my_requested_tutorials(nav_controller) {
                         NO ONGOING TUTORIALS  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -115,7 +133,7 @@ function load_my_requested_tutorials(nav_controller) {
                         NO DONE TUTORIALS  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -164,7 +182,11 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.open_tutorials.length ? "OPEN TUTORIALS" : "NO OPEN TUTORIALS"}
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
+                    <ion-refresher slot="fixed" id="tutorials_refresher">
+                        <ion-refresher-content></ion-refresher-content>
+                    </ion-refresher>
+                    
                     <ion-infinite-scroll threshold="100px" id="open-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -176,7 +198,7 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.pending_tutorials.length ? "PENDING TUTORIALS" : "NO PENDING TUTORIALS"} 
                     </ion-list-header> 
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="pending-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -187,7 +209,7 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.ongoing_tutorials.length ? "ONGOING TUTORIALS" : "NO ONGOING TUTORIALS"}  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="ongoing-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -198,7 +220,7 @@ function load_my_requested_tutorials(nav_controller) {
                         ${tutorials.done_tutorials.length ? "DONE TUTORIALS" : "NO DONE TUTORIALS"}  
                     </ion-list-header>  
                     <ion-icon color="primary" class="info" size="large" name="information-circle-outline"></ion-icon>
-                
+                    
                     <ion-infinite-scroll threshold="100px" id="done-tutorials-infinite-scroll">
                         <ion-infinite-scroll-content loading-spinner="bubbles" loading-text="Loading more data...">
                         </ion-infinite-scroll-content>
@@ -210,44 +232,6 @@ function load_my_requested_tutorials(nav_controller) {
             }
 
             this.innerHTML = html;
-//console.log(tutorials.create_tutorial_elements(tutorials.open_tutorials));
-//
-//
-//
-//
-//            let openReferenceNode = document.getElementById("open");
-//            let append_open_tutorials_list = document.createElement("ion-list");
-//            append_open_tutorials_list.setAttribute("id", "open_tutorials_list");
-//            append_open_tutorials_list.classList = "ion-activatable ripple offer";
-//
-//            // Insert the new node before the reference node
-//            openReferenceNode.parentNode.insertBefore(append_open_tutorials_list, openReferenceNode.nextSibling);
-//
-//            let pendingReferenceNode = document.getElementById("pending_tutorials_header");
-//            let append_pending_tutorials_list = document.createElement("ion-list");
-//            append_pending_tutorials_list.setAttribute("id", "open_tutorials_list");
-//            append_pending_tutorials_list.classList = "ion-activatable ripple offer";
-//
-//            // Insert the new node before the reference node
-//            pendingReferenceNode.parentNode.insertBefore(append_pending_tutorials_list, pendingReferenceNode.nextSibling);
-//
-//            let ongoingReferenceNode = document.getElementById("ongoing");
-//            let append_ongoing_tutorials_list = document.createElement("ion-list");
-//            append_ongoing_tutorials_list.setAttribute("id", "open_tutorials_list");
-//            append_ongoing_tutorials_list.classList = "ion-activatable ripple offer";
-//
-//            // Insert the new node before the reference node
-//            ongoingReferenceNode.parentNode.insertBefore(append_ongoing_tutorials_list, ongoingReferenceNode.nextSibling);
-//
-//            let doneReferenceNode = document.getElementById("done");
-//            let append_done_tutorials_infinite_scroll = document.createElement("ion-list");
-//            append_done_tutorials_infinite_scroll.setAttribute("id", "open_tutorials_list");
-//            append_done_tutorials_infinite_scroll.classList = "ion-activatable ripple offer";
-//
-//            // Insert the new node before the reference node
-//            doneReferenceNode.parentNode.insertBefore(append_done_tutorials_infinite_scroll, doneReferenceNode.nextSibling);
-
-
 
             //Ionic popover 
             let currentPopover = null;
@@ -258,6 +242,7 @@ function load_my_requested_tutorials(nav_controller) {
             }
 
             async function handleButtonClick(ev) {
+                device_feedback();
                 popover = await popoverController.create({
                     component: 'popover-example-page2',
                     event: ev,
@@ -297,20 +282,11 @@ function load_my_requested_tutorials(nav_controller) {
             //const open_tutorial_list = document.getElementById('open_tutorials_header');
             const openInfiniteScroll = document.getElementById('open-tutorials-infinite-scroll');
 
-
-            console.log("Tutorials")
-            console.log(tutorials);
-            console.log(tutorials.get_open_tutorials());
-
-
-
-
-
-            //If we have less than 3 tutorials we display all of them otherwise we display only 3
-            if (tutorials.get_open_tutorials().length <= 3) {
+            //If we have less than 7 tutorials we display all of them otherwise we display only 7
+            if (tutorials.get_open_tutorials().length <= 7) {
                 tutorials.open_tutorials_length = tutorials.appendPosts(tutorials.get_open_tutorials().length, openInfiniteScroll, tutorials.open_tutorials, tutorials.open_tutorials_length);
             } else {
-                tutorials.open_tutorials_length = tutorials.appendPosts(3, openInfiniteScroll, tutorials.open_tutorials, tutorials.open_tutorials_length);
+                tutorials.open_tutorials_length = tutorials.appendPosts(7, openInfiniteScroll, tutorials.open_tutorials, tutorials.open_tutorials_length);
             }
 
             const pendingInfiniteScroll = document.getElementById('pending-tutorials-infinite-scroll');
@@ -325,29 +301,120 @@ function load_my_requested_tutorials(nav_controller) {
             let number_of_ongoing_tutorials_to_add;
             let number_of_done_tutorials_to_add;
 
+            const tutorials_refresher = document.getElementById('tutorials_refresher');
+            tutorials_refresher.addEventListener('ionRefresh', async () => {
+                let token;
+                if (!localhost) {
+                    token = await get_secure_storage("jwt_session");
+                } else {
+                    token = "";
+                }
+
+                let load_more_response = await access_route({token: token, users_email: user.getEmail()}, "get_my_requested_posts", false);
+
+                if (!load_more_response.session_valid) {
+                    sessionStorage.setItem("session_timeout", true);
+                    window.location = "login.html";
+                    return;
+                } else {
+                    if (!localhost) {
+                        set_secure_storage("jwt_session", load_more_response.new_token);
+                    }
+                }
+
+                //Update the posts object with the new reloaded values
+                tutorials.refresh_tutorials(load_more_response);
+
+                tutorials_refresher.complete();
+            });
+
             openInfiniteScroll.addEventListener('ionInfinite', async function () {
                 if (tutorials.open_tutorials_length < tutorials.get_open_tutorials().length) {
-                    console.log('Loading data...');
                     await wait(500);
                     openInfiniteScroll.complete();
 
-                    if (tutorials.get_open_tutorials().length - tutorials.open_tutorials_length <= 3) {
+                    if (tutorials.get_open_tutorials().length - tutorials.open_tutorials_length <= 7) {
                         number_of_open_tutorials_to_add = tutorials.get_open_tutorials().length - tutorials.open_tutorials_length;
                     } else {
-                        number_of_open_tutorials_to_add = 3;
+                        number_of_open_tutorials_to_add = 7;
                     }
 
                     tutorials.open_tutorials_length = tutorials.appendPosts(number_of_open_tutorials_to_add, openInfiniteScroll, tutorials.open_tutorials, tutorials.open_tutorials_length);
 
-                    console.log('Done');
-
                     if (tutorials.open_tutorials_length >= tutorials.get_open_tutorials().length) {
-                        console.log('No More Open Data 2');
                         openInfiniteScroll.disabled = true;
                     }
                 } else {
-                    console.log('No More Open Data 1');
                     openInfiniteScroll.disabled = true;
+                }
+            });
+
+            pendingInfiniteScroll.addEventListener('ionInfinite', async function () {
+                console.log("pending tut length: " + tutorials.pending_tutorials_length)
+                console.log("num of posts " + tutorials.get_pending_tutorials().length)
+
+                if (tutorials.pending_tutorials_length < tutorials.get_pending_tutorials().length) {
+                    console.log("in")
+                    await wait(500);
+                    pendingInfiniteScroll.complete();
+
+                    if (tutorials.get_pending_tutorials().length - tutorials.pending_tutorials_length <= 7) {
+                        number_of_pending_tutorials_to_add = tutorials.get_pending_tutorials().length - tutorials.pending_tutorials_length;
+                    } else {
+                        number_of_pending_tutorials_to_add = 7;
+                    }
+
+                    tutorials.pending_tutorials_length = tutorials.appendPosts(number_of_pending_tutorials_to_add, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
+
+                    if (tutorials.pending_tutorials_length >= tutorials.get_pending_tutorials().length) {
+                        console.log("idk? in")
+                        pendingInfiniteScroll.disabled = true;
+                    }
+                } else {
+                    console.log("out");
+                    pendingInfiniteScroll.disabled = true;
+                }
+            });
+
+            ongoingInfiniteScroll.addEventListener('ionInfinite', async function () {
+                if (tutorials.ongoing_tutorials_length < tutorials.get_ongoing_tutorials().length) {
+                    await wait(500);
+                    ongoingInfiniteScroll.complete();
+
+                    if (tutorials.get_ongoing_tutorials().length - tutorials.ongoing_tutorials_length <= 7) {
+                        number_of_ongoing_tutorials_to_add = tutorials.get_ongoing_tutorials().length - tutorials.ongoing_tutorials_length;
+                    } else {
+                        number_of_ongoing_tutorials_to_add = 7;
+                    }
+
+                    tutorials.ongoing_tutorials_length = tutorials.appendPosts(number_of_ongoing_tutorials_to_add, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
+
+                    if (tutorials.ongoing_tutorials_length >= tutorials.get_ongoing_tutorials().length) {
+                        ongoingInfiniteScroll.disabled = true;
+                    }
+                } else {
+                    ongoingInfiniteScroll.disabled = true;
+                }
+            });
+
+            doneInfiniteScroll.addEventListener('ionInfinite', async function () {
+                if (tutorials.done_tutorials_length < tutorials.get_done_tutorials().length) {
+                    await wait(500);
+                    doneInfiniteScroll.complete();
+
+                    if (tutorials.get_done_tutorials().length - tutorials.done_tutorials_length <= 7) {
+                        number_of_done_tutorials_to_add = tutorials.get_done_tutorials().length - tutorials.done_tutorials_length;
+                    } else {
+                        number_of_done_tutorials_to_add = 7;
+                    }
+
+                    tutorials.done_tutorials_length = tutorials.appendPosts(number_of_done_tutorials_to_add, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
+
+                    if (tutorials.done_tutorials_length >= tutorials.get_done_tutorials().length) {
+                        doneInfiniteScroll.disabled = true;
+                    }
+                } else {
+                    doneInfiniteScroll.disabled = true;
                 }
             });
 
@@ -377,44 +444,19 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener 
-                        if (!my_requested_posts_pending_loaded || document.getElementById('pending').childElementCount <= 3) {
-                            //If we have less than 3 tutorials we display all of them otherwise we display only 3 
-                            if (tutorials.get_pending_tutorials().length <= 3) {
+                        if (!my_requested_posts_pending_loaded || document.getElementById('pending').childElementCount <= 7) {
+                            //If we have less than 7 tutorials we display all of them otherwise we display only 7 
+                            if (tutorials.get_pending_tutorials().length <= 7) {
                                 tutorials.pending_tutorials_length = tutorials.appendPosts(tutorials.get_pending_tutorials().length, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
-                            } else if (document.getElementById('pending').childElementCount <= 3) {
-                                if (tutorials.total_done_tutorials >= 3) {
-                                    tutorials.done_tutorials_length = tutorials.appendPosts(3, pendingInfiniteScroll, tutorials.pending_tutorials, 0);
+                            } else if (document.getElementById('pending').childElementCount <= 7) {
+                                if (tutorials.total_pending_tutorials >= 7) {
+                                    tutorials.pending_tutorials_length = tutorials.appendPosts(7, pendingInfiniteScroll, tutorials.pending_tutorials, 0);
                                 } else {
-                                    tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.total_pending_tutorials, pendingInfiniteScroll, tutorials.pending_tutorials, 0);
+                                    tutorials.pending_tutorials_length = tutorials.appendPosts(tutorials.total_pending_tutorials, pendingInfiniteScroll, tutorials.pending_tutorials, 0);
                                 }
                             } else {
-                                tutorials.pending_tutorials_length = tutorials.appendPosts(3, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
+                                tutorials.pending_tutorials_length = tutorials.appendPosts(7, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
                             }
-
-                            pendingInfiniteScroll.addEventListener('ionInfinite', async function () {
-                                if (tutorials.pending_tutorials_length < tutorials.get_pending_tutorials().length) {
-                                    console.log('Loading data...');
-                                    await wait(500);
-                                    pendingInfiniteScroll.complete();
-
-                                    if (tutorials.get_pending_tutorials().length - tutorials.pending_tutorials_length <= 3) {
-                                        number_of_pending_tutorials_to_add = tutorials.get_pending_tutorials().length - tutorials.pending_tutorials_length;
-                                    } else {
-                                        number_of_pending_tutorials_to_add = 3;
-                                    }
-
-                                    tutorials.pending_tutorials_length = tutorials.appendPosts(number_of_pending_tutorials_to_add, pendingInfiniteScroll, tutorials.pending_tutorials, tutorials.pending_tutorials_length);
-                                    console.log('Done');
-
-                                    if (tutorials.pending_tutorials_length >= tutorials.get_pending_tutorials().length) {
-                                        console.log('No More Pending Data 2');
-                                        pendingInfiniteScroll.disabled = true;
-                                    }
-                                } else {
-                                    console.log('No More Pending Data 1');
-                                    pendingInfiniteScroll.disabled = true;
-                                }
-                            });
 
                             my_requested_posts_pending_loaded = true;
                         }
@@ -429,44 +471,19 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.done.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_ongoing_loaded || document.getElementById('ongoing').childElementCount <= 3) {
-                            //If we have less than 3 tutorials we display all of them otherwise we display only 3 
-                            if (tutorials.get_ongoing_tutorials().length <= 3) {
+                        if (!my_requested_posts_ongoing_loaded || document.getElementById('ongoing').childElementCount <= 7) {
+                            //If we have less than 7 tutorials we display all of them otherwise we display only 3 
+                            if (tutorials.get_ongoing_tutorials().length <= 7) {
                                 tutorials.ongoing_tutorials_length = tutorials.appendPosts(tutorials.get_ongoing_tutorials().length, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
-                            } else if (document.getElementById('ongoing').childElementCount <= 3) {
-                                if (tutorials.total_done_tutorials >= 3) {
-                                    tutorials.done_tutorials_length = tutorials.appendPosts(3, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
+                            } else if (document.getElementById('ongoing').childElementCount <= 7) {
+                                if (tutorials.total_done_tutorials >= 7) {
+                                    tutorials.ongoing_tutorials_length = tutorials.appendPosts(7, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
                                 } else {
-                                    tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.total_ongoing_tutorials, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
+                                    tutorials.ongoing_tutorials_length = tutorials.appendPosts(tutorials.total_ongoing_tutorials, ongoingInfiniteScroll, tutorials.ongoing_tutorials, 0);
                                 }
                             } else {
-                                tutorials.ongoing_tutorials_length = tutorials.appendPosts(3, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
+                                tutorials.ongoing_tutorials_length = tutorials.appendPosts(7, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
                             }
-
-                            ongoingInfiniteScroll.addEventListener('ionInfinite', async function () {
-                                if (tutorials.ongoing_tutorials_length < tutorials.get_ongoing_tutorials().length) {
-                                    console.log('Loading data...');
-                                    await wait(500);
-                                    ongoingInfiniteScroll.complete();
-
-                                    if (tutorials.get_ongoing_tutorials().length - tutorials.ongoing_tutorials_length <= 3) {
-                                        number_of_ongoing_tutorials_to_add = tutorials.get_ongoing_tutorials().length - tutorials.ongoing_tutorials_length;
-                                    } else {
-                                        number_of_ongoing_tutorials_to_add = 3;
-                                    }
-
-                                    tutorials.ongoing_tutorials_length = tutorials.appendPosts(number_of_ongoing_tutorials_to_add, ongoingInfiniteScroll, tutorials.ongoing_tutorials, tutorials.ongoing_tutorials_length);
-                                    console.log('Done');
-
-                                    if (tutorials.ongoing_tutorials_length >= tutorials.get_ongoing_tutorials().length) {
-                                        console.log('No More Pending Data 2');
-                                        ongoingInfiniteScroll.disabled = true;
-                                    }
-                                } else {
-                                    console.log('No More Pending Data 1');
-                                    ongoingInfiniteScroll.disabled = true;
-                                }
-                            });
 
                             my_requested_posts_ongoing_loaded = true;
                         }
@@ -481,44 +498,19 @@ function load_my_requested_tutorials(nav_controller) {
                         segment_elements.open.classList.add("hide");
 
                         //Add the infinite scroll listener
-                        if (!my_requested_posts_done_loaded || document.getElementById('done').childElementCount <= 3) {
-                            //If we have less than 3 tutorials we display all of them otherwise we display only 3 
-                            if (tutorials.get_done_tutorials().length <= 3 && document.getElementById('done').childElementCount > 3) {
+                        if (!my_requested_posts_done_loaded || document.getElementById('done').childElementCount <= 7) {
+                            //If we have less than 7 tutorials we display all of them otherwise we display only 7 
+                            if (tutorials.get_done_tutorials().length <= 7) {
                                 tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.get_done_tutorials().length, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
-                            } else if (document.getElementById('done').childElementCount <= 3) {
-                                if (tutorials.total_done_tutorials >= 3) {
-                                    tutorials.done_tutorials_length = tutorials.appendPosts(3, doneInfiniteScroll, tutorials.done_tutorials, 0);
+                            } else if (document.getElementById('done').childElementCount <= 7) {
+                                if (tutorials.total_done_tutorials >= 7) {
+                                    tutorials.done_tutorials_length = tutorials.appendPosts(7, doneInfiniteScroll, tutorials.done_tutorials, 0);
                                 } else {
                                     tutorials.done_tutorials_length = tutorials.appendPosts(tutorials.total_done_tutorials, doneInfiniteScroll, tutorials.done_tutorials, 0);
                                 }
                             } else {
-                                tutorials.done_tutorials_length = tutorials.appendPosts(3, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
+                                tutorials.done_tutorials_length = tutorials.appendPosts(7, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
                             }
-
-                            doneInfiniteScroll.addEventListener('ionInfinite', async function () {
-                                if (tutorials.done_tutorials_length < tutorials.get_done_tutorials().length) {
-                                    console.log('Loading data...');
-                                    await wait(500);
-                                    doneInfiniteScroll.complete();
-
-                                    if (tutorials.get_done_tutorials().length - tutorials.done_tutorials_length <= 3) {
-                                        number_of_done_tutorials_to_add = tutorials.get_done_tutorials().length - tutorials.done_tutorials_length;
-                                    } else {
-                                        number_of_done_tutorials_to_add = 3;
-                                    }
-
-                                    tutorials.done_tutorials_length = tutorials.appendPosts(number_of_done_tutorials_to_add, doneInfiniteScroll, tutorials.done_tutorials, tutorials.done_tutorials_length);
-                                    console.log('Done');
-
-                                    if (tutorials.done_tutorials_length >= tutorials.get_done_tutorials().length) {
-                                        console.log('No More Pending Data 2');
-                                        doneInfiniteScroll.disabled = true;
-                                    }
-                                } else {
-                                    console.log('No More Pending Data 1');
-                                    doneInfiniteScroll.disabled = true;
-                                }
-                            });
 
                             my_requested_posts_done_loaded = true;
                         }
@@ -530,8 +522,6 @@ function load_my_requested_tutorials(nav_controller) {
                 document.querySelector('body').addEventListener('click', async function (event) {
                     //Get closest element with specified class
                     let tutorial = getClosest(event.target, '.test');
-
-                    console.log(tutorial);
 
                     //If there exists an element with the specified target near the clicked 
                     if (tutorial) {

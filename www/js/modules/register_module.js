@@ -43,15 +43,11 @@ async function send_verification_sms(route) {
 
         //if error is set to 'true', we show an error message
         if (content.status === "SUCCESS") {
-            console.log(content)
             return content;
         } else {
-            console.log(content)
-            //window.location.href = "login.html";
             return content;
         }
     } catch (ex) {
-        console.log(ex)
         create_ionic_alert("Error", ex, ["OK"]);
     }
 }
@@ -87,14 +83,11 @@ async function verify_sms_code(token, code, verification_phone_number, currentMo
 
         //Extract the reponse as JSON
         const content = JSON.parse(await rawResponse.json());
-        console.log(content)
-        console.log(typeof content)
+
         //if error is set to 'true', we show an error message
         if (content.status === "SUCCESS") {
             return content;
         } else {
-            console.log(content);
-            //window.location.href = "login.html";
             return content;
         }
     } catch (ex) {
@@ -289,8 +282,7 @@ async function sms_verification_setup() {
             
             //Wait for the function to finish checking on the server whether the code is correct
             let sms_verification_response = await verify_sms_code(token, document.getElementById('4_digit_verifier').value, document.getElementById('users_phone_number').value);
-            console.log(sms_verification_response);
-            console.log("^^^l^^^^")
+
             //If the status of the response is not "SUCCESS", that means an error has occured and we handle it in this function
             if (sms_verification_response.status !== "SUCCESS") {
                 //Handle error
@@ -302,11 +294,8 @@ async function sms_verification_setup() {
 
         //If the user loses their code, we can resend it
         document.getElementById("resend_sms").addEventListener('click', async () => {
-            //device_feedback();
-            
             //We pass in a different route to resend code
             sms_response = await send_verification_sms("send_sms_verification");
-            console.log(sms_response)
 
             if (sms_response.status !== "SUCCESS") {
                 sms_verification_errors(sms_response);
@@ -316,7 +305,6 @@ async function sms_verification_setup() {
         });
 
         document.getElementById("modal_close").addEventListener('click', () => {
-            //device_feedback();
             dismissModal(currentModal);
         });
     });
@@ -350,7 +338,6 @@ function create_new_user() {
 
             //Extract the reponse as JSON
             const content = JSON.parse(await rawResponse.json());
-            console.log(content);
 
             //if error is set to 'true', we show an error message
             if (content.error) {
@@ -394,7 +381,6 @@ async function verify_registration_input() {
 
     //Extract the reponse as JSON
     const content = JSON.parse(await rawResponse.json());
-    console.log(content);
 
     //if error is set to 'true', we show an error message
     if (content.error) {

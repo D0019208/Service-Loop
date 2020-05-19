@@ -22,6 +22,39 @@ document.addEventListener("deviceready", function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
+    if (sessionStorage.getItem('session_timeout') !== null) {
+        sessionStorage.removeItem('session_timeout');
+        
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+        create_toast("Session has timed out", "dark", 2000, toast_buttons);
+    }
+
+    let pass_reset = (sessionStorage.getItem("pass_reset") === "true");
+
+    if (pass_reset) {
+        sessionStorage.removeItem("pass_reset");
+
+        let toast_buttons = [
+            {
+                side: 'end',
+                text: 'Close',
+                role: 'cancel',
+                handler: () => {
+                    console.log('Cancel clicked');
+                }
+            }
+        ];
+        create_toast("Password has been reset", "dark", 2000, toast_buttons);
+    }
 
     let fingerprint_active = false;
 

@@ -2,7 +2,6 @@ class Posts extends User {
     constructor(id, posts, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, socket) {
         super(id, name, email, status, modules, avatar, open_tutorials, pending_tutorials, ongoing_tutorials, done_tutorials, tutored_pending_tutorials, tutored_ongoing_tutorials, tutored_done_tutorials, 0, socket);
 
-
         this.all_posts = posts.response;
 
         //Check to see if there are any posts (If empty, there will be a string)
@@ -14,7 +13,41 @@ class Posts extends User {
 
         this.posts_length = 0;
         this.notification_posts = [];
-        console.log(this.all_posts);
+    }
+
+    async update_with_new_posts(posts) {
+        this.all_posts = posts.response;
+        this.posts_length = 0;
+
+        //Check to see if there are any posts (If empty, there will be a string)
+        if (typeof posts.response !== "string") {
+            this.total_posts = this.all_posts.length;
+            document.getElementById('posts_header').innerText = "ALL REQUESTED TUTORIALS";
+        } else {
+            this.total_posts = 0;
+            document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
+        }
+
+        document.getElementById('forum_list').innerHTML = "";
+        if (this.total_posts > 7) {
+            this.appendPosts(7, document.getElementById('forum_list'));
+        } else {
+            this.appendPosts(this.total_posts, document.getElementById('forum_list'));
+        }
+
+        notification_posts = await this.getAllNotificationPosts();
+        console.log(notification_posts)
+    }
+
+    append_unique_posts(posts) {
+        let context = this;
+
+        //Get all new notifications
+        let new_posts = posts.filter(new_post => context.all_posts.map(old_post => old_post._id).indexOf(new_post._id) === -1);
+
+        new_posts.filter((post) => {
+            context.addToPosts(post);
+        });
     }
 
     set_notification_posts(notification_posts) {
@@ -26,24 +59,13 @@ class Posts extends User {
     }
 
     appendPosts(number, list) {
-        console.log("rgrfdbgfjkg")
         let posts = this.getAllPosts();
-
-        console.log('length is', this.posts_length);
         const originalLength = this.posts_length;
 
         for (var i = 0; i < number; i++) {
             const el = document.createElement('ion-list');
             el.className = "ion-activatable ripple";
-
-//            if (posts[i + originalLength].notification_opened) {
-//                read_class = "read";
-//            } else {
-//                read_class = "not_read";
-//            }
-
             el.classList.add('ion-activatable', 'ripple', "not_read");
-
             el.innerHTML = `
                 <ion-card onclick="device_feedback();" class="test post" post_id="${posts[i + originalLength]._id}" post_modules="${posts[i + originalLength].post_modules.join(', ')}">
                         <ion-item lines="full">
@@ -70,32 +92,22 @@ class Posts extends User {
             
         `;
             list.prepend(el)
-            //list.appendChild(el);
-
             this.posts_length += 1;
         }
     }
 
-    //Array
     addPosts(posts) {
-        console.log(posts);
-        console.log(this.all_posts.length)
-
         if (posts !== "There are no posts to display!") {
             if (this.all_posts.length === 0) {
-                console.log("d")
                 for (let i = 0; i < posts.length; i++) {
                     this.all_posts.push(posts[i]);
                 }
-
-                console.log(this.all_posts)
             } else {
                 this.all_posts = posts;
             }
 
             this.setTotalPosts();
         }
-
     }
 
     getPostDetailsById(post_id) {
@@ -123,7 +135,6 @@ class Posts extends User {
     }
 
     addToPosts(post) {
-        console.log(this.all_posts)
         if (this.all_posts == "There are no posts to display!") {
             this.all_posts = [post];
         } else {
@@ -142,7 +153,7 @@ class Posts extends User {
             const el = document.createElement('ion-list');
             el.classList.add('ion-activatable', 'ripple', 'not_read');
             el.innerHTML = `
-                <ion-card class="test post" post_id="${post._id}" post_modules="${post.post_modules.join(', ')}">
+                <ion-card onclick="device_feedback();" class="test post" post_id="${post._id}" post_modules="${post.post_modules.join(', ')}">
                         <ion-item lines="full">
                             <ion-avatar slot="start">
                                 <img src="${post.std_avatar}">
@@ -191,8 +202,6 @@ class Posts extends User {
             create_toast("New tutorial request available.", "dark", 3000, toast_buttons);
             new_message_ping.play();
             this.addToPosts(data.response);
-            //Add notification
-            console.log(data);
         });
 
 //        socket.on('tutorial_request_accepted', (data) => {
@@ -200,10 +209,6 @@ class Posts extends User {
 //            //Add notification
 //            console.log(data);
 //        });
-
-        socket.on('news', function (data) {
-            console.log(data);
-        });
     }
 
     waitForTutorialAccepted() {
@@ -224,29 +229,27 @@ class Posts extends User {
             create_toast("A tutorial has been accepted!", "dark", 3000, toast_buttons);
             new_message_ping.play();
             user_notifications.addToNotifications(data.the_notification.response);
-            //Add notification
-            console.log(data);
         });
     }
 
-    removePostById(id) {
+    removePostById(id, is_notifications = false) {
         if (this.all_posts.length !== 0) {
             this.all_posts = this.all_posts.filter(function (obj) {
                 return obj._id !== id;
             });
         }
 
-        console.log(this.total_posts)
         this.total_posts--;
-        console.log(this.total_posts)
-        console.log("Remove by id")
-        console.log(this.all_posts);
 
-        if (typeof document.getElementById('forum_list') !== 'undefined') {
-            document.querySelector('[post_id="' + id + '"]').parentNode.remove();
+        if (typeof document.getElementById('forum_list') !== 'undefined' && !is_notifications) {
+            if (document.querySelector('[post_id="' + id + '"]') !== null) {
+                document.querySelector('[post_id="' + id + '"]').parentNode.remove();
+            }
 
             if (this.all_posts.length == 0) {
-                document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
+                if (document.getElementById('posts_header') !== null) {
+                    document.getElementById('posts_header').innerText = "THERE ARE NO TUTORIAL REQUESTS!";
+                }
             }
         }
     }
@@ -266,8 +269,6 @@ class Posts extends User {
     }
 
     getNotificationPostDetailsById(id) {
-        console.log("Notification post>>");
-        console.log(this.notification_posts)
         for (let i = 0; i < this.notification_posts.length; i++) {
             if (this.notification_posts[i]._id == id) {
                 return this.notification_posts[i];
@@ -278,15 +279,32 @@ class Posts extends User {
     async getAllNotificationPosts() {
         //The list containing all the notifications
         let notification_list = user_notifications.getAllNotifications();
-        console.log("maryamrya")
-        console.log(notification_list)
+        let notification_posts;
         let post_ids = [];
 
         for (let i = 0; i < notification_list.length; i++) {
             post_ids.push(notification_list[i].post_id);
         }
-console.log(post_ids)
-        let notification_posts = await access_route({notification_posts_id: post_ids}, "get_notification_posts");
+        
+        let token;
+        if (!localhost) {
+            token = await get_secure_storage("jwt_session");
+        } else {
+            token = "";
+        }
+        
+        notification_posts = await access_route({token: token, notification_posts_id: post_ids}, "get_notification_posts");
+        
+        if (!notification_posts.session_valid) {
+            sessionStorage.setItem("session_timeout", true);
+            window.location = "login.html";
+            return;
+        } else {
+            if (!localhost) {
+                set_secure_storage("jwt_session", notification_posts.new_token);
+            }
+        }
+        
         return notification_posts.response;
     }
 
